@@ -1,3 +1,6 @@
+#ifndef TF_STACK_H
+#define TF_STACK_H
+
 namespace tf {
 
 template <class T>
@@ -61,4 +64,6 @@ public:
     }
 };
 
-};
+}
+
+#endif
