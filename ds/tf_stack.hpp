@@ -21,6 +21,10 @@ public:
         capacity(capacity),
         top(nullptr) {}
 
+    stack(const T &value, int capacity = 10):
+        capacity(capacity),
+        top(new stack_item(value)) {}
+
     ~stack() {
         close();
     }
