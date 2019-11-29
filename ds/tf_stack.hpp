@@ -32,15 +32,18 @@ public:
         close();
     }
 
+    // O(1)
     void put(const T &value) {
         stack_item *item = new stack_item(value, top);
         top = item;
     }
 
+    // O(1)
     T &peek() {
         return top->value;
     }
 
+    // O(1)
     T pop() {
         T value = top->value;
 
@@ -51,10 +54,12 @@ public:
         return value;
     }
 
+    // O(1)
     bool empty() {
         return top == nullptr;
     }
 
+    // O(n)
     void close() {
         while (!empty()) {
             stack_item *prev_top = top;

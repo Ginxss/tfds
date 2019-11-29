@@ -1,7 +1,6 @@
 #ifndef TF_ARRAY_H
 #define TF_ARRAY_H
 
-#include <cstdio> // printf
 #include <cstdlib> // malloc
 
 namespace tf {
@@ -12,6 +11,7 @@ private:
     int capacity;
     T *buffer;
 
+    // O(1) - O(n) if index > capacity
     void check_size(const int index) {
         if (index >= capacity) {
             capacity *= 2;
@@ -28,24 +28,28 @@ public:
         close();
     }
 
+    // O(1) - O(n) if index > capacity
     void insert(const int index, const T &value) {
         check_size(index);
         buffer[index] = value;
     }
 
+    // O(1) - O(n) if index > capacity
     T &get(const int index) const {
         check_size(index);
         return buffer[index];
     }
 
-    void close() {
-        if (buffer)
-            free(buffer);
-    }
-
+    // O(1) - O(n) if index > capacity
     T &operator[](const int index) const {
         check_size(index);
         return buffer[index];
+    }
+
+    // O(1)
+    void close() {
+        if (buffer)
+            free(buffer);
     }
 };
 
