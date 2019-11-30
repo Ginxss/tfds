@@ -18,20 +18,37 @@ private:
             next(next) {}
     };
 
+    // Provides standard iteration interface - everything O(1)
+    class iterator {
+    public:
+        node *nd;
+
+        T &operator*() { return nd->value; }
+        void operator++() { nd = nd->next; }
+        void operator--() { nd = nd->prev; }
+        bool operator!=(const iterator &other) { return nd != other.nd; }
+    };
+
     node *start_node;
     node *end_node;
+    int length_;
+    
+    iterator start_it;
+    iterator end_it;
 
 public:
     linked_list():
         start_node(nullptr),
-        end_node(nullptr) {}
+        end_node(nullptr),
+        length_(0) {}
 
     linked_list(const T& value):
         start_node(new node(value)),
-        end_node(start_node) {}
+        end_node(start_node),
+        length_(1) {}
 
     ~linked_list() {
-        close();
+        clear();
     }
 
     // O(1)
@@ -44,6 +61,8 @@ public:
             end_node->next = new node(value, end_node);
             end_node = end_node->next;
         }
+
+        length_++;
     }
 
     // O(n) - O(1) for first and last element
@@ -52,12 +71,16 @@ public:
             return;
         
         if (start_node->value == value) {
+            length_--;
             node *to_delete = start_node;
-            start_node = start_node->next;
-            start_node->prev = nullptr;
+            if (start_node->next) {
+                start_node = start_node->next;
+                start_node->prev = nullptr;
+            }
             delete to_delete;
         }
         else if (end_node->value == value) {
+            length_--;
             node *to_delete = end_node;
             end_node = end_node->prev;
             end_node->next = nullptr;
@@ -68,6 +91,7 @@ public:
 
             while (it) {
                 if (it->value == value) {
+                    length_--;
                     it->prev->next = it->next;
                     it->next->prev = it->prev;
                     delete it;
@@ -80,15 +104,46 @@ public:
     }
 
     // O(1)
-    bool empty() const {
-        return start_node == nullptr;
+    iterator begin() {
+        start_it.nd = start_node;
+        return start_it;
+    }
+
+    // O(1)
+    iterator end() {
+        end_it.nd = nullptr;
+        return end_it;
     }
 
     // O(n)
-    void close() {
+    bool contains(const T &value) const {
         node *it = start_node;
 
         while (it) {
+            if (it->value == value) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    // O(1)
+    int length() const {
+        return length_;
+    }
+
+    // O(1)
+    bool empty() const {
+        return length_ == 0;
+    }
+
+    // O(n)
+    void clear() {
+        node *it = start_node;
+
+        while (it) {
+            length_--;
             node *to_delete = it;
             it = it->next;
             delete to_delete;
@@ -97,6 +152,5 @@ public:
 };
 
 }
-
 
 #endif

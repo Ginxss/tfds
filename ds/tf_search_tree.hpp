@@ -28,7 +28,7 @@ public:
         root(new node(value)) {}
     
     ~tree() {
-        close();
+        clear();
     }
 
     // TODO: always balance the tree, so that the search running time is always O(log(n)) and removing is O(1)
@@ -68,7 +68,7 @@ public:
     }
 
     // O(n)
-    void close() {
+    void clear() {
         // TODO
     }
 };

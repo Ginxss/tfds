@@ -5,6 +5,10 @@
 
 namespace tf {
 
+/*
+Dynamic array that reallocates with twice the size when accessed out of bounds.
+Slightly slower than a c-array, but more secure.
+*/
 template <class T>
 class array {
 private:
@@ -25,7 +29,7 @@ public:
         buffer((T *)malloc(capacity * sizeof(T))) {}
 
     ~array() {
-        close();
+        clear();
     }
 
     // O(1) - O(n) if index > capacity
@@ -47,7 +51,7 @@ public:
     }
 
     // O(1)
-    void close() {
+    void clear() {
         if (buffer)
             free(buffer);
     }

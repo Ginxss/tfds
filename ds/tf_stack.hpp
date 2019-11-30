@@ -29,7 +29,7 @@ public:
         top(new stack_item(value)) {}
 
     ~stack() {
-        close();
+        clear();
     }
 
     // O(1)
@@ -38,7 +38,7 @@ public:
         top = item;
     }
 
-    // O(1)
+    // O(1) - only use when stack is not empty
     T &peek() {
         return top->value;
     }
@@ -60,7 +60,7 @@ public:
     }
 
     // O(n)
-    void close() {
+    void clear() {
         while (!empty()) {
             stack_item *prev_top = top;
             top = top->under;
