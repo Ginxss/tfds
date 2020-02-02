@@ -1,8 +1,16 @@
+//////////
+// DONE //
+//////////
+
 #ifndef TF_STACK_H
 #define TF_STACK_H
 
 namespace tf {
 
+/*
+* Standard Stack structure.
+* Put, Peek and Pop
+*/
 template <class T>
 class stack {
 private:
@@ -16,16 +24,13 @@ private:
             under(under) {}
     };
 
-    int capacity;
     stack_item *top;
 
 public:
-    stack(int capacity = 10):
-        capacity(capacity),
+    stack():
         top(nullptr) {}
 
-    stack(const T &value, int capacity = 10):
-        capacity(capacity),
+    stack(const T &value):
         top(new stack_item(value)) {}
 
     ~stack() {
@@ -55,7 +60,7 @@ public:
     }
 
     // O(1)
-    bool empty() {
+    bool empty() const {
         return top == nullptr;
     }
 

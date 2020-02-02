@@ -1,3 +1,7 @@
+//////////
+// TODO //
+//////////
+
 #ifndef TF_SEARCH_TREE_H
 #define TF_SEARCH_TREE_H
 
@@ -16,7 +20,7 @@ private:
             value(value),
             left(nullptr),
             right(nullptr) {}
-    }
+    };
 
     node *root;
 
@@ -34,6 +38,7 @@ public:
     // TODO: always balance the tree, so that the search running time is always O(log(n)) and removing is O(1)
     // Make this an AVL tree
     // https://en.wikipedia.org/wiki/AVL_tree
+    // https://www.geeksforgeeks.org/avl-tree-set-1-insertion/
     // O(log(n)) for a balanced tree - O(n) for a linear tree
     void insert(const T &value) {
         if (empty()) {

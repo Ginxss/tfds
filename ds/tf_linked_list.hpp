@@ -1,8 +1,17 @@
-#ifndef TF_LINKED_LIST
-#define TF_LINKED_LIST
+//////////
+// DONE //
+//////////
+
+#ifndef TF_LINKED_LIST_H
+#define TF_LINKED_LIST_H
 
 namespace tf {
 
+/*
+* Doubly Linked List that allows efficient iteration both forwards and backwards.
+* Elements can be added at the end and removed via value.
+* Recommended only if the order has to be preserved and only iteration over the entire list is required.
+*/
 template <class T>
 class linked_list {
 private:
@@ -18,6 +27,7 @@ private:
             next(next) {}
     };
 
+public:
     // Provides standard iteration interface - everything O(1)
     class iterator {
     public:
@@ -26,9 +36,10 @@ private:
         T &operator*() { return nd->value; }
         void operator++() { nd = nd->next; }
         void operator--() { nd = nd->prev; }
-        bool operator!=(const iterator &other) { return nd != other.nd; }
+        bool condition() { return nd != nullptr; }
     };
 
+private:
     node *start_node;
     node *end_node;
     int length_;
@@ -111,7 +122,7 @@ public:
 
     // O(1)
     iterator end() {
-        end_it.nd = nullptr;
+        end_it.nd = end_node;
         return end_it;
     }
 
@@ -123,6 +134,8 @@ public:
             if (it->value == value) {
                 return true;
             }
+
+            it = it->next;
         }
 
         return false;
