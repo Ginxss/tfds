@@ -43,7 +43,7 @@ public:
     }
 
     // O(1) - O(n) if index > capacity
-    T &get(const int index) {
+    const T &get(const int index) {
         check_size(index);
         return buffer[index];
     }

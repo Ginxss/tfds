@@ -39,8 +39,7 @@ public:
 
     // O(1)
     void put(const T &value) {
-        stack_item *item = new stack_item(value, top);
-        top = item;
+        top = new stack_item(value, top);
     }
 
     // O(1) - only use when stack is not empty
