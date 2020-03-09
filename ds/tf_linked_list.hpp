@@ -82,30 +82,30 @@ public:
             return;
         
         if (start_node->value == value) {
-            length_--;
             node *to_delete = start_node;
             if (start_node->next) {
                 start_node = start_node->next;
                 start_node->prev = nullptr;
             }
             delete to_delete;
+            length_--;
         }
         else if (end_node->value == value) {
-            length_--;
             node *to_delete = end_node;
             end_node = end_node->prev;
             end_node->next = nullptr;
             delete to_delete;
+            length_--;
         }
         else {
             node *it = start_node;
 
             while (it) {
                 if (it->value == value) {
-                    length_--;
                     it->prev->next = it->next;
                     it->next->prev = it->prev;
                     delete it;
+                    length_--;
                     break;
                 }
 
@@ -156,11 +156,14 @@ public:
         node *it = start_node;
 
         while (it) {
-            length_--;
             node *to_delete = it;
             it = it->next;
             delete to_delete;
+            length_--;
         }
+
+        start_node = nullptr;
+        end_node = nullptr;
     }
 };
 

@@ -10,6 +10,7 @@
     "editor.find.autoFindInSelection": "always",
     "zenMode.hideTabs": false,
     "debug.inlineValues": true,
+    "debug.console.fontSize": 13,
     "terminal.integrated.fontSize": 13,
     "terminal.integrated.cursorStyle": "line",
     "terminal.integrated.shell.windows": "cmd.exe",
