@@ -8,20 +8,25 @@
 #include <iostream> // print            |
 #include "tf_linked_list.hpp" // print  | DEBUG
 
+#include "tf_exception.hpp"
+
 namespace tf {
 
-template <class T>
+template <class K, class V>
 class search_tree {
 private:
+// CLASSES
     class node {
     public:
-        T value;
+        K key;
+        V value;
         int height;
         node *parent;
         node *left;
         node *right;
 
-        node(const T &value, node *parent = nullptr):
+        node(const K &key, const V &value, node *parent = nullptr):
+            key(key),
             value(value),
             height(1),
             parent(parent),
@@ -29,8 +34,10 @@ private:
             right(nullptr) {}
     };
 
+// VARIABLES
     node *root;
 
+// FUNCTIONS
     int height(node *n) {
         return (n) ? n->height : 0;
     }
@@ -46,7 +53,7 @@ private:
     bool is_left_child(node *child) {
         if (child) {
             node *parent = child->parent;
-            if (parent->left && parent->left->value == child->value) {
+            if (parent && parent->left && parent->left->key == child->key) {
                 return true;
             }
         }
@@ -70,61 +77,131 @@ private:
         }
     }
 
-    node *rotation(node *n, bool left) {
-        // set the new n
-        node *n_before = n;
-        if (left)
-            n = n->right;
-        else
-            n = n->left;
-
-        if (n_before == root) {
-            root = n;
-        }
-
-        // swap parents
-        if (n_before->parent) {
-            if (is_left_child(n_before))
-                set_left(n_before->parent, n);
-            else
-                set_right(n_before->parent, n);
-        }
-        else {
-            n->parent = nullptr;
-        }
-        n_before->parent = n;
-
-        // swap trees
-        if (left) {
-            set_right(n_before, n->left);
-            set_left(n, n_before);
-        }
-        else {
-            set_left(n_before, n->right);
-            set_right(n, n_before);
-        }
-
-        update_height(n->left);
-        update_height(n->right);
-        update_height(n);
-
-        return n;
-    }
-
     node *left_rotation(node *n) {
-        return rotation(n, true);
+        node *new_root = n->right;
+        if (n == root)
+            root = new_root;
+
+        if (n->parent) {
+            if (is_left_child(n))
+                set_left(n->parent, new_root);
+            else
+                set_right(n->parent, new_root);
+        }
+        else {
+            new_root->parent = nullptr;
+        }
+        n->parent = new_root;
+
+        set_right(n, new_root->left);
+        set_left(new_root, n);
+
+        update_height(new_root->left);
+        update_height(new_root->right);
+        update_height(new_root);
+        return new_root;
     }
 
     node *right_rotation(node *n) {
-        return rotation(n, false);
+        node *new_root = n->left;
+        if (n == root)
+            root = new_root;
+
+        if (n->parent) {
+            if (is_left_child(n))
+                set_left(n->parent, new_root);
+            else
+                set_right(n->parent, new_root);
+        }
+        else {
+            new_root->parent = nullptr;
+        }
+        n->parent = new_root;
+
+        set_left(n, new_root->right);
+        set_right(new_root, n);
+
+        update_height(new_root->left);
+        update_height(new_root->right);
+        update_height(new_root);
+        return new_root;
+    }
+
+    node *min_node(node *n) {
+        node *it = n;
+        while (true) {
+            if (it->left) {
+                it = it->left;
+            }
+            else {
+                return it;
+            }
+        }
+    }
+
+    const V remove_leaf(node *to_delete) {
+        const V result = to_delete->value;
+
+        if (to_delete->parent) {
+            if (is_left_child(to_delete)) {
+                to_delete->parent->left = nullptr;
+            }
+            else {
+                to_delete->parent->right = nullptr;
+            }
+        }
+        else {
+            root = nullptr;
+        }
+
+        delete to_delete;
+        return result;
+    }
+
+    const V remove_single_parent(node *to_delete) {
+        const V result = to_delete->value;
+
+        node *new_root = (to_delete->left) ? to_delete->left : to_delete->right;
+        if (to_delete->parent) {
+            if (is_left_child(to_delete)) {
+                set_left(to_delete->parent, new_root);
+            }
+            else {
+                set_right(to_delete->parent, new_root);
+            }
+        }
+        else {
+            new_root->parent = nullptr;
+            root = new_root;
+        }
+
+        delete to_delete;
+        return result;
+    }
+
+    const V remove_double_parent(node *to_delete) {
+        const V result = to_delete->value;
+
+        node *succ = min_node(to_delete->right);
+        to_delete->key = succ->key;
+        to_delete->value = succ->value;
+
+        if (succ->right) {
+            remove_single_parent(succ);
+        }
+        else {
+            remove_leaf(succ);
+        }
+
+        return result;
     }
 
 public:
     search_tree():
         root(nullptr) {}
 
-    search_tree(const T &value):
-        root(new node(value)) {}
+    search_tree(const K &key, const V &value):
+        root(new node(key, value)) {}
     
     ~search_tree() {
         clear();
@@ -134,36 +211,35 @@ public:
     // https://wkdtjsgur100.github.io/avl-tree/
 
     // O(log(n))
-    void insert(const T &value) {
+    void insert(const K &key, const V &value) {
         if (empty()) {
-            root = new node(value);
+            root = new node(key, value);
             return;
         }
 
-        node *it = root;
-
         // insert
+        node *it = root;
         while (true) {
-            if (value < it->value) {
+            if (key < it->key) {
                 if (it->left) {
                     it = it->left;
                 }
                 else {
-                    it->left = new node(value, it);
+                    it->left = new node(key, value, it);
                     break;
                 }
             }
-            else if (value > it->value) {
+            else if (key > it->key) {
                 if (it->right) {
                     it = it->right;
                 }
                 else {
-                    it->right = new node(value, it);
+                    it->right = new node(key, value, it);
                     break;
                 }
             }
             else { // if (value == it->value)
-                break;
+                throw tf::exception("search tree: insert: key already present");
             }
         }
 
@@ -173,7 +249,7 @@ public:
 
             int balance = height(it->right) - height(it->left);
             if (balance > 1) {
-                if (value > it->right->value) {
+                if (key > it->right->key) {
                     it = left_rotation(it);
                 }
                 else {
@@ -182,7 +258,7 @@ public:
                 }
             }
             else if (balance < -1) {
-                if (value < it->left->value) {
+                if (key < it->left->key) {
                     it = right_rotation(it);
                 }
                 else {
@@ -193,6 +269,85 @@ public:
 
             it = it->parent;
         }
+    }
+
+    const V remove(const K &key) {
+        node *it = root;
+        while (it) {
+            if (key < it->key) {
+                it = it->left;
+            }
+            else if (key > it->key) {
+                it = it->right;
+            }
+            else {
+                if (it->left && it->right) {
+                    return remove_double_parent(it);
+                }
+                else if (it->left || it->right) {
+                    return remove_single_parent(it);
+                }
+                else {
+                    return remove_leaf(it);
+                }
+            }
+        }
+
+        throw tf::exception("search tree: remove: key not found");
+    }
+
+    const V &get(const K &key) {
+        node *it = root;
+        while (it) {
+            if (key < it->key) {
+                it = it->left;
+            }
+            else if (key > it->key) {
+                it = it->right;
+            }
+            else {
+                return it->value;
+            }
+        }
+
+        throw tf::exception("search tree: get: invalid key");
+    }
+
+    // O(1)
+    bool empty() const {
+        return root == nullptr;
+    }
+
+    // O(n)
+    void clear() {
+        node *it = root;
+        while (it) {
+            if (it->left) {
+                it = it->left;
+                continue;
+            }
+            if (it->right) {
+                it = it->right;
+                continue;
+            }
+
+            node *to_delete = it;
+            if (it->parent) {
+                it = it->parent;
+
+                if (is_left_child(to_delete))
+                    it->left = nullptr;
+                else 
+                    it->right = nullptr;
+            }
+            else {
+                it = nullptr;
+            }
+
+            delete to_delete;
+        }
+
+        root = nullptr;
     }
 
     // DEBUG
@@ -206,7 +361,7 @@ public:
             // print level
             for (auto it = list.begin(); it.condition(); ++it) {
                 if ((*it)) {
-                    std::cout << (*it)->value << "(" << (*it)->height << ") ";
+                    std::cout << (*it)->key  << " ";
 
                     // add next level
                     next_level.add((*it)->left);
@@ -224,45 +379,6 @@ public:
                 list.add(*it);
             }
             next_level.clear();
-        }
-    }
-
-    void remove(const T &value) {
-        // TODO
-    }
-
-    // O(1)
-    bool empty() const {
-        return root == nullptr;
-    }
-
-    // O(n)
-    void clear() {
-        node *it = root;
-
-        while (it) {
-            if (it->left) {
-                it = it->left;
-                continue;
-            }
-            if (it->right) {
-                it = it->right;
-                continue;
-            }
-
-            node *to_delete = it;
-            if (it->parent) {
-                it = it->parent;
-                if (is_left_child(to_delete))
-                    it->left = nullptr;
-                else 
-                    it->right = nullptr;
-            }
-            else {
-                it = nullptr;
-            }
-
-            delete to_delete;
         }
     }
 };

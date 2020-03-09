@@ -62,6 +62,7 @@ public:
     void clear() {
         if (buffer)
             free(buffer);
+        buffer = nullptr;
     }
 };
 

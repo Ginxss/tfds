@@ -5,6 +5,8 @@
 #ifndef TF_STACK_H
 #define TF_STACK_H
 
+#include "tf_exception.hpp"
+
 namespace tf {
 
 /*
@@ -42,13 +44,19 @@ public:
         top = new stack_item(value, top);
     }
 
-    // O(1) - only use when stack is not empty
+    // O(1)
     T &peek() {
+        if (empty())
+            throw tf::exception("stack: peek: stack is empty");
+        
         return top->value;
     }
 
     // O(1)
     T pop() {
+        if (empty())
+            throw tf::exception("stack: pop: stack is empty");
+        
         T value = top->value;
 
         stack_item *prev_top = top;
@@ -70,6 +78,8 @@ public:
             top = top->under;
             delete prev_top;
         }
+        
+        top = nullptr;
     }
 };
 

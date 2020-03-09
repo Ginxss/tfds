@@ -5,6 +5,8 @@
 #ifndef TF_LINKED_LIST_H
 #define TF_LINKED_LIST_H
 
+#include "tf_exception.hpp"
+
 namespace tf {
 
 /*
@@ -106,12 +108,14 @@ public:
                     it->next->prev = it->prev;
                     delete it;
                     length_--;
-                    break;
+                    return;
                 }
 
                 it = it->next;
             }
         }
+
+        throw tf::exception("linked list: remove: invalid value");
     }
 
     // O(1)
