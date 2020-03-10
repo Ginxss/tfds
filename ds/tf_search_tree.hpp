@@ -50,17 +50,6 @@ private:
         }
     }
 
-    bool is_left_child(node *child) {
-        if (child) {
-            node *parent = child->parent;
-            if (parent && parent->left && parent->left->key == child->key) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     void set_left(node *parent, node *child) {
         if (parent) {
             parent->left = child;
@@ -75,6 +64,17 @@ private:
             if (child)
                 child->parent = parent;
         }
+    }
+
+    bool is_left_child(node *child) {
+        if (child) {
+            node *parent = child->parent;
+            if (parent && parent->left && parent->left->key == child->key) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     node *left_rotation(node *n) {
@@ -125,6 +125,34 @@ private:
         update_height(new_root->right);
         update_height(new_root);
         return new_root;
+    }
+
+    void rebalance_upward(node *n) {
+        node *it = n;
+        while (it) {
+            update_height(it);
+            int balance = height(it->right) - height(it->left);
+            if (balance > 1) {
+                if (height(it->right->right) > height(it->right->left)) {
+                    it = left_rotation(it);
+                }
+                else {
+                    it->right = right_rotation(it->right);
+                    it = left_rotation(it);
+                }
+            }
+            else if (balance < -1) {
+                if (height(it->left->left) > height(it->left->right)) {
+                    it = right_rotation(it);
+                }
+                else {
+                    it->left = left_rotation(it->left);
+                    it = right_rotation(it);
+                }
+            }
+
+            it = it->parent;
+        }
     }
 
     node *min_node(node *n) {
@@ -217,7 +245,6 @@ public:
             return;
         }
 
-        // insert
         node *it = root;
         while (true) {
             if (key < it->key) {
@@ -243,35 +270,12 @@ public:
             }
         }
 
-        // rebalance
-        while (it) {
-            update_height(it);
-
-            int balance = height(it->right) - height(it->left);
-            if (balance > 1) {
-                if (key > it->right->key) {
-                    it = left_rotation(it);
-                }
-                else {
-                    it->right = right_rotation(it->right);
-                    it = left_rotation(it);
-                }
-            }
-            else if (balance < -1) {
-                if (key < it->left->key) {
-                    it = right_rotation(it);
-                }
-                else {
-                    it->left = left_rotation(it->left);
-                    it = right_rotation(it);
-                }
-            }
-
-            it = it->parent;
-        }
+        rebalance_upward(it);
     }
 
     const V remove(const K &key) {
+        V result;
+
         node *it = root;
         while (it) {
             if (key < it->key) {
@@ -281,19 +285,27 @@ public:
                 it = it->right;
             }
             else {
-                if (it->left && it->right) {
-                    return remove_double_parent(it);
+                node *to_delete = it;
+                it = it->parent;
+
+                if (to_delete->left && to_delete->right)
+                    result = remove_double_parent(to_delete);
+                else if (to_delete->left || to_delete->right)
+                    result = remove_single_parent(to_delete);
+                else
+                    result = remove_leaf(to_delete);
+
+                if (it) {
+                    update_height(it->left);
+                    update_height(it->right);
                 }
-                else if (it->left || it->right) {
-                    return remove_single_parent(it);
-                }
-                else {
-                    return remove_leaf(it);
-                }
+
+                rebalance_upward(it);
+                return result;
             }
         }
 
-        throw tf::exception("search tree: remove: key not found");
+        throw tf::exception("search tree: remove: invalid key");
     }
 
     const V &get(const K &key) {
@@ -324,27 +336,23 @@ public:
         while (it) {
             if (it->left) {
                 it = it->left;
-                continue;
             }
-            if (it->right) {
+            else if (it->right) {
                 it = it->right;
-                continue;
-            }
-
-            node *to_delete = it;
-            if (it->parent) {
-                it = it->parent;
-
-                if (is_left_child(to_delete))
-                    it->left = nullptr;
-                else 
-                    it->right = nullptr;
             }
             else {
-                it = nullptr;
-            }
+                node *to_delete = it;
+                it = it->parent;
 
-            delete to_delete;
+                if (it) {
+                    if (is_left_child(to_delete))
+                        it->left = nullptr;
+                    else 
+                        it->right = nullptr;
+                }
+
+                delete to_delete;
+            }
         }
 
         root = nullptr;
