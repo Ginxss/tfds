@@ -10,10 +10,11 @@
 namespace tf {
 
 /*
-* Dynamic array that reallocates with twice the size when accessed out of bounds.
+* Dynamic array that reallocates when accessed out of bounds.
+* New allocation size is the smallest multiple of the current capacity, that can fit the index.
 * Slightly slower than a c-array, but more secure.
 */
-template <class T>
+template <typename T>
 class array {
 private:
     int capacity_;
@@ -22,7 +23,7 @@ private:
     // O(1) - O(n) if index > capacity
     void check_size(const int index) {
         if (index >= capacity_) {
-            capacity_ *= 2;
+            capacity_ *= (int)((index / capacity_) + 1);
             buffer = (T *)realloc(buffer, capacity_ * sizeof(T));
         }
     }

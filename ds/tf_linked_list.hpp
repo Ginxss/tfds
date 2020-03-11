@@ -1,6 +1,6 @@
-//////////
-// DONE //
-//////////
+////////////
+// USABLE //
+////////////
 
 #ifndef TF_LINKED_LIST_H
 #define TF_LINKED_LIST_H
@@ -14,7 +14,7 @@ namespace tf {
 * Elements can be added at the end and removed via value.
 * Recommended only if the order has to be preserved and only iteration over the entire list is required.
 */
-template <class T>
+template <typename T>
 class linked_list {
 private:
     class node {

@@ -1,6 +1,6 @@
-//////////
-// TODO //
-//////////
+////////////
+// USABLE //
+////////////
 
 #ifndef TF_SEARCH_TREE_H
 #define TF_SEARCH_TREE_H
@@ -12,10 +12,15 @@
 
 namespace tf {
 
-template <class K, class V>
+/*
+An ordered map (iterative implementation of an AVL tree).
+Allows searching by key in logarithmic time while automatically ordering the entries by key.
+*/
+template <typename K, typename V>
 class search_tree {
 private:
 // CLASSES
+
     class node {
     public:
         K key;
@@ -35,13 +40,17 @@ private:
     };
 
 // VARIABLES
+
     node *root;
 
 // FUNCTIONS
+
+    // O(1)
     int height(node *n) {
         return (n) ? n->height : 0;
     }
 
+    // O(1)
     void update_height(node *n) {
         if (n) {
             int left_height = height(n->left);
@@ -50,6 +59,7 @@ private:
         }
     }
 
+    // O(1)
     void set_left(node *parent, node *child) {
         if (parent) {
             parent->left = child;
@@ -58,6 +68,7 @@ private:
         }
     }
 
+    // O(1)
     void set_right(node *parent, node *child) {
         if (parent) {
             parent->right = child;
@@ -66,6 +77,7 @@ private:
         }
     }
 
+    // O(1)
     bool is_left_child(node *child) {
         if (child) {
             node *parent = child->parent;
@@ -77,6 +89,7 @@ private:
         return false;
     }
 
+    // O(1)
     node *left_rotation(node *n) {
         node *new_root = n->right;
         if (n == root)
@@ -102,6 +115,7 @@ private:
         return new_root;
     }
 
+    // O(1)
     node *right_rotation(node *n) {
         node *new_root = n->left;
         if (n == root)
@@ -127,6 +141,7 @@ private:
         return new_root;
     }
 
+    // O(log(n))
     void rebalance_upward(node *n) {
         node *it = n;
         while (it) {
@@ -155,6 +170,7 @@ private:
         }
     }
 
+    // O(log(n))
     node *min_node(node *n) {
         node *it = n;
         while (true) {
@@ -167,6 +183,7 @@ private:
         }
     }
 
+    // O(1)
     const V remove_leaf(node *to_delete) {
         const V result = to_delete->value;
 
@@ -186,6 +203,7 @@ private:
         return result;
     }
 
+    // O(1)
     const V remove_single_parent(node *to_delete) {
         const V result = to_delete->value;
 
@@ -207,6 +225,7 @@ private:
         return result;
     }
 
+    // O(log(n))
     const V remove_double_parent(node *to_delete) {
         const V result = to_delete->value;
 
@@ -234,9 +253,6 @@ public:
     ~search_tree() {
         clear();
     }
-
-    // https://www.tutorialspoint.com/data_structures_algorithms/avl_tree_algorithm.htm
-    // https://wkdtjsgur100.github.io/avl-tree/
 
     // O(log(n))
     void insert(const K &key, const V &value) {
@@ -273,6 +289,7 @@ public:
         rebalance_upward(it);
     }
 
+    // O(log(n))
     const V remove(const K &key) {
         V result;
 
@@ -308,6 +325,7 @@ public:
         throw tf::exception("search tree: remove: invalid key");
     }
 
+    // O(log(n))
     const V &get(const K &key) {
         node *it = root;
         while (it) {

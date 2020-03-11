@@ -13,7 +13,7 @@ namespace tf {
 * Standard Stack structure.
 * Put, Peek and Pop
 */
-template <class T>
+template <typename T>
 class stack {
 private:
     class stack_item {
