@@ -2,15 +2,12 @@
 // TODO //
 //////////
 
-// Nothing works!
-
 #ifndef TF_HASH_TABLE_H
 #define TF_HASH_TABLE_H
 
-#include <cstdlib>
-#include <cstring>
+#include <cstdlib> // malloc
+#include <cstring> // strlen
 #include <iostream>
-#include "tf_linked_list.hpp"
 #include "tf_exception.hpp"
 
 namespace tf {
@@ -49,21 +46,21 @@ private:
     struct bucket {
         K key;
         V value;
-        bool empty;
+        bucket *next;
     };
 
 // VARIABLES
 
-    int array_size;
-    bucket *array;
+    const int table_size;
+    bucket **buckets;
 
 public:
-    hash_table(const int array_size = 100):
-        array_size(array_size),
-        array((bucket *)malloc(array_size * sizeof(bucket)))
+    hash_table(const int table_size = 100):
+        table_size(table_size),
+        buckets((bucket **)malloc(table_size * sizeof(bucket *)))
     {
-        for (int i = 0; i < array_size; ++i) {
-            array[i].empty = true;
+        for (int i = 0; i < table_size; ++i) {
+            *(buckets + i) = nullptr;
         }
     }
 
@@ -72,69 +69,87 @@ public:
     }
 
     void insert(const K &key, const V &value) {
-        unsigned long index = hash<K>(key) % array_size;
-        bucket *b;
-        int offset = 0;
+        unsigned long index = hash<K>(key) % table_size;
+        bucket *new_bucket;
 
-        do {
-            b = array + index + offset++;
-            if (offset >= array_size)
-                throw tf::exception("hash table: insert: hash table is full");
-        } while (!b->empty);
+        if (*(buckets + index)) {
+            bucket *it = *(buckets + index);
+            while (it->next) {
+                it = it->next;
+            }
 
-        b->key = key;
-        b->value = value;
-        b->empty = false;
+            it->next = (bucket *)malloc(sizeof(bucket));
+            new_bucket = it->next;
+        }
+        else {
+            *(buckets + index) = (bucket *)malloc(sizeof(bucket));
+            new_bucket = *(buckets + index);
+        }
+
+        new_bucket->key = key;
+        new_bucket->value = value;
+        new_bucket->next = nullptr;
     }
 
     const V &get(const K &key) const {
-        unsigned long index = hash<K>(key) % array_size;
-        bucket *b;
-        int offset = 0;
-        
-        do {
-            b = array + index + offset++;
-            if (b->empty || offset >= array_size)
-                throw tf::exception("hash table: get: invalid key");
-        } while (key != b->key);
-        
-        return b->value;
+        unsigned long index = hash<K>(key) % table_size;
+        bucket *it = *(buckets + index);
+
+        while (it) {
+            if (key == it->key) {
+                return it->value;
+            }
+
+            it = it->next;
+        }
+
+        throw tf::exception("hash table: get: invalid key");
     }
 
-    // do this
     V &operator[](const K &key) {
-        unsigned long index = hash<K>(key) % array_size;
-        bucket *b;
-        int offset = 0;
+        unsigned long index = hash<K>(key) % table_size;
+        bucket *it = *(buckets + index);
         
-        do {
-            b = array + index + offset++;
-            if (b->empty || offset >= array_size)
-                throw tf::exception("hash table: get: invalid key");
-        } while (key != b->key);
-        
-        return b->value;
+        while (it) {
+            if (key == it->key) {
+                return it->value;
+            }
+
+            it = it->next;
+        }
+
+        throw tf::exception("hash table: get: invalid key");
     }
 
-    // O(1)
+    // O(n)
     void clear() {
-        if (array)
-            free(array);
-        array = nullptr;
+        for (int i = 0; i < table_size; ++i) {
+            free_bucket(*(buckets + i));
+        }
+
+        free(buckets);
+        buckets = nullptr;
+    }
+
+    void free_bucket(bucket *b) {
+        if (b) {
+            free_bucket(b->next);
+            free(b);
+        }
     }
 
     // DEBUG
     void print() {
-        for (int i = 0; i < array_size; ++i) {
+        for (int i = 0; i < table_size; ++i) {
             std::cout << "bucket " << i << ": ";
 
-            bucket &b = array[i];
-            if (b.empty) {
-                std::cout << "-" << std::endl;
+            bucket *it = *(buckets + i);
+            while (it) {
+                std::cout << it->key << "/" << it->value << " ";
+                it = it->next;
             }
-            else {
-                std::cout << b.key << "/" << b.value << std::endl;
-            }
+
+            std::cout << std::endl;
         }
     }
 };
