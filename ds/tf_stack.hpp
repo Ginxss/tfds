@@ -16,24 +16,27 @@ namespace tf {
 template <typename T>
 class stack {
 private:
-    class stack_item {
-    public:
-        T value;
-        stack_item *under;
+    // ITEM
 
-        stack_item(T value, stack_item *under = nullptr):
-            value(value),
-            under(under) {}
+    struct item {
+        T value;
+        item *under;
     };
 
-    stack_item *top;
+    item *alloc_item(const T &value, item *under) {
+        item *i = (item *)malloc(sizeof(item));
+        i->value = value;
+        i->under = under;
+        return i;
+    }
+
+    // VARIABLES
+
+    item *top;
 
 public:
     stack():
         top(nullptr) {}
-
-    stack(const T &value):
-        top(new stack_item(value)) {}
 
     ~stack() {
         clear();
@@ -41,7 +44,7 @@ public:
 
     // O(1)
     void put(const T &value) {
-        top = new stack_item(value, top);
+        top = alloc_item(value, top);
     }
 
     // O(1)
@@ -59,9 +62,9 @@ public:
         
         T value = top->value;
 
-        stack_item *prev_top = top;
+        item *to_delete = top;
         top = top->under;
-        delete prev_top;
+        free(to_delete);
 
         return value;
     }
@@ -74,12 +77,10 @@ public:
     // O(n)
     void clear() {
         while (!empty()) {
-            stack_item *prev_top = top;
+            item *to_delete = top;
             top = top->under;
-            delete prev_top;
+            free(to_delete);
         }
-        
-        top = nullptr;
     }
 };
 

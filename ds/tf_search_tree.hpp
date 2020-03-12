@@ -19,38 +19,38 @@ Allows searching by key in logarithmic time while automatically ordering the ent
 template <typename K, typename V>
 class search_tree {
 private:
-// CLASSES
-
-    class node {
-    public:
+    // NODE
+    
+    struct node {
         K key;
         V value;
         int height;
         node *parent;
         node *left;
         node *right;
-
-        node(const K &key, const V &value, node *parent = nullptr):
-            key(key),
-            value(value),
-            height(1),
-            parent(parent),
-            left(nullptr),
-            right(nullptr) {}
     };
 
-// VARIABLES
+    node *alloc_node(const K &key, const V &value, int height, node *parent, node *left, node *right) {
+        node *n = (node *)malloc(sizeof(node));
+        n->key = key;
+        n->value = value;
+        n->height = height;
+        n->parent = parent;
+        n->left = left;
+        n->right = right;
+        return n;
+    }
+
+    // VARIABLES
 
     node *root;
 
-// FUNCTIONS
+    // METHODS    
 
-    // O(1)
     int height(node *n) {
         return (n) ? n->height : 0;
     }
 
-    // O(1)
     void update_height(node *n) {
         if (n) {
             int left_height = height(n->left);
@@ -59,7 +59,6 @@ private:
         }
     }
 
-    // O(1)
     void set_left(node *parent, node *child) {
         if (parent) {
             parent->left = child;
@@ -68,7 +67,6 @@ private:
         }
     }
 
-    // O(1)
     void set_right(node *parent, node *child) {
         if (parent) {
             parent->right = child;
@@ -77,19 +75,16 @@ private:
         }
     }
 
-    // O(1)
     bool is_left_child(node *child) {
         if (child) {
             node *parent = child->parent;
-            if (parent && parent->left && parent->left->key == child->key) {
+            if (parent && parent->left && parent->left->key == child->key)
                 return true;
-            }
         }
 
         return false;
     }
 
-    // O(1)
     node *left_rotation(node *n) {
         node *new_root = n->right;
         if (n == root)
@@ -104,7 +99,6 @@ private:
         else {
             new_root->parent = nullptr;
         }
-        n->parent = new_root;
 
         set_right(n, new_root->left);
         set_left(new_root, n);
@@ -115,7 +109,6 @@ private:
         return new_root;
     }
 
-    // O(1)
     node *right_rotation(node *n) {
         node *new_root = n->left;
         if (n == root)
@@ -130,7 +123,6 @@ private:
         else {
             new_root->parent = nullptr;
         }
-        n->parent = new_root;
 
         set_left(n, new_root->right);
         set_right(new_root, n);
@@ -141,7 +133,6 @@ private:
         return new_root;
     }
 
-    // O(log(n))
     void rebalance_upward(node *n) {
         node *it = n;
         while (it) {
@@ -170,75 +161,57 @@ private:
         }
     }
 
-    // O(log(n))
-    node *min_node(node *n) {
-        node *it = n;
-        while (true) {
-            if (it->left) {
-                it = it->left;
-            }
-            else {
-                return it;
-            }
-        }
-    }
-
-    // O(1)
     const V remove_leaf(node *to_delete) {
         const V result = to_delete->value;
 
         if (to_delete->parent) {
-            if (is_left_child(to_delete)) {
+            if (is_left_child(to_delete))
                 to_delete->parent->left = nullptr;
-            }
-            else {
+            else
                 to_delete->parent->right = nullptr;
-            }
         }
         else {
             root = nullptr;
         }
 
-        delete to_delete;
+        free(to_delete);
         return result;
     }
 
-    // O(1)
     const V remove_single_parent(node *to_delete) {
         const V result = to_delete->value;
 
         node *new_root = (to_delete->left) ? to_delete->left : to_delete->right;
         if (to_delete->parent) {
-            if (is_left_child(to_delete)) {
+            if (is_left_child(to_delete))
                 set_left(to_delete->parent, new_root);
-            }
-            else {
+            else
                 set_right(to_delete->parent, new_root);
-            }
         }
         else {
             new_root->parent = nullptr;
             root = new_root;
         }
 
-        delete to_delete;
+        free(to_delete);
         return result;
     }
 
-    // O(log(n))
     const V remove_double_parent(node *to_delete) {
         const V result = to_delete->value;
 
-        node *succ = min_node(to_delete->right);
+        node *succ = to_delete->right;
+        while (succ->left) {
+            succ = succ->left;
+        }
+
         to_delete->key = succ->key;
         to_delete->value = succ->value;
 
-        if (succ->right) {
+        if (succ->right)
             remove_single_parent(succ);
-        }
-        else {
+        else
             remove_leaf(succ);
-        }
 
         return result;
     }
@@ -246,9 +219,6 @@ private:
 public:
     search_tree():
         root(nullptr) {}
-
-    search_tree(const K &key, const V &value):
-        root(new node(key, value)) {}
     
     ~search_tree() {
         clear();
@@ -257,36 +227,37 @@ public:
     // O(log(n))
     void insert(const K &key, const V &value) {
         if (empty()) {
-            root = new node(key, value);
+            root = alloc_node(key, value, 1, nullptr, nullptr, nullptr);
             return;
         }
+        else {
+            node *it = root;
+            while (true) {
+                if (key < it->key) {
+                    if (it->left) {
+                        it = it->left;
+                    }
+                    else {
+                        it->left = alloc_node(key, value, 1, it, nullptr, nullptr);
+                        break;
+                    }
+                }
+                else if (key > it->key) {
+                    if (it->right) {
+                        it = it->right;
+                    }
+                    else {
+                        it->right = alloc_node(key, value, 1, it, nullptr, nullptr);
+                        break;
+                    }
+                }
+                else { // if (value == it->value)
+                    throw tf::exception("search tree: insert: key already present");
+                }
+            }
 
-        node *it = root;
-        while (true) {
-            if (key < it->key) {
-                if (it->left) {
-                    it = it->left;
-                }
-                else {
-                    it->left = new node(key, value, it);
-                    break;
-                }
-            }
-            else if (key > it->key) {
-                if (it->right) {
-                    it = it->right;
-                }
-                else {
-                    it->right = new node(key, value, it);
-                    break;
-                }
-            }
-            else { // if (value == it->value)
-                throw tf::exception("search tree: insert: key already present");
-            }
+            rebalance_upward(it);
         }
-
-        rebalance_upward(it);
     }
 
     // O(log(n))
@@ -315,9 +286,12 @@ public:
                 if (it) {
                     update_height(it->left);
                     update_height(it->right);
+                    rebalance_upward(it);
+                }
+                else {
+                    root = nullptr;
                 }
 
-                rebalance_upward(it);
                 return result;
             }
         }
@@ -368,12 +342,13 @@ public:
                     else 
                         it->right = nullptr;
                 }
+                else {
+                    root = nullptr;
+                }
 
-                delete to_delete;
+                free(to_delete);
             }
         }
-
-        root = nullptr;
     }
 
     // DEBUG
@@ -387,14 +362,14 @@ public:
             // print level
             for (auto it = list.begin(); it.condition(); ++it) {
                 if ((*it)) {
-                    std::cout << (*it)->key  << " ";
+                    std::cout << (*it)->key  << "/" << (*it)->value << " ";
 
                     // add next level
                     next_level.add((*it)->left);
                     next_level.add((*it)->right);
                 }
                 else {
-                    std::cout << "_ ";
+                    std::cout << "_/_ ";
                 }
             }
             std::cout << std::endl;

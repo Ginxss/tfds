@@ -1,6 +1,6 @@
-//////////
-// TODO //
-//////////
+////////////
+// USABLE //
+////////////
 
 #ifndef TF_HASH_TABLE_H
 #define TF_HASH_TABLE_H
@@ -58,7 +58,7 @@ unsigned long hash<const char *>(const char * const &key) {
 template <typename K, typename V>
 class hash_table {
 private:
-// CLASSES
+    // BUCKET
 
     struct bucket {
         K key;
@@ -66,12 +66,13 @@ private:
         bucket *next;
     };
 
-// VARIABLES
-
-    const int table_size;
-    bucket **buckets;
-
-// FUNCTIONS
+    bucket *alloc_bucket(const K &key, const V &value, bucket *next) {
+        bucket *b = (bucket *)malloc(sizeof(bucket));
+        b->key = key;
+        b->value = value;
+        b->next = next;
+        return b;
+    }
 
     void free_bucket(bucket *b) {
         if (b) {
@@ -80,24 +81,30 @@ private:
         }
     }
 
+    // VARIABLES
+
+    const int table_size;
+    bucket **buckets;
+
 public:
     hash_table(const int table_size = 100):
         table_size(table_size),
         buckets((bucket **)malloc(table_size * sizeof(bucket *)))
     {
-        for (int i = 0; i < table_size; ++i) {
-            *(buckets + i) = nullptr;
-        }
+        memset(buckets, 0, table_size);
     }
 
     ~hash_table() {
-        clear();
+        for (int i = 0; i < table_size; ++i) {
+            free_bucket(*(buckets + i));
+        }
+
+        free(buckets);
     }
 
-    // average: O(1) - worst case: O(n)
+    // average case: O(1) - worst case: O(n)
     void insert(const K &key, const V &value) {
         unsigned long index = hash<K>(key) % table_size;
-        bucket *new_bucket;
 
         if (*(buckets + index)) {
             bucket *it = *(buckets + index);
@@ -105,20 +112,14 @@ public:
                 it = it->next;
             }
 
-            it->next = (bucket *)malloc(sizeof(bucket));
-            new_bucket = it->next;
+            it->next = alloc_bucket(key, value, nullptr);
         }
         else {
-            *(buckets + index) = (bucket *)malloc(sizeof(bucket));
-            new_bucket = *(buckets + index);
+            *(buckets + index) = alloc_bucket(key, value, nullptr);
         }
-
-        new_bucket->key = key;
-        new_bucket->value = value;
-        new_bucket->next = nullptr;
     }
 
-    // average: O(1) - worst case: O(n)
+    // average case: O(1) - worst case: O(n)
     const V &get(const K &key) const {
         unsigned long index = hash<K>(key) % table_size;
         bucket *it = *(buckets + index);
@@ -134,7 +135,7 @@ public:
         throw tf::exception("hash table: get: invalid key");
     }
 
-    // average: O(1) - worst case: O(n)
+    // average case: O(1) - worst case: O(n)
     V &operator[](const K &key) {
         unsigned long index = hash<K>(key) % table_size;
         bucket *it = *(buckets + index);
@@ -150,24 +151,17 @@ public:
         throw tf::exception("hash table: get: invalid key");
     }
 
-    // O(n)
-    void clear() {
-        for (int i = 0; i < table_size; ++i) {
-            free_bucket(*(buckets + i));
-        }
-
-        free(buckets);
-        buckets = nullptr;
-    }
-
     // DEBUG
     void print() {
         for (int i = 0; i < table_size; ++i) {
             std::cout << "bucket " << i << ": ";
 
             bucket *it = *(buckets + i);
+            if (!it) {
+                std::cout << "- ";
+            }
             while (it) {
-                std::cout << it->key->a << "/" << it->value << " ";
+                std::cout << it->key << "/" << it->value << " ";
                 it = it->next;
             }
 

@@ -5,8 +5,6 @@
 #ifndef TF_ARRAY_H
 #define TF_ARRAY_H
 
-#include <cstdlib> // malloc
-
 namespace tf {
 
 /*
@@ -17,10 +15,13 @@ namespace tf {
 template <typename T>
 class array {
 private:
+    // VARIABLES
+
     int capacity_;
     T *buffer;
 
-    // O(1) - O(n) if index > capacity
+    // METHODS
+
     void check_size(const int index) {
         if (index >= capacity_) {
             capacity_ *= (int)((index / capacity_) + 1);
@@ -34,7 +35,9 @@ public:
         buffer((T *)malloc(capacity_ * sizeof(T))) {}
 
     ~array() {
-        clear();
+        if (buffer)
+            free(buffer);       
+        buffer = nullptr;
     }
 
     // O(1) - O(n) if index > capacity
@@ -55,15 +58,9 @@ public:
         return buffer[index];
     }
 
+    // O(1)
     int capacity() const {
         return capacity_;
-    }
-
-    // O(1)
-    void clear() {
-        if (buffer)
-            free(buffer);
-        buffer = nullptr;
     }
 };
 

@@ -17,17 +17,18 @@ namespace tf {
 template <typename T>
 class linked_list {
 private:
-    class node {
-    public:
+    struct node {
         T value;
         node *prev;
         node *next;
-
-        node(const T &value, node *prev = nullptr, node *next = nullptr):
-            value(value),
-            prev(prev),
-            next(next) {}
     };
+
+    node *alloc_node(const T &value, node *prev, node *next) {
+        node *n = (node *)malloc(sizeof(node));
+        n->value = value;
+        n->prev = prev;
+        n->next = next;
+    }
 
 public:
     // Provides standard iteration interface - everything O(1)
@@ -55,11 +56,6 @@ public:
         end_node(nullptr),
         length_(0) {}
 
-    linked_list(const T& value):
-        start_node(new node(value)),
-        end_node(start_node),
-        length_(1) {}
-
     ~linked_list() {
         clear();
     }
@@ -67,55 +63,53 @@ public:
     // O(1)
     void add(const T &value) {
         if (empty()) {
-            start_node = new node(value);
+            start_node = alloc_node(value, nullptr, nullptr);
             end_node = start_node;
         }
         else {
-            end_node->next = new node(value, end_node);
+            end_node->next = alloc_node(value, end_node, nullptr);
             end_node = end_node->next;
         }
 
         length_++;
     }
 
-    // O(n) - O(1) for first and last element
+    // O(n)
     void remove(const T &value) {
-        if (empty())
-            return;
-        
-        if (start_node->value == value) {
-            node *to_delete = start_node;
-            if (start_node->next) {
-                start_node = start_node->next;
-                start_node->prev = nullptr;
-            }
-            delete to_delete;
-            length_--;
-        }
-        else if (end_node->value == value) {
-            node *to_delete = end_node;
-            end_node = end_node->prev;
-            end_node->next = nullptr;
-            delete to_delete;
-            length_--;
-        }
-        else {
-            node *it = start_node;
+        node *it = start_node;
 
-            while (it) {
-                if (it->value == value) {
+        while (it) {
+            if (value == it->value) {
+                if (it == start_node || it == end_node) {
+                    if (it == start_node) {
+                        start_node = it->next;
+                        if (start_node)
+                            start_node->prev = nullptr;
+                        else
+                            end_node = nullptr;
+                    }
+                    else { //if (it == end_node)
+                        end_node = it->prev;
+                        if (end_node)
+                            end_node->next = nullptr;
+                        else
+                            start_node = nullptr;
+                    }
+                }
+                else {
                     it->prev->next = it->next;
                     it->next->prev = it->prev;
-                    delete it;
-                    length_--;
-                    return;
                 }
-
-                it = it->next;
+                
+                free(it);
+                length_--;
+                return;
             }
+
+            it = it->next;
         }
 
-        throw tf::exception("linked list: remove: invalid value");
+        throw tf::exception("linked list (c): remove: invalid value");
     }
 
     // O(1)
@@ -135,7 +129,7 @@ public:
         node *it = start_node;
 
         while (it) {
-            if (it->value == value) {
+            if (value == it->value) {
                 return true;
             }
 
@@ -152,7 +146,7 @@ public:
 
     // O(1)
     bool empty() const {
-        return length_ == 0;
+        return start_node == nullptr;
     }
 
     // O(n)
@@ -162,7 +156,7 @@ public:
         while (it) {
             node *to_delete = it;
             it = it->next;
-            delete to_delete;
+            free(to_delete);
             length_--;
         }
 
