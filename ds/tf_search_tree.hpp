@@ -13,8 +13,8 @@
 namespace tf {
 
 /*
-An ordered map (iterative implementation of an AVL tree).
-Allows searching by key in logarithmic time while automatically ordering the entries by key.
+* An ordered map (iterative implementation of an AVL tree).
+* Allows searching by key in logarithmic time while automatically ordering the entries by key.
 */
 template <typename K, typename V>
 class search_tree {

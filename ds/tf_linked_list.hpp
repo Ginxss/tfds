@@ -13,6 +13,7 @@ namespace tf {
 * Doubly Linked List that allows efficient iteration both forwards and backwards.
 * Elements can be added at the end and removed via value.
 * Recommended only if the order has to be preserved and only iteration over the entire list is required.
+* No memory overhead.
 */
 template <typename T>
 class linked_list {
@@ -28,6 +29,7 @@ private:
         n->value = value;
         n->prev = prev;
         n->next = next;
+        return n;
     }
 
 public:

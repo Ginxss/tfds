@@ -10,41 +10,34 @@
 namespace tf {
 
 /*
-* Standard Stack structure.
-* Put, Peek and Pop
+* Standard Stack structure (Put, Peek and Pop).
+* Implemented as a dynamic array, which makes it significantly faster, but less memory efficient.
 */
 template <typename T>
 class stack {
 private:
-    // ITEM
-
-    struct item {
-        T value;
-        item *under;
-    };
-
-    item *alloc_item(const T &value, item *under) {
-        item *i = (item *)malloc(sizeof(item));
-        i->value = value;
-        i->under = under;
-        return i;
-    }
-
-    // VARIABLES
-
-    item *top;
+    int capacity;
+    int top_index;
+    T *buffer;
 
 public:
-    stack():
-        top(nullptr) {}
+    stack(const int initial_capacity = 10):
+        capacity(initial_capacity),
+        top_index(-1),
+        buffer((T *)malloc(capacity * sizeof(T))) {}
 
     ~stack() {
-        clear();
+        free(buffer);
     }
 
     // O(1)
     void put(const T &value) {
-        top = alloc_item(value, top);
+        if (++top_index >= capacity) {
+            capacity *= 2;
+            buffer = (T *)realloc(buffer, capacity * sizeof(T));
+        }
+        
+        buffer[top_index] = value;
     }
 
     // O(1)
@@ -52,35 +45,24 @@ public:
         if (empty())
             throw tf::exception("stack: peek: stack is empty");
         
-        return top->value;
+        return buffer[top_index];
     }
 
     // O(1)
     T pop() {
         if (empty())
             throw tf::exception("stack: pop: stack is empty");
-        
-        T value = top->value;
 
-        item *to_delete = top;
-        top = top->under;
-        free(to_delete);
+        return buffer[top_index--];
+    }
 
-        return value;
+    int size() const {
+        return top_index + 1;
     }
 
     // O(1)
     bool empty() const {
-        return top == nullptr;
-    }
-
-    // O(n)
-    void clear() {
-        while (!empty()) {
-            item *to_delete = top;
-            top = top->under;
-            free(to_delete);
-        }
+        return top_index < 0;
     }
 };
 

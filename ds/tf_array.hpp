@@ -9,7 +9,7 @@ namespace tf {
 
 /*
 * Dynamic array that reallocates when accessed out of bounds.
-* New allocation size is the smallest multiple of the current capacity, that can fit the index.
+* New allocation size is the smallest multiple of the current capacity that can hold the index.
 * Slightly slower than a c-array, but more secure.
 */
 template <typename T>

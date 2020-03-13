@@ -55,6 +55,13 @@ unsigned long hash<const char *>(const char * const &key) {
     return string_hash((unsigned char *)key);
 }
 
+/*
+* An unordered map.
+* Any object with consistens memory image can be used as key.
+* C and C++ String keys possible (and encouraged).
+* No memory overhead.
+* Table size should be close to the maximum number of elements.
+*/
 template <typename K, typename V>
 class hash_table {
 private:
