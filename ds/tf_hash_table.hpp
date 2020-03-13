@@ -109,14 +109,19 @@ public:
         free(buckets);
     }
 
-    // average case: O(1) - worst case: O(n)
+    // average: O(1) - worst: O(n)
     void insert(const K &key, const V &value) {
         unsigned long index = hash<K>(key) % table_size;
 
         if (*(buckets + index)) {
             bucket *it = *(buckets + index);
+            if (key == it->key)
+                throw tf::exception("hash table: insert: key already exists");
+            
             while (it->next) {
                 it = it->next;
+                if (key == it->key)
+                    throw tf::exception("hash table: insert: key already exists");
             }
 
             it->next = alloc_bucket(key, value, nullptr);
@@ -126,7 +131,36 @@ public:
         }
     }
 
-    // average case: O(1) - worst case: O(n)
+    // TODO
+    // average: O(1) - worst: O(n)
+    /*const V remove(const K &key) {
+        unsigned long index = hash<K>(key) % table_size;
+
+        bucket *it = *(buckets + index);
+
+
+        bucket *prev = nullptr;
+        while (it) {
+            if (key == it->key) {
+                V result = it->value;
+
+                if (prev)
+                    prev->next = it->next;
+                if (it->next)
+
+
+                free(it);
+                return result;
+            }
+
+            prev = it;
+            it = it->next;
+        }
+
+        throw tf::exception("hash table: remove: key not found");
+    }*/
+
+    // average: O(1) - worst: O(n)
     const V &get(const K &key) const {
         unsigned long index = hash<K>(key) % table_size;
         bucket *it = *(buckets + index);
@@ -139,10 +173,10 @@ public:
             it = it->next;
         }
 
-        throw tf::exception("hash table: get: invalid key");
+        throw tf::exception("hash table: get: key not found");
     }
 
-    // average case: O(1) - worst case: O(n)
+    // average: O(1) - worst: O(n)
     V &operator[](const K &key) {
         unsigned long index = hash<K>(key) % table_size;
         bucket *it = *(buckets + index);
@@ -155,7 +189,16 @@ public:
             it = it->next;
         }
 
-        throw tf::exception("hash table: get: invalid key");
+        throw tf::exception("hash table: []: key not found");
+    }
+
+    // O(n)
+    void clear() {
+        for (int i = 0; i < table_size; ++i) {
+            free_bucket(*(buckets + i));
+        }
+
+        memset(buckets, 0, table_size);
     }
 
     // DEBUG

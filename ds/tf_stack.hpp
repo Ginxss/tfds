@@ -1,7 +1,3 @@
-//////////
-// DONE //
-//////////
-
 #ifndef TF_STACK_H
 #define TF_STACK_H
 
@@ -10,8 +6,7 @@
 namespace tf {
 
 /*
-* Standard Stack structure (Put, Peek and Pop).
-* Implemented as a dynamic array, which makes it significantly faster, but less memory efficient.
+* Put, Peek and Pop.
 */
 template <typename T>
 class stack {
@@ -63,6 +58,11 @@ public:
     // O(1)
     bool empty() const {
         return top_index < 0;
+    }
+
+    // O(1)
+    void clear() {
+        top_index = -1;
     }
 };
 

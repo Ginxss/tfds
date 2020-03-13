@@ -1,7 +1,3 @@
-//////////
-// DONE //
-//////////
-
 #ifndef TF_ARRAY_H
 #define TF_ARRAY_H
 
@@ -9,8 +5,6 @@ namespace tf {
 
 /*
 * Dynamic array that reallocates when accessed out of bounds.
-* New allocation size is the smallest multiple of the current capacity that can hold the index.
-* Slightly slower than a c-array, but more secure.
 */
 template <typename T>
 class array {
@@ -22,6 +16,7 @@ private:
 
     // METHODS
 
+    // reallocation size is the smallest multiple of the current capacity that can hold the index.
     void check_size(const int index) {
         if (index >= capacity_) {
             capacity_ *= (int)((index / capacity_) + 1);
@@ -30,14 +25,15 @@ private:
     }
 
 public:
-    array(const int capacity = 10):
-        capacity_(capacity),
-        buffer((T *)malloc(capacity_ * sizeof(T))) {}
+    array(const int initial_capacity = 10):
+        capacity_(initial_capacity),
+        buffer((T *)malloc(capacity_ * sizeof(T)))
+    {
+        clear();
+    }
 
     ~array() {
-        if (buffer)
-            free(buffer);       
-        buffer = nullptr;
+        free(buffer);
     }
 
     // O(1) - O(n) if index > capacity
@@ -61,6 +57,11 @@ public:
     // O(1)
     int capacity() const {
         return capacity_;
+    }
+
+    // O(n)
+    void clear() {
+        memset(buffer, 0, capacity_);
     }
 };
 

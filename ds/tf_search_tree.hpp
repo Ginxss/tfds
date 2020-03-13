@@ -14,7 +14,6 @@ namespace tf {
 
 /*
 * An ordered map (iterative implementation of an AVL tree).
-* Allows searching by key in logarithmic time while automatically ordering the entries by key.
 */
 template <typename K, typename V>
 class search_tree {
@@ -296,11 +295,11 @@ public:
             }
         }
 
-        throw tf::exception("search tree: remove: invalid key");
+        throw tf::exception("search tree: remove: key not found");
     }
 
     // O(log(n))
-    const V &get(const K &key) {
+    const V &get(const K &key) const {
         node *it = root;
         while (it) {
             if (key < it->key) {
@@ -314,7 +313,25 @@ public:
             }
         }
 
-        throw tf::exception("search tree: get: invalid key");
+        throw tf::exception("search tree: get: key not found");
+    }
+
+    // average: O(1) - worst: O(n)
+    V &operator[](const K &key) {
+        node *it = root;
+        while (it) {
+            if (key < it->key) {
+                it = it->left;
+            }
+            else if (key > it->key) {
+                it = it->right;
+            }
+            else {
+                return it->value;
+            }
+        }
+
+        throw tf::exception("search tree: []: key not found");
     }
 
     // O(1)

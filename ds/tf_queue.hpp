@@ -1,7 +1,3 @@
-////////////
-// USABLE //
-////////////
-
 #ifndef TF_QUEUE_H
 #define TF_QUEUE_H
 
@@ -9,6 +5,9 @@
 
 namespace tf {
 
+/*
+* FIFO Queue.
+*/
 template <typename T>
 class queue {
 private:
@@ -33,10 +32,10 @@ private:
     int length_;
 
 public:
-
     queue():
         input(nullptr),
-        output(nullptr) {}
+        output(nullptr),
+        length_(0) {}
 
     ~queue() {
         clear();
@@ -45,8 +44,7 @@ public:
     // O(1)
     void add(const T &value) {
         if (empty()) {
-            input = alloc_node(value, nullptr);
-            output = input;
+            output = input = alloc_node(value, nullptr);
         }
         else {
             input->prev = alloc_node(value, nullptr);
