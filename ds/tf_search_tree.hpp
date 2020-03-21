@@ -17,9 +17,7 @@ namespace tf {
 */
 template <typename K, typename V>
 class search_tree {
-private:
-    // NODE
-    
+private:    
     struct node {
         K key;
         V value;
@@ -40,9 +38,30 @@ private:
         return n;
     }
 
+public:
+    // TODO
+    class iterator {
+    public:
+        node *nd;
+
+        T &operator*() { return nd->value; }
+
+        void operator++() {
+            // ...
+        }
+
+        void operator--() { nd = nd->prev; }
+        bool condition() { return nd != nullptr; }
+    };
+
+private:
     // VARIABLES
 
     node *root;
+    int size_;
+
+    iterator start_it;
+    iterator end_it;
 
     // METHODS    
 
@@ -217,7 +236,8 @@ private:
 
 public:
     search_tree():
-        root(nullptr) {}
+        root(nullptr),
+        size_(0) {}
     
     ~search_tree() {
         clear();
@@ -257,6 +277,8 @@ public:
 
             rebalance_upward(it);
         }
+
+        size_++;
     }
 
     // O(log(n))
@@ -291,6 +313,7 @@ public:
                     root = nullptr;
                 }
 
+                size_--;
                 return result;
             }
         }
@@ -332,6 +355,38 @@ public:
         }
 
         throw tf::exception("search tree: []: key not found");
+    }
+
+    // O(log(n))
+    iterator begin() {
+        node *it = root;
+        while (it->left) {
+            it = it->left;
+        }
+
+        start_it.nd = it;
+        return start_it;
+    }
+
+    // O(log(n))
+    iterator end() {
+        node *it = root;
+        while (it->right) {
+            it = it->right;
+        }
+
+        end_it.nd = it;
+        return end_it;
+    }
+
+    // O(1)
+    int height() const {
+        return height(root);
+    }
+
+    // O(1)
+    int size() const {
+        return size_;
     }
 
     // O(1)
