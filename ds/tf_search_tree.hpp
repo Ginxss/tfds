@@ -44,14 +44,20 @@ public:
     public:
         node *nd;
 
-        T &operator*() { return nd->value; }
+        V &operator*() { return nd->value; }
 
         void operator++() {
             // ...
         }
 
-        void operator--() { nd = nd->prev; }
-        bool condition() { return nd != nullptr; }
+        void operator--() {
+            // ...
+        }
+
+        bool condition() {
+            // ...
+            return false;
+        }
     };
 
 private:

@@ -1,12 +1,8 @@
-////////////
-// USABLE //
-////////////
-
 #ifndef TF_HASH_TABLE_H
 #define TF_HASH_TABLE_H
 
 #include <cstring> // memcpy
-#include <iostream> // DEBUG
+// #include <iostream> // DEBUG
 #include "tf_exception.hpp"
 
 namespace tf {
@@ -127,34 +123,37 @@ public:
         }
     }
 
-    // TODO
     // average: O(1) - worst: O(n)
-    /*const V remove(const K &key) {
+    const V remove(const K &key) {
         unsigned long index = hash<K>(key) % table_size;
 
-        bucket *it = *(buckets + index);
+        if (key == (*(buckets + index))->key) {
+            bucket *to_delete = *(buckets + index);
+            *(buckets + index) = to_delete->next;
 
-
-        bucket *prev = nullptr;
-        while (it) {
-            if (key == it->key) {
-                V result = it->value;
-
-                if (prev)
+            V result = to_delete->value;
+            free(to_delete);
+            return result;
+        }
+        else {
+            bucket *it = (*(buckets + index))->next;
+            bucket *prev = *(buckets + index);
+            while (it) {
+                if (key == it->key) {
                     prev->next = it->next;
-                if (it->next)
+                    
+                    V result = it->value;
+                    free(it);
+                    return result;
+                }
 
-
-                free(it);
-                return result;
+                prev = it;
+                it = it->next;
             }
-
-            prev = it;
-            it = it->next;
         }
 
         throw tf::exception("hash table: remove: key not found");
-    }*/
+    }
 
     // average: O(1) - worst: O(n)
     const V &get(const K &key) const {
@@ -192,13 +191,12 @@ public:
     void clear() {
         for (int i = 0; i < table_size; ++i) {
             free_bucket(*(buckets + i));
+            *(buckets + i) = nullptr;
         }
-
-        memset(buckets, 0, table_size);
     }
 
     // DEBUG
-    void print() {
+    /* void print() {
         for (int i = 0; i < table_size; ++i) {
             std::cout << "bucket " << i << ": ";
 
@@ -213,7 +211,7 @@ public:
 
             std::cout << std::endl;
         }
-    }
+    } */
 };
 
 }
