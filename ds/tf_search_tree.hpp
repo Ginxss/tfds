@@ -14,10 +14,11 @@ namespace tf {
 
 /*
 * An ordered map (iterative implementation of an AVL tree).
+* Can be used as a priority queue (TODO: Make Wrapper for that)
 */
 template <typename K, typename V>
 class search_tree {
-private:    
+private:
     struct node {
         K key;
         V value;
@@ -37,39 +38,6 @@ private:
         n->right = right;
         return n;
     }
-
-public:
-    // TODO
-    class iterator {
-    public:
-        node *nd;
-
-        V &operator*() { return nd->value; }
-
-        void operator++() {
-            // ...
-        }
-
-        void operator--() {
-            // ...
-        }
-
-        bool condition() {
-            // ...
-            return false;
-        }
-    };
-
-private:
-    // VARIABLES
-
-    node *root;
-    int size_;
-
-    iterator start_it;
-    iterator end_it;
-
-    // METHODS    
 
     int height(node *n) {
         return (n) ? n->height : 0;
@@ -99,6 +67,24 @@ private:
         }
     }
 
+    node *min_node(node *n) {
+        node *it = n;
+        while (it->left) {
+            it = it->left;
+        }
+
+        return it;
+    }
+
+    node *max_node(node *n) {
+        node *it = n;
+        while (it->right) {
+            it = it->right;
+        }
+
+        return it;
+    }
+
     bool is_left_child(node *child) {
         if (child) {
             node *parent = child->parent;
@@ -108,6 +94,61 @@ private:
 
         return false;
     }
+
+    node *successor(node *n) {
+        if (n->right)
+            return min_node(n->right);
+
+        node *it = n;
+        while (it->parent) {
+            if (is_left_child(it)) {
+                return it->parent;
+            }
+
+            it = it->parent;
+        }
+
+        return nullptr;
+    }
+
+    node *predecessor(node *n) {
+        if (n->left)
+            return max_node(n->left);
+
+        node *it = n;
+        while (it->parent) {
+            if (!is_left_child(it)) {
+                return it->parent;
+            }
+
+            it = it->parent;
+        }
+        
+        return nullptr;
+    }
+
+public:
+    class iterator {
+    public:
+        node *nd;
+        search_tree *tree;
+
+        V &operator*() { return nd->value; }
+        void operator++() { nd = tree->successor(nd); }
+        void operator--() { nd = tree->predecessor(nd); }
+        bool condition() { return nd != nullptr; }
+    };
+
+private:
+    // VARIABLES
+
+    node *root;
+    int size_;
+
+    iterator start_it;
+    iterator end_it;
+
+    // METHODS
 
     node *left_rotation(node *n) {
         node *new_root = n->right;
@@ -224,11 +265,8 @@ private:
     const V remove_double_parent(node *to_delete) {
         const V result = to_delete->value;
 
-        node *succ = to_delete->right;
-        while (succ->left) {
-            succ = succ->left;
-        }
-
+        node *succ = successor(to_delete);
+        
         to_delete->key = succ->key;
         to_delete->value = succ->value;
 
@@ -243,7 +281,10 @@ private:
 public:
     search_tree():
         root(nullptr),
-        size_(0) {}
+        size_(0)
+    {
+        start_it.tree = this;
+    }
     
     ~search_tree() {
         clear();
@@ -432,7 +473,7 @@ public:
     // DEBUG
     void print() const {
         tf::linked_list<node *> list;
-        list.add(root);
+        list.add_back(root);
 
         tf::linked_list<node *> next_level;
 
@@ -443,8 +484,8 @@ public:
                     std::cout << (*it)->key  << "/" << (*it)->value << " ";
 
                     // add next level
-                    next_level.add((*it)->left);
-                    next_level.add((*it)->right);
+                    next_level.add_back((*it)->left);
+                    next_level.add_back((*it)->right);
                 }
                 else {
                     std::cout << "_/_ ";
@@ -455,7 +496,7 @@ public:
             // transfer next level
             list.clear();
             for (auto it = next_level.begin(); it.condition(); ++it) {
-                list.add(*it);
+                list.add_back(*it);
             }
             next_level.clear();
         }
