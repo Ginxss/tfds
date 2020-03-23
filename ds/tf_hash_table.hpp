@@ -1,7 +1,7 @@
 #ifndef TF_HASH_TABLE_H
 #define TF_HASH_TABLE_H
 
-#include <cstring> // memcpy
+#include <cstring> // memcpy, memset
 // #include <iostream> // DEBUG
 #include "tf_exception.hpp"
 

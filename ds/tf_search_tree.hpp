@@ -1,12 +1,8 @@
-////////////
-// USABLE //
-////////////
-
 #ifndef TF_SEARCH_TREE_H
 #define TF_SEARCH_TREE_H
 
-#include <iostream> // print            |
-#include "tf_linked_list.hpp" // print  | DEBUG
+// #include <iostream> // print            |
+// #include "tf_linked_list.hpp" // print  | DEBUG
 
 #include "tf_exception.hpp"
 
@@ -228,9 +224,7 @@ private:
         }
     }
 
-    const V remove_leaf(node *to_delete) {
-        const V result = to_delete->value;
-
+    void remove_leaf(node *to_delete) {
         if (to_delete->parent) {
             if (is_left_child(to_delete))
                 to_delete->parent->left = nullptr;
@@ -242,12 +236,9 @@ private:
         }
 
         free(to_delete);
-        return result;
     }
 
-    const V remove_single_parent(node *to_delete) {
-        const V result = to_delete->value;
-
+    void remove_single_parent(node *to_delete) {
         node *new_root = (to_delete->left) ? to_delete->left : to_delete->right;
         if (to_delete->parent) {
             if (is_left_child(to_delete))
@@ -261,12 +252,9 @@ private:
         }
 
         free(to_delete);
-        return result;
     }
 
-    const V remove_double_parent(node *to_delete) {
-        const V result = to_delete->value;
-
+    void remove_double_parent(node *to_delete) {
         node *succ = successor(to_delete);
         
         to_delete->key = succ->key;
@@ -276,7 +264,28 @@ private:
             remove_single_parent(succ);
         else
             remove_leaf(succ);
+    }
 
+    // uses one of the three methods above to remove a node and return its value.
+    const V remove_node(node *n) {
+        const V result = n->value;
+        node *parent = n->parent;
+
+        if (n->left && n->right)
+            remove_double_parent(n);
+        else if (n->left || n->right)
+            remove_single_parent(n);
+        else
+            remove_leaf(n);
+
+        if (!empty()) {
+            node *replacing = (parent) ? parent : root;
+            update_height(replacing->left);
+            update_height(replacing->right);
+            rebalance_upward(replacing);
+        }
+
+        size_--;
         return result;
     }
 
@@ -333,8 +342,6 @@ public:
 
     // O(log(n))
     const V remove(const K &key) {
-        V result;
-
         node *it = root;
         while (it) {
             if (key < it->key) {
@@ -344,27 +351,7 @@ public:
                 it = it->right;
             }
             else {
-                node *to_delete = it;
-                it = it->parent;
-
-                if (to_delete->left && to_delete->right)
-                    result = remove_double_parent(to_delete);
-                else if (to_delete->left || to_delete->right)
-                    result = remove_single_parent(to_delete);
-                else
-                    result = remove_leaf(to_delete);
-
-                if (it) {
-                    update_height(it->left);
-                    update_height(it->right);
-                    rebalance_upward(it);
-                }
-                else {
-                    root = nullptr;
-                }
-
-                size_--;
-                return result;
+                return remove_node(it);
             }
         }
 
@@ -433,6 +420,32 @@ public:
         return end_it;
     }
 
+    // O(log(n))
+    V pop_min() {
+        if (empty())
+            throw tf::exception("search tree: pop_min: tree is empty");
+
+        node *it = root;
+        while (it->left) {
+            it = it->left;
+        }
+        
+        return remove_node(it);
+    }
+
+    // O(log(n))
+    V pop_max() {
+        if (empty())
+            throw tf::exception("search tree: pop_max: tree is empty");
+        
+        node *it = root;
+        while (it->right) {
+            it = it->right;
+        }
+
+        return remove_node(it);
+    }
+
     // O(1)
     int height() const {
         return height(root);
@@ -478,7 +491,7 @@ public:
     }
 
     // DEBUG
-    void print() const {
+    /*void print() const {
         tf::linked_list<node *> list;
         list.add_back(root);
 
@@ -507,7 +520,7 @@ public:
             }
             next_level.clear();
         }
-    }
+    }*/
 };
 
 }

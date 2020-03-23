@@ -1,6 +1,8 @@
 #ifndef TF_ARRAY_H
 #define TF_ARRAY_H
 
+#include <cstring> // memset
+
 namespace tf {
 
 /*
@@ -61,7 +63,7 @@ public:
 
     // O(n)
     void clear() {
-        memset(buffer, 0, capacity_);
+        memset(buffer, 0, capacity_ * sizeof(T));
     }
 };
 
