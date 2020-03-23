@@ -284,6 +284,7 @@ public:
         size_(0)
     {
         start_it.tree = this;
+        end_it.tree = this;
     }
     
     ~search_tree() {
