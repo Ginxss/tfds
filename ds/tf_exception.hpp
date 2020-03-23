@@ -6,7 +6,7 @@
 namespace tf {
 
 /*
-Exception class used in all tfds classes.
+* Exception class used in all tfds classes.
 */
 class exception : public std::exception {
 protected:

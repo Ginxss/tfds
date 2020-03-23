@@ -446,6 +446,23 @@ public:
         return remove_node(it);
     }
 
+    bool contains(const K &key) const {
+        node *it = root;
+        while (it) {
+            if (key < it->key) {
+                it = it->left;
+            }
+            else if (key > it->key) {
+                it = it->right;
+            }
+            else {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     // O(1)
     int height() const {
         return height(root);

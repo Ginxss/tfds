@@ -7,7 +7,6 @@ namespace tf {
 
 /*
 * Doubly Linked List.
-* Can be used as a FIFO-Queue. (TODO: FIFO-Wrapper for this)
 */
 template <typename T>
 class linked_list {
