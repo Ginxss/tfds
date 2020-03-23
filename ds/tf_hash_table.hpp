@@ -83,6 +83,7 @@ private:
     // VARIABLES
 
     const int table_size;
+    int size_;
     bucket **buckets;
 
 public:
@@ -185,6 +186,16 @@ public:
         }
 
         throw tf::exception("hash table: []: key not found");
+    }
+
+    // O(1)
+    int size() const  {
+        return size_;
+    }
+
+    // O(1)
+    bool empty() const {
+        return size_ == 0;
     }
 
     // O(n)

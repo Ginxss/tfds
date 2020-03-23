@@ -130,10 +130,12 @@ private:
 public:
     class iterator {
     public:
-        node *nd;
         search_tree *tree;
+        node *nd;
 
         V &operator*() { return nd->value; }
+        K &key() { return nd->key; }
+        V &value() { return nd->value; }
         void operator++() { nd = tree->successor(nd); }
         void operator--() { nd = tree->predecessor(nd); }
         bool condition() { return nd != nullptr; }
@@ -408,8 +410,10 @@ public:
     // O(log(n))
     iterator begin() {
         node *it = root;
-        while (it->left) {
-            it = it->left;
+        if (it) {
+            while (it->left) {
+                it = it->left;
+            }
         }
 
         start_it.nd = it;
@@ -419,8 +423,10 @@ public:
     // O(log(n))
     iterator end() {
         node *it = root;
-        while (it->right) {
-            it = it->right;
+        if (it) {
+            while (it->right) {
+                it = it->right;
+            }
         }
 
         end_it.nd = it;

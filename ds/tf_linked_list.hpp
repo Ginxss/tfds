@@ -33,6 +33,7 @@ public:
         node *nd;
 
         T &operator*() { return nd->value; }
+        T &value() { return nd->value; }
         void operator++() { nd = nd->next; }
         void operator--() { nd = nd->prev; }
         bool condition() { return nd != nullptr; }
