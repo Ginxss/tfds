@@ -102,7 +102,7 @@ public:
         free(buckets);
     }
 
-    // average: O(1) - worst: O(n)
+    // average: O(1) / worst: O(n)
     void insert(const K &key, const V &value) {
         unsigned long index = hash<K>(key) % table_size;
 
@@ -124,7 +124,7 @@ public:
         }
     }
 
-    // average: O(1) - worst: O(n)
+    // average: O(1) / worst: O(n)
     const V remove(const K &key) {
         unsigned long index = hash<K>(key) % table_size;
 
@@ -156,7 +156,7 @@ public:
         throw tf::exception("hash table: remove: key not found");
     }
 
-    // average: O(1) - worst: O(n)
+    // average: O(1) / worst: O(n)
     const V &get(const K &key) const {
         unsigned long index = hash<K>(key) % table_size;
         bucket *it = *(buckets + index);
@@ -172,7 +172,7 @@ public:
         throw tf::exception("hash table: get: key not found");
     }
 
-    // average: O(1) - worst: O(n)
+    // average: O(1) / worst: O(n)
     V &operator[](const K &key) {
         unsigned long index = hash<K>(key) % table_size;
         bucket *it = *(buckets + index);

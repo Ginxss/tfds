@@ -25,7 +25,7 @@ public:
         free(buffer);
     }
 
-    // O(1)
+    // O(1) / O(n) if capacity is full
     void put(const T &value) {
         if (++top_index >= capacity) {
             capacity *= 2;
@@ -51,6 +51,7 @@ public:
         return buffer[top_index--];
     }
 
+    // O(1)
     int size() const {
         return top_index + 1;
     }

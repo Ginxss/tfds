@@ -7,6 +7,7 @@ namespace tf {
 
 /*
 * Dynamic array that reallocates when accessed out of bounds.
+* TODO: Test for negative indices!
 */
 template <typename T>
 class array {
@@ -38,19 +39,19 @@ public:
         free(buffer);
     }
 
-    // O(1) - O(n) if index > capacity
+    // O(1) / O(n) if index > capacity
     void insert(const int index, const T &value) {
         check_size(index);
         buffer[index] = value;
     }
 
-    // O(1) - O(n) if index > capacity
+    // O(1) / O(n) if index > capacity
     const T &get(const int index) {
         check_size(index);
         return buffer[index];
     }
 
-    // O(1) - O(n) if index > capacity
+    // O(1) / O(n) if index > capacity
     T &operator[](const int index) {
         check_size(index);
         return buffer[index];

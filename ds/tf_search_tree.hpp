@@ -376,7 +376,7 @@ public:
         throw tf::exception("search tree: get: key not found");
     }
 
-    // average: O(1) - worst: O(n)
+    // O(log(n))
     V &operator[](const K &key) {
         node *it = root;
         while (it) {
@@ -446,6 +446,7 @@ public:
         return remove_node(it);
     }
 
+    // O(log(n))
     bool contains(const K &key) const {
         node *it = root;
         while (it) {
