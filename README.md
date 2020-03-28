@@ -60,7 +60,7 @@ int value = array[1];
 
 Returns the current capacity of the array:
 ```
-int capacity_of_array = array.capacity();
+int array_capacity = array.capacity();
 ```
 
 ---
@@ -567,4 +567,174 @@ tree.clear();
 ---
 ---
 
-TODO: Wrapper
+## FIFO Queue
+This is just a wrapper for the [Linked List], which only supports the actions that make a FIFO Queue.
+
+The queue deallocates on destruction.
+
+---
+
+### Constructor
+Constructor with type `int`:
+```
+tf::fifo_queue<int> queue;
+```
+
+---
+
+### add(value)
+*Runtime:* **O(1)**
+
+Adds the value 3 to the queue:
+```
+queue.add(3);
+```
+
+---
+
+### next()
+*Runtime:* **O(1)**
+
+*Exceptions:* Throws a tf::exception if the queue is empty.
+
+Returns the next value in the queue:
+```
+int next_value = queue.next();
+```
+
+---
+
+### contains(value)
+*Runtime:* **O(n)**
+
+Returns true if the queue contains the value 3:
+```
+bool contains_value = queue.contains(3);
+```
+
+---
+
+### length()
+*Runtime:* **O(1)**
+
+Returns the number of elements in the queue:
+```
+int num_elements = queue.length();
+```
+
+---
+
+### empty()
+*Runtime:* **O(1)**
+
+Returns true if the queue has no elements:
+```
+bool queue_empty = queue.empty();
+```
+
+---
+
+### clear()
+*Runtime:* **O(n)**
+
+Deallocates all elements in the queue:
+```
+queue.clear();
+```
+
+---
+---
+
+## Priority Queue
+This is just a wrapper for the [Search Tree], which only supports the actions that make a Priority Queue.
+
+The Elements are sorted by the key. If only sorting by value is needed, the values should just have themselves as keys.
+
+The queue deallocates on destruction.
+
+---
+
+### Constructor
+Constructor with `int` keys and `int` values:
+```
+tf::prio_queue<int, int> queue;
+```
+
+---
+
+### insert(key, value)
+*Runtime:* **O(log(n))**
+
+*Exceptions:* Throws a tf::exception if the key already exists.
+
+Adds the value 3 with the key 1 to the queue:
+```
+queue.insert(1, 3);
+```
+
+---
+
+### next_min()
+*Runtime:* **O(log(n))**
+
+*Exceptions:* Throws a tf::exception if the queue is empty.
+
+Removes and returns the value with the smallest key:
+```
+int min_value = queue.next_min();
+```
+
+---
+
+### next_max()
+*Runtime:* **O(log(n))**
+
+*Exceptions:* Throws a tf::exception if the queue is empty.
+
+Removes and returns the value with the biggest key:
+```
+int max_value = queue.next_max();
+```
+
+---
+
+### contains(key)
+*Runtime:* **O(log(n))**
+
+Returns true if the queue contains the value 3:
+```
+bool contains_value = queue.contains(3);
+```
+
+---
+
+### length()
+*Runtime:* **O(1)**
+
+Returns the number of elements in the queue.
+```
+int num_entries = queue.length();
+```
+
+---
+
+### empty()
+*Runtime:* **O(1)**
+
+Returns true if the queue has no entries.
+```
+bool queue_empty = queue.empty();
+```
+
+---
+
+### clear()
+*Runtime:* **O(n)**
+
+Deallocates all entires in the queue:
+```
+queue.clear();
+```
+
+---
+---
