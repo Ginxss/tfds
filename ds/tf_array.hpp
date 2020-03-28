@@ -2,12 +2,12 @@
 #define TF_ARRAY_H
 
 #include <cstring> // memset
+#include "tf_exception.hpp"
 
 namespace tf {
 
 /*
 * Dynamic array that reallocates when accessed out of bounds.
-* TODO: Test for negative indices!
 */
 template <typename T>
 class array {
@@ -20,20 +20,20 @@ private:
     // METHODS
 
     // reallocation size is the smallest multiple of the current capacity that can hold the index.
-    void check_size(const int index) {
+    void check_index(const int index) {
         if (index >= capacity_) {
             capacity_ *= (int)((index / capacity_) + 1);
             buffer = (T *)realloc(buffer, capacity_ * sizeof(T));
+        }
+        else if (index < 0) {
+            throw tf::exception("array: index negative");
         }
     }
 
 public:
     array(const int initial_capacity = 10):
         capacity_(initial_capacity),
-        buffer((T *)malloc(capacity_ * sizeof(T)))
-    {
-        clear();
-    }
+        buffer((T *)malloc(capacity_ * sizeof(T))) {}
 
     ~array() {
         free(buffer);
@@ -41,19 +41,19 @@ public:
 
     // O(1) / O(n) if index > capacity
     void insert(const int index, const T &value) {
-        check_size(index);
+        check_index(index);
         buffer[index] = value;
     }
 
     // O(1) / O(n) if index > capacity
     const T &get(const int index) {
-        check_size(index);
+        check_index(index);
         return buffer[index];
     }
 
     // O(1) / O(n) if index > capacity
     T &operator[](const int index) {
-        check_size(index);
+        check_index(index);
         return buffer[index];
     }
 

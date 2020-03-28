@@ -37,6 +37,8 @@ tf::array<int> array(100);
 ### insert(index, value)
 *Runtime:* **O(1)** / O(n) on reallocation
 
+*Exceptions:* Throws a tf::exception if the index is negative.
+
 Inserts the value 3 at index 1:
 ```
 array.insert(1, 3);
@@ -47,6 +49,8 @@ array.insert(1, 3);
 ### get(index)
 *Runtime:* **O(1)** / O(n) on reallocation
 
+*Exceptions:* Throws a tf::exception if the index is negative.
+
 Returns a constant reference to the value at index 1:
 ```
 int value = array.get(1);
@@ -56,6 +60,8 @@ int value = array.get(1);
 
 ### [index]
 *Runtime:* **O(1)** / O(n) on reallocation
+
+*Exceptions:* Throws a tf::exception if the index is negative.
 
 Returns a reference to the value at index 1:
 ```
@@ -654,7 +660,7 @@ bool queue_empty = queue.empty();
 ### clear()
 *Runtime:* **O(n)**
 
-Deallocates all elements in the FIFO queue:
+Deallocates all elements:
 ```
 queue.clear();
 ```
@@ -748,7 +754,7 @@ bool queue_empty = queue.empty();
 ### clear()
 *Runtime:* **O(n)**
 
-Deallocates all entires in the priority queue:
+Deallocates all entries:
 ```
 queue.clear();
 ```
