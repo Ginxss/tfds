@@ -27,7 +27,7 @@ Default constructor with type `int` and initial capacitity 10:
 ```
 tf::array<int> array;
 ```
-Initial capacity, in this case 100, can be set in the Constructor:
+A custom initial capacity, in this case 100, can be set in the Constructor:
 ```
 tf::array<int> array(100);
 ```
@@ -102,7 +102,7 @@ Default constructor with type `int` and initial capacitity 10:
 ```
 tf::stack<int> stack;
 ```
-Initial capacity, in this case 100, can be set in the Constructor:
+A custom initial capacity, in this case 100, can be set in the Constructor:
 ```
 tf::stack<int> stack(100);
 ```
