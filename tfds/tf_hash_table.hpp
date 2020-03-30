@@ -2,7 +2,6 @@
 #define TF_HASH_TABLE_H
 
 #include <cstring> // memcpy, memset
-// #include <iostream> // DEBUG
 #include "tf_exception.hpp"
 
 namespace tf {
@@ -273,24 +272,6 @@ public:
         memset(buckets, 0, table_size_ * sizeof(bucket *));
         size_ = 0;
     }
-
-    // DEBUG
-    /* void print() {
-        for (int i = 0; i < table_size_; ++i) {
-            std::cout << "bucket " << i << ": ";
-
-            bucket *it = *(buckets + i);
-            if (!it) {
-                std::cout << "- ";
-            }
-            while (it) {
-                std::cout << it->key << "/" << it->value << " ";
-                it = it->next;
-            }
-
-            std::cout << std::endl;
-        }
-    } */
 };
 
 }

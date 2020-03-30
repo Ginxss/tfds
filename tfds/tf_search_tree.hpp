@@ -1,9 +1,6 @@
 #ifndef TF_SEARCH_TREE_H
 #define TF_SEARCH_TREE_H
 
-// #include <iostream> // print            |
-// #include "tf_linked_list.hpp" // print  | DEBUG
-
 #include "tf_exception.hpp"
 
 namespace tf {
@@ -507,38 +504,6 @@ public:
 
         size_ = 0;
     }
-
-    // DEBUG
-    /* void print() const {
-        tf::linked_list<node *> list;
-        list.add_back(root);
-
-        tf::linked_list<node *> next_level;
-
-        while (!list.empty()) {
-            // print level
-            for (auto it = list.begin(); it.condition(); ++it) {
-                if ((*it)) {
-                    std::cout << (*it)->key  << "/" << (*it)->value << " ";
-
-                    // add next level
-                    next_level.add_back((*it)->left);
-                    next_level.add_back((*it)->right);
-                }
-                else {
-                    std::cout << "_/_ ";
-                }
-            }
-            std::cout << std::endl;
-
-            // transfer next level
-            list.clear();
-            for (auto it = next_level.begin(); it.condition(); ++it) {
-                list.add_back(*it);
-            }
-            next_level.clear();
-        }
-    } */
 };
 
 }
