@@ -10,7 +10,6 @@ namespace tf {
 
 /*
 * An ordered map (iterative implementation of an AVL tree).
-* Can be used as a priority queue (TODO: Make Wrapper for that)
 */
 template <typename K, typename V>
 class search_tree {
@@ -35,14 +34,14 @@ private:
         return n;
     }
 
-    int height(node *n) {
+    int node_height(node *n) const {
         return (n) ? n->height : 0;
     }
 
     void update_height(node *n) {
         if (n) {
-            int left_height = height(n->left);
-            int right_height = height(n->right);
+            int left_height = node_height(n->left);
+            int right_height = node_height(n->right);
             n->height = ((right_height > left_height) ? right_height : left_height) + 1;
         }
     }
@@ -63,7 +62,7 @@ private:
         }
     }
 
-    node *min_node(node *n) {
+    node *min_node(node *n) const {
         node *it = n;
         while (it->left) {
             it = it->left;
@@ -72,7 +71,7 @@ private:
         return it;
     }
 
-    node *max_node(node *n) {
+    node *max_node(node *n) const {
         node *it = n;
         while (it->right) {
             it = it->right;
@@ -81,7 +80,7 @@ private:
         return it;
     }
 
-    bool is_left_child(node *child) {
+    bool is_left_child(node *child) const {
         if (child) {
             node *parent = child->parent;
             if (parent && parent->left && parent->left->key == child->key)
@@ -91,7 +90,7 @@ private:
         return false;
     }
 
-    node *successor(node *n) {
+    node *successor(node *n) const {
         if (n->right)
             return min_node(n->right);
 
@@ -107,7 +106,7 @@ private:
         return nullptr;
     }
 
-    node *predecessor(node *n) {
+    node *predecessor(node *n) const {
         if (n->left)
             return max_node(n->left);
 
@@ -200,9 +199,9 @@ private:
         node *it = n;
         while (it) {
             update_height(it);
-            int balance = height(it->right) - height(it->left);
+            int balance = node_height(it->right) - node_height(it->left);
             if (balance > 1) {
-                if (height(it->right->right) > height(it->right->left)) {
+                if (node_height(it->right->right) > node_height(it->right->left)) {
                     it = left_rotation(it);
                 }
                 else {
@@ -211,7 +210,7 @@ private:
                 }
             }
             else if (balance < -1) {
-                if (height(it->left->left) > height(it->left->right)) {
+                if (node_height(it->left->left) > node_height(it->left->right)) {
                     it = right_rotation(it);
                 }
                 else {
@@ -306,7 +305,6 @@ public:
     void insert(const K &key, const V &value) {
         if (empty()) {
             root = alloc_node(key, value, 1, nullptr, nullptr, nullptr);
-            return;
         }
         else {
             node *it = root;
@@ -466,7 +464,7 @@ public:
 
     // O(1)
     int height() const {
-        return height(root);
+        return node_height(root);
     }
 
     // O(1)
@@ -511,7 +509,7 @@ public:
     }
 
     // DEBUG
-    /*void print() const {
+    /* void print() const {
         tf::linked_list<node *> list;
         list.add_back(root);
 
@@ -540,7 +538,7 @@ public:
             }
             next_level.clear();
         }
-    }*/
+    } */
 };
 
 }
