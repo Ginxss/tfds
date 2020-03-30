@@ -1,12 +1,12 @@
 #ifndef TF_FIFO_QUEUE_H
 #define TF_FIFO_QUEUE_H
 
-#include "../ds/tf_linked_list.hpp"
+#include "tf_linked_list.hpp"
 
 namespace tf {
 
 /*
-* FIFO-Queue: Wrapper for tf::linked_list
+* FIFO Queue: Wrapper for tf::linked_list.
 */
 template <typename T>
 class fifo_queue {

@@ -9,7 +9,7 @@
 namespace tf {
 
 /*
-* An ordered map (iterative implementation of an AVL tree).
+* Ordered map (iterative implementation of an AVL tree).
 */
 template <typename K, typename V>
 class search_tree {

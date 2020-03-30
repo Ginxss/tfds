@@ -6,7 +6,7 @@
 namespace tf {
 
 /*
-* Put, Peek and Pop.
+* Stack.
 */
 template <typename T>
 class stack {

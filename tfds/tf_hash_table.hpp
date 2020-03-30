@@ -52,7 +52,7 @@ unsigned long hash<const char *>(const char * const &key) {
 }
 
 /*
-* An unordered map (separate chaining hash map).
+* Unordered map (separate chaining hash map).
 */
 template <typename K, typename V>
 class hash_table {

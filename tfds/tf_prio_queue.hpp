@@ -1,12 +1,12 @@
 #ifndef TF_PRIO_QUEUE_H
 #define TF_PRIO_QUEUE_H
 
-#include "../ds/tf_search_tree.hpp"
+#include "tf_search_tree.hpp"
 
 namespace tf {
 
 /*
-* Priority-Queue: Wrapper for tf::search_tree
+* Priority Queue: Wrapper for tf::search_tree.
 */
 template <typename K, typename V>
 class prio_queue {
