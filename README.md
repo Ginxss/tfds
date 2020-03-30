@@ -23,11 +23,11 @@ The array deallocates on destruction.
 ---
 
 ### Constructor
-Default constructor with type `int` and initial capacitity 10:
+Default constructor with type `int` and initial capacity 10:
 ```
 tf::array<int> array;
 ```
-A custom initial capacity, in this case 100, can be set in the Constructor:
+A custom initial capacity, in this case 100, can be set in the constructor:
 ```
 tf::array<int> array(100);
 ```
@@ -104,11 +104,11 @@ The stack deallocates on destruction.
 ---
 
 ### Constructor
-Default constructor with type `int` and initial capacitity 10:
+Default constructor with type `int` and initial capacity 10:
 ```
 tf::stack<int> stack;
 ```
-A custom initial capacity, in this case 100, can be set in the Constructor:
+A custom initial capacity, in this case 100, can be set in the constructor:
 ```
 tf::stack<int> stack(100);
 ```
@@ -360,7 +360,7 @@ Default constructor with `int` keys and `int` values and table size 100:
 ```
 tf::hash_table<int, int> table;
 ```
-A custom table size, in this case 10, can be set in the Constructor:
+A custom table size, in this case 10, can be set in the constructor:
 ```
 tf::hash_table<int, int> table(10);
 ```
@@ -485,7 +485,7 @@ table.clear();
 ## Search Tree
 An ordered map (iterative AVL Tree).
 
-The Entries are sorted by the key. If only sorting by value is needed, the values should just have themselves as keys.
+The entries are sorted by the key. If only sorting by value is needed, the values should just have themselves as keys.
 
 Can also be used as a Priority Queue, although the use of the wrapper [Priority Queue](#priority-queue) is recommended for that.
 
@@ -645,7 +645,7 @@ tree.clear();
 ---
 
 ## FIFO Queue
-This is just a wrapper for the [Linked List](#linked-list), which provides only the functionality of a FIFO Queue.
+This is just a wrapper for the [Linked List](#linked-list), which provides only the functionality of a FIFO queue.
 
 The queue deallocates on destruction.
 
@@ -723,9 +723,9 @@ queue.clear();
 ---
 
 ## Priority Queue
-This is just a wrapper for the [Search Tree](#search-tree), which provides only the functionality of a Priority Queue.
+This is just a wrapper for the [Search Tree](#search-tree), which provides only the functionality of a priority queue.
 
-The Entries are sorted by the key. If only sorting by value is needed, the values should just have themselves as keys.
+The entries are sorted by the key. If only sorting by value is needed, the values should just have themselves as keys.
 
 The queue deallocates on destruction.
 
