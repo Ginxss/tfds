@@ -328,7 +328,7 @@ public:
                     }
                 }
                 else { // if (value == it->value)
-                    throw tf::exception("search tree: insert: key already present");
+                    throw tf::exception("search tree: insert: key already exists");
                 }
             }
 

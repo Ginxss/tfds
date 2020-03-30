@@ -21,7 +21,12 @@ public:
 
     // O(1)
     T next() {
-        return list.pop_back();
+        try {
+            return list.pop_back();
+        }
+        catch (tf::exception &e) {
+            throw tf::exception("fifo queue: next: queue is empty");
+        }
     }
 
     // O(n)

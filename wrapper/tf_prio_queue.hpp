@@ -16,17 +16,32 @@ private:
 public:
     // O(log(n))
     void insert(const K &key, const V &value) {
-        tree.insert(key, value);
+        try {
+            tree.insert(key, value);
+        }
+        catch (tf::exception &e) {
+            throw tf::exception("prio queue: insert: key already exists");
+        }
     }
 
     // O(log(n))
     V next_min() {
-        return tree.pop_min();
+        try {
+            return tree.pop_min();
+        }
+        catch (tf::exception &e) {
+            throw tf::exception("prio queue: next_min: queue is empty");
+        }
     }
 
     // O(log(n))
     V next_max() {
-        return tree.pop_max();
+        try {
+            return tree.pop_max();
+        }
+        catch (tf::exception &e) {
+            throw tf::exception("prio queue: next_max: queue is empty");
+        }
     }
 
     // O(log(n))
