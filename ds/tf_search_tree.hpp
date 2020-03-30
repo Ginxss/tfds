@@ -140,8 +140,8 @@ public:
 private:
     // VARIABLES
 
-    node *root;
     int size_;
+    node *root;
 
     iterator start_it;
     iterator end_it;
@@ -291,8 +291,8 @@ private:
 
 public:
     search_tree():
-        root(nullptr),
-        size_(0)
+        size_(0),
+        root(nullptr)
     {
         start_it.tree = this;
         end_it.tree = this;
@@ -506,6 +506,8 @@ public:
                 free(to_delete);
             }
         }
+
+        size_ = 0;
     }
 
     // DEBUG

@@ -41,9 +41,9 @@ public:
 private:
     // VARIABLES
 
+    int length_;
     node *start_node;
     node *end_node;
-    int length_;
     
     iterator start_it;
     iterator end_it;
@@ -78,9 +78,9 @@ private:
 
 public:
     linked_list():
+        length_(0),
         start_node(nullptr),
-        end_node(nullptr),
-        length_(0) {}
+        end_node(nullptr) {}
 
     ~linked_list() {
         clear();
@@ -259,9 +259,9 @@ public:
             free(to_delete);
         }
 
+        length_ = 0;
         start_node = nullptr;
         end_node = nullptr;
-        length_ = 0;
     }
 };
 
