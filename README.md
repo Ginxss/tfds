@@ -349,7 +349,7 @@ An unordered map (Separate Chaining Hash Map).
 Any type with non-changing memory can be used as the key, because the hash is built from the memory block of the key.
 Strings can be used as keys as well, `std::string` and `const char *` with the same string produce the same hash.
 
-The default table size is 100. For the best possible performance, the table size should be roughly the maximum number of elements. The average case performance of **O(1)** can only be ensured if the table is big enough.
+The default table size is 100 (table size = number of buckets, bucket = linked list of entries). The table size is fixed and can only be modified on construction. For the best possible performance, the table size should be roughly the maximum number of elements. The average case performance of **O(1)** can only be ensured if the table is big enough.
 
 The hash table deallocates on destruction.
 
@@ -364,6 +364,21 @@ A custom table size, in this case 10, can be set in the Constructor:
 ```
 tf::hash_table<int, int> table(10);
 ```
+
+---
+
+### Iteration
+Iterate over every entry in the hash table and print the values:
+```
+for (auto it = table.begin(); it.condition(); ++it) {
+    std::cout << *it << std::endl;
+}
+```
+The iterator is of the type `tf::hash_table<int, int>::iterator`, but for simplicity,  the use of `auto` is recommended. Backward iteration is not supported, since the order of the entries is random and does not matter.
+
+The value of the iterator can be accessed with either `*it` or the method `it.value()`. These two methods are identical and are interchangeable. The key of the iterator can be accessed with the method `it.key()`.
+
+In general, the hash table is not a data structure made for efficient iteration. If consistent and fast iteration is required, the use of [Linked List](#linked-list) is recommended.
 
 ---
 
@@ -416,6 +431,16 @@ table[1] = 4;
 
 ---
 
+### contains(key)
+*Runtime:* average case: **O(1)** / worst case: O(n)
+
+Returns `true` if an entry with key 3 is found in the hash table:
+```
+bool contains_value = table.contains(3);
+```
+
+---
+
 ### size()
 *Runtime:* **O(1)**
 
@@ -432,6 +457,16 @@ int num_entries = table.size();
 Returns `true` if the hash table has no entries:
 ```
 bool table_empty = table.empty();
+```
+
+---
+
+### table_size()
+*Runtime:* **O(1)**
+
+Returns the number of buckets in the hash table:
+```
+bool num_buckets = table.table_size();
 ```
 
 ---
@@ -463,6 +498,25 @@ Constructor with `int` keys and `int` values:
 ```
 tf::search_tree<int, int> tree;
 ```
+
+---
+
+### Iteration
+Iterate over every entry in the search tree in ascending order and print the values:
+```
+for (auto it = tree.begin(); it.condition(); ++it) {
+    std::cout << *it << std::endl;
+}
+```
+Iterate in descending order:
+```
+for (auto it = tree.end(); it.condition(); --it) {
+    std::cout << it.value() << std::endl;
+}
+```
+The iterator is of the type `tf::search_tree<int, int>::iterator`, but for simplicity,  the use of `auto` is recommended.
+
+The value of the iterator can be accessed with either `*it` or the method `it.value()`. These two methods are identical and are interchangeable. The key of the iterator can be accessed with the method `it.key()`.
 
 ---
 
@@ -591,7 +645,7 @@ tree.clear();
 ---
 
 ## FIFO Queue
-This is just a wrapper for the [Linked List](#linked-list), which only supports the actions that make a FIFO Queue.
+This is just a wrapper for the [Linked List](#linked-list), which provides only the functionality of a FIFO Queue.
 
 The queue deallocates on destruction.
 
@@ -669,7 +723,7 @@ queue.clear();
 ---
 
 ## Priority Queue
-This is just a wrapper for the [Search Tree](#search-tree), which only supports the actions that make a Priority Queue.
+This is just a wrapper for the [Search Tree](#search-tree), which provides only the functionality of a Priority Queue.
 
 The Entries are sorted by the key. If only sorting by value is needed, the values should just have themselves as keys.
 
