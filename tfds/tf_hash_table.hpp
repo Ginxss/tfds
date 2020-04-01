@@ -1,11 +1,14 @@
 #ifndef TF_HASH_TABLE_H
 #define TF_HASH_TABLE_H
 
+#include <iostream>
 #include <string>
 #include <cstring> // memcpy, memset
 #include "tf_exception.hpp"
 
 namespace tf {
+
+// HASH
 
 // src: http://www.cse.yorku.ca/~oz/hash.html
 // the actual djb2 algorithm which iterates over a string until a '0' is found
@@ -49,6 +52,23 @@ inline unsigned long hash<std::string>(const std::string &key) {
 template <>
 inline unsigned long hash<const char *>(const char * const &key) {
     return string_hash((unsigned char *)key);
+}
+
+// COMPARE
+
+template <typename K>
+inline bool compare(const K &key1, const K &key2) {
+    return key1 == key2;
+}
+
+template <>
+inline bool compare<std::string>(const std::string &key1, const std::string &key2) {
+    return key1.compare(key2) == 0;
+}
+
+template <>
+inline bool compare<const char *>(const char * const &key1, const char * const &key2) {
+    return strcmp(key1, key2) == 0;
 }
 
 /*
@@ -138,12 +158,12 @@ public:
 
         if (*(buckets + index)) {
             bucket *it = *(buckets + index);
-            if (key == it->key)
+            if (compare<K>(key, it->key))
                 throw tf::exception("hash table: insert: key already exists");
             
             while (it->next) {
                 it = it->next;
-                if (key == it->key)
+                if (compare<K>(key, it->key))
                     throw tf::exception("hash table: insert: key already exists");
             }
 
@@ -160,7 +180,7 @@ public:
     const V remove(const K &key) {
         unsigned long index = hash<K>(key) % table_size_;
 
-        if (key == (*(buckets + index))->key) {
+        if (compare<K>(key, (*(buckets + index))->key)) {
             bucket *to_delete = *(buckets + index);
             *(buckets + index) = to_delete->next;
 
@@ -173,7 +193,7 @@ public:
             bucket *it = (*(buckets + index))->next;
             bucket *prev = *(buckets + index);
             while (it) {
-                if (key == it->key) {
+                if (compare<K>(key, it->key)) {
                     prev->next = it->next;
                     
                     V result = it->value;
@@ -196,7 +216,7 @@ public:
         bucket *it = *(buckets + index);
 
         while (it) {
-            if (key == it->key) {
+            if (compare<K>(key, it->key)) {
                 return it->value;
             }
 
@@ -212,7 +232,7 @@ public:
         bucket *it = *(buckets + index);
         
         while (it) {
-            if (key == it->key) {
+            if (compare<K>(key, it->key)) {
                 return it->value;
             }
 
@@ -228,7 +248,7 @@ public:
         bucket *it = *(buckets + index);
 
         while (it) {
-            if (key == it->key) {
+            if (compare<K>(key, it->key)) {
                 return true;
             }
 
