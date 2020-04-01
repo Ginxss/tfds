@@ -83,8 +83,9 @@ private:
             return curr_b->next;
         }
 
+        (*curr_index)++;
         while ((*curr_index) < table_size_) {
-            bucket *b = *(buckets + ++(*curr_index));
+            bucket *b = *(buckets + (*curr_index)++);
             if (b) {
                 return b;
             }
