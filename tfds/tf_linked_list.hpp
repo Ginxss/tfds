@@ -1,6 +1,7 @@
 #ifndef TF_LINKED_LIST_H
 #define TF_LINKED_LIST_H
 
+#include <cstdlib> // malloc
 #include "tf_exception.hpp"
 
 namespace tf {
