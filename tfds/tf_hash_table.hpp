@@ -1,6 +1,7 @@
 #ifndef TF_HASH_TABLE_H
 #define TF_HASH_TABLE_H
 
+#include <string>
 #include <cstring> // memcpy, memset
 #include "tf_exception.hpp"
 
