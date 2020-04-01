@@ -1,6 +1,7 @@
 #ifndef TF_SEARCH_TREE_H
 #define TF_SEARCH_TREE_H
 
+#include <cstdlib> // malloc
 #include "tf_exception.hpp"
 
 namespace tf {
