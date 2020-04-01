@@ -9,7 +9,7 @@ namespace tf {
 
 // src: http://www.cse.yorku.ca/~oz/hash.html
 // the actual djb2 algorithm which iterates over a string until a '0' is found
-unsigned long string_hash(unsigned char *str) {
+inline unsigned long string_hash(unsigned char *str) {
     unsigned long hash = 5381;
     int c;
 
@@ -20,7 +20,7 @@ unsigned long string_hash(unsigned char *str) {
 }
 
 // a modified version that iterates over a fixed number of bytes
-unsigned long byte_hash(unsigned char *bytes, int length) {
+inline unsigned long byte_hash(unsigned char *bytes, int length) {
     unsigned long hash = 5381;
     int c;
 
@@ -34,7 +34,7 @@ unsigned long byte_hash(unsigned char *bytes, int length) {
 }
 
 template <typename K>
-unsigned long hash(const K &key) {
+inline unsigned long hash(const K &key) {
     int key_size = sizeof(K);
     unsigned char bytes[key_size];
     memcpy(bytes, &key, key_size);
@@ -42,12 +42,12 @@ unsigned long hash(const K &key) {
 }
 
 template <>
-unsigned long hash<std::string>(const std::string &key) {
+inline unsigned long hash<std::string>(const std::string &key) {
     return string_hash((unsigned char *)key.c_str());
 }
 
 template <>
-unsigned long hash<const char *>(const char * const &key) {
+inline unsigned long hash<const char *>(const char * const &key) {
     return string_hash((unsigned char *)key);
 }
 
