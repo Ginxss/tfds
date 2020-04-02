@@ -278,6 +278,30 @@ list.remove(3);
 
 ---
 
+### back()
+*Runtime:* **O(1)**
+
+*Exceptions:* Throws a tf::exception if the list is empty.
+
+Returns a constant reference to the last value in the list:
+```
+int last_value = list.back();
+```
+
+---
+
+### front()
+*Runtime:* **O(1)**
+
+*Exceptions:* Throws a tf::exception if the list is empty.
+
+Returns a constant reference to the first value in the list:
+```
+int first_value = list.front();
+```
+
+---
+
 ### pop_back()
 *Runtime:* **O(1)**
 

@@ -184,6 +184,22 @@ public:
     }
 
     // O(1)
+    const T &back() const {
+        if (empty())
+            throw tf::exception("linked list: pop_front: list is empty");
+        
+        return end_node->value;
+    }
+
+    // O(1)
+    const T &front() const {
+        if (empty())
+            throw tf::exception("linked list: pop_front: list is empty");
+        
+        return start_node->value;
+    }
+
+    // O(1)
     T pop_back() {
         if (empty())
             throw tf::exception("linked list: pop_back: list is empty");
