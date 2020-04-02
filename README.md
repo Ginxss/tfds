@@ -283,7 +283,7 @@ list.remove(3);
 
 *Exceptions:* Throws a tf::exception if the list is empty.
 
-Returns a constant reference to the last value in the list:
+Returns a reference to the last value in the list:
 ```
 int last_value = list.back();
 ```
@@ -295,7 +295,7 @@ int last_value = list.back();
 
 *Exceptions:* Throws a tf::exception if the list is empty.
 
-Returns a constant reference to the first value in the list:
+Returns a reference to the first value in the list:
 ```
 int first_value = list.front();
 ```

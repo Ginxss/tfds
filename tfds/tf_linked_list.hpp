@@ -184,7 +184,7 @@ public:
     }
 
     // O(1)
-    const T &back() const {
+    T &back() {
         if (empty())
             throw tf::exception("linked list: pop_front: list is empty");
         
@@ -192,7 +192,7 @@ public:
     }
 
     // O(1)
-    const T &front() const {
+    T &front() {
         if (empty())
             throw tf::exception("linked list: pop_front: list is empty");
         
