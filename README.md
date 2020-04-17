@@ -219,6 +219,7 @@ for (auto it = list.end(); it.condition(); --it) {
 The iterator is of the type `tf::linked_list<int>::iterator`, but for simplicity,  the use of `auto` is recommended.
 
 The value of the iterator can be accessed with either `*it` or the method `it.value()`. These two methods are identical and are interchangeable.
+The methods `it.next_value()` and `it.prev_value()` return pointers to the following or previous value of the iterator if they exist, otherwise `nullptr`.
  
 ---
 
