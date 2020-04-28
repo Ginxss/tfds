@@ -10,6 +10,8 @@
 * [Priority Queue](#priority-queue)
 * [Multi Priority Queue](#multi-priority-queue)
 
+---
+
 Why not just use the standard C++ data structures, you ask? Well, there's a couple of reasons:
 
 First of all, every one of these data structures is faster than their C++ counterpart in almost all scenarios (The only exception being std::vector, which is slightly faster than tf::array because tf::array automatically allocates new space if accessed out of bounds, while std::vector just throws an exception. So these two structures actually behave quite differently and can't really be compared).
