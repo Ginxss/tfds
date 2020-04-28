@@ -37,7 +37,7 @@ inline unsigned long byte_hash(unsigned char *bytes, int length) {
 
 template <typename K>
 inline unsigned long hash(const K &key) {
-    int key_size = sizeof(K);
+    const int key_size = sizeof(K);
     unsigned char bytes[key_size];
     memcpy(bytes, &key, key_size);
     return byte_hash(bytes, key_size);
