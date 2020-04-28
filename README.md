@@ -5,8 +5,10 @@
 * [Linked List](#linked-list)
 * [Hash Table](#hash-table)
 * [Search Tree](#search-tree)
+* [Multi Search Tree](#multi-search-tree)
 * [FIFO Queue](#fifo-queue)
 * [Priority Queue](#priority-queue)
+* [Multi Priority Queue](#multi-priority-queue)
 
 ---
 ---
@@ -512,7 +514,7 @@ An ordered map (iterative AVL Tree).
 
 The entries are sorted by the key. If only sorting by value is needed, the values should just have themselves as keys.
 
-Can also be used as a Priority Queue, although the use of the wrapper [Priority Queue](#priority-queue) is recommended for that.
+Can also be used as a Priority Queue, although the use of the wrapper [Priority Queue](#priority-queue) is recommended for that, because of its simpler interface.
 
 The search tree deallocates on destruction.
 
@@ -669,6 +671,179 @@ tree.clear();
 ---
 ---
 
+## Multi Search Tree
+Behaves just like the [Search Tree](#search-tree) while allowing duplicate keys.
+
+The entries are sorted by the key. Values with the same key are not ordered in any particular order. If no duplicate keys are expected, the use of [Search Tree](#search-tree) is recommended, because of its slightly higher speed.
+
+Can also be used as a Multi Priority Queue, although the use of the wrapper [Multi Priority Queue](#multi-priority-queue) is recommended for that, because of its simpler interface.
+
+The multi search tree deallocates on destruction.
+
+---
+
+### Constructor
+Constructor with `int` keys and `int` values:
+```
+tf::multi_search_tree<int, int> tree;
+```
+
+---
+
+### Iteration
+Iterate over every entry in the search tree in ascending order and print the values:
+```
+for (auto it = tree.begin(); it.condition(); ++it) {
+    std::cout << *it << std::endl;
+}
+```
+Iterate in descending order:
+```
+for (auto it = tree.end(); it.condition(); --it) {
+    std::cout << it.value() << std::endl;
+}
+```
+The iterator is of the type `tf::multi_search_tree<int, int>::iterator`, but for simplicity,  the use of `auto` is recommended.
+
+The value of the iterator can be accessed with either `*it` or the method `it.value()`. These two methods are identical and are interchangeable. The key of the iterator can be accessed with the method `it.key()`.
+
+---
+
+### insert(key, value)
+*Runtime:* **O(log(n))**
+
+Inserts the value 3 with key 1 into the multi search tree:
+```
+tree.insert(1, 3);
+```
+
+---
+
+### remove(key)
+*Runtime:* **O(log(n))**
+
+*Exceptions:* Throws a tf::exception if the key does not exist.
+
+Removes all entries with key 1 and returns a value:
+```
+int value = tree.remove(1);
+```
+
+---
+
+### remove_value(key, value)
+*Runtime:* **O(log(n))**
+
+*Exceptions:* Throws a tf::exception if either the key or the value do not exist.
+
+Removes the entries with key 1 and value 1 and returns the removed value:
+```
+int value = tree.remove(1, 1);
+```
+While it is redundant to return the same value that was just removed, it works like that for reasons of symmetry and compatibility with the [Search Tree](#search-tree).
+
+---
+
+### get(key)
+*Runtime:* **O(log(n))**
+
+*Exceptions:* Throws a tf::exception if the key does not exist.
+
+Returns a constant reference to a value with key 1:
+```
+int value = tree.get(1);
+```
+
+---
+
+### [key]
+*Runtime:* **O(log(n))**
+
+*Exceptions:* Throws a tf::exception if the key does not exist.
+
+Returns a reference to a value with key 1:
+```
+int value = tree[1];
+tree[1] = 4;
+```
+
+---
+
+### pop_min()
+*Runtime:* **O(log(n))**
+
+*Exceptions:* Throws a tf::exception if the multi search tree is empty.
+
+Removes and returns a value with the smallest key:
+```
+int min_value = tree.pop_min();
+```
+
+---
+
+### pop_max()
+*Runtime:* **O(log(n))**
+
+*Exceptions:* Throws a tf::exception if the multi search tree is empty.
+
+Removes and returns a value with the biggest key:
+```
+int max_value = tree.pop_max();
+```
+
+---
+
+### contains(key)
+*Runtime:* **O(log(n))**
+
+Returns `true` if the multi search tree contains an entry with key 1:
+```
+bool key_present = tree.contains(1);
+```
+
+---
+
+### height()
+*Runtime:* **O(1)**
+
+Returns the height of the multi search tree.
+```
+int tree_height = tree.height();
+```
+
+---
+
+### size()
+*Runtime:* **O(1)**
+
+Returns the number of entries in the multi search tree:
+```
+int num_entries = tree.size();
+```
+
+---
+
+### empty()
+*Runtime:* **O(log(n))**
+
+Returns `true` if the multi search tree has no entries:
+```
+bool tree_empty = tree.empty();
+```
+
+---
+
+### clear()
+*Runtime:* **O(n)**
+
+Deallocates all entries:
+```
+tree.clear();
+```
+
+---
+---
+
 ## FIFO Queue
 This is just a wrapper for the [Linked List](#linked-list), which provides only the functionality of a FIFO queue.
 
@@ -752,7 +927,7 @@ This is just a wrapper for the [Search Tree](#search-tree), which provides only 
 
 The entries are sorted by the key. If only sorting by value is needed, the values should just have themselves as keys.
 
-The queue deallocates on destruction.
+The priority queue deallocates on destruction.
 
 ---
 
@@ -803,7 +978,7 @@ int max_value = queue.next_max();
 ### contains(key)
 *Runtime:* **O(log(n))**
 
-Returns `true` if the priority queue contains the value 3:
+Returns `true` if the priority queue contains a value with key 3:
 ```
 bool contains_value = queue.contains(3);
 ```
@@ -824,6 +999,98 @@ int num_entries = queue.length();
 *Runtime:* **O(1)**
 
 Returns `true` if the priority queue has no entries.
+```
+bool queue_empty = queue.empty();
+```
+
+---
+
+### clear()
+*Runtime:* **O(n)**
+
+Deallocates all entries:
+```
+queue.clear();
+```
+
+---
+---
+
+## Multi Priority Queue
+This is just a wrapper for the [Multi Search Tree](#multi-search-tree), which provides only the functionality of a multi priority queue.
+
+The entries are sorted by the key. Values with the same key are not ordered in any particular order. If no duplicate keys are expected, the use of [Priority Queue](#priority-queue) is recommended, because of its slightly higher speed.
+
+The multi priority queue deallocates on destruction.
+
+---
+
+### Constructor
+Constructor with `int` keys and `int` values:
+```
+tf::multi_prio_queue<int, int> queue;
+```
+
+---
+
+### insert(key, value)
+*Runtime:* **O(log(n))**
+
+Adds the value 3 with the key 1 to the multi priority queue:
+```
+queue.insert(1, 3);
+```
+
+---
+
+### next_min()
+*Runtime:* **O(log(n))**
+
+*Exceptions:* Throws a tf::exception if the multi priority queue is empty.
+
+Removes and returns a value with the smallest key:
+```
+int min_value = queue.next_min();
+```
+
+---
+
+### next_max()
+*Runtime:* **O(log(n))**
+
+*Exceptions:* Throws a tf::exception if the multi priority queue is empty.
+
+Removes and returns a value with the biggest key:
+```
+int max_value = queue.next_max();
+```
+
+---
+
+### contains(key)
+*Runtime:* **O(log(n))**
+
+Returns `true` if the multi priority queue contains a value with key 3:
+```
+bool contains_value = queue.contains(3);
+```
+
+---
+
+### length()
+*Runtime:* **O(1)**
+
+Returns the number of elements in the multi priority queue.
+```
+int num_entries = queue.length();
+```
+
+---
+
+### empty()
+*Runtime:* **O(1)**
+
+Returns `true` if the multi priority queue has no entries.
 ```
 bool queue_empty = queue.empty();
 ```

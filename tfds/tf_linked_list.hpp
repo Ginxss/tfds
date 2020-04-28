@@ -27,15 +27,14 @@ private:
     }
 
 public:
-    // Provides standard iteration interface - everything O(1)
     class iterator {
     public:
         node *nd;
 
         T &operator*() { return nd->value; }
         T &value() { return nd->value; }
-        T *next_value() { if (nd->next) return &nd->next->value; return nullptr; };
-        T *prev_value() { if (nd->prev) return &nd->prev->value; return nullptr; };
+        T *next_value() { return (nd->next) ? &nd->next->value : nullptr; };
+        T *prev_value() { return (nd->prev) ? &nd->prev->value : nullptr; };
         void operator++() { nd = nd->next; }
         void operator--() { nd = nd->prev; }
         bool condition() { return nd != nullptr; }
