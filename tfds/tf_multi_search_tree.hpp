@@ -7,7 +7,7 @@
 namespace tf {
 
 /*
-* Ordered map (iterative implementation of an AVL tree).
+* Ordered multimap (iterative implementation of an AVL tree).
 */
 template <typename K, typename V>
 class multi_search_tree {
