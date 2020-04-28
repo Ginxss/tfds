@@ -520,7 +520,9 @@ table.clear();
 ## Search Tree
 An ordered map (iterative AVL Tree).
 
-The entries are sorted by the key. If only sorting by value is needed, the values should just have themselves as keys.
+The entries are sorted by the key. If only sorting by value is needed, the values should just have themselves as keys. If duplicate keys are expected, the use of [ Multi Search Tree](#multi-search-tree) is recommended.
+
+The keys for the search tree have to be comparable with `operator<` and `operator>`.
 
 Can also be used as a Priority Queue, although the use of the wrapper [Priority Queue](#priority-queue) is recommended for that, because of its simpler interface.
 
@@ -683,6 +685,8 @@ tree.clear();
 Behaves just like the [Search Tree](#search-tree) while allowing duplicate keys.
 
 The entries are sorted by the key. Values with the same key are not ordered in any particular order. If no duplicate keys are expected, the use of [Search Tree](#search-tree) is recommended, because of its slightly higher speed.
+
+The keys for the multi search tree have to be comparable with `operator<` and `operator>` and the values must be comparable with `operator==`.
 
 Can also be used as a Multi Priority Queue, although the use of the wrapper [Multi Priority Queue](#multi-priority-queue) is recommended for that, because of its simpler interface.
 
@@ -933,7 +937,7 @@ queue.clear();
 ## Priority Queue
 This is just a wrapper for the [Search Tree](#search-tree), which provides only the functionality of a priority queue.
 
-The entries are sorted by the key. If only sorting by value is needed, the values should just have themselves as keys.
+The entries are sorted by the key. If only sorting by value is needed, the values should just have themselves as keys. If duplicate keys are expected, the use of [Multi Priority Queue](#multi-priority-queue) is recommended.
 
 The priority queue deallocates on destruction.
 

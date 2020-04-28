@@ -388,7 +388,6 @@ public:
     }
 
     // O(log(n))
-    // gives back the first value with the key
     const V remove(const K &key) {
         node *it = root;
         while (it) {
@@ -408,8 +407,7 @@ public:
         throw tf::exception("search tree: remove: key not found");
     }
 
-    // O(log(n))
-    // TODO: give warning that values must be comparable
+    // O(log(n) + #values with that key)
     const V remove_value(const K &key, const V &value) {
         node *it = root;
         while (it) {
