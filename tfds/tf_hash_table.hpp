@@ -103,7 +103,7 @@ private:
             return curr_b->next;
         }
 
-        (*curr_index)++;
+        ++(*curr_index);
         while ((*curr_index) < table_size_) {
             bucket *b = *(buckets + (*curr_index)++);
             if (b) {
@@ -173,7 +173,7 @@ public:
             *(buckets + index) = alloc_bucket(key, value, nullptr);
         }
 
-        size_++;
+        ++size_;
     }
 
     // average: O(1) / worst: O(n)
@@ -186,7 +186,7 @@ public:
 
             V result = to_delete->value;
             free(to_delete);
-            size_--;
+            --size_;
             return result;
         }
         else {
@@ -198,7 +198,7 @@ public:
                     
                     V result = it->value;
                     free(it);
-                    size_--;
+                    --size_;
                     return result;
                 }
 
@@ -263,7 +263,7 @@ public:
         start_it.b = *buckets;
 
         while (!start_it.b) {
-            start_it.index++;
+            ++start_it.index;
             start_it.b = *(buckets + start_it.index);
         }
 

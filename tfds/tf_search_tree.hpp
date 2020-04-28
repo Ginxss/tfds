@@ -282,7 +282,7 @@ private:
             rebalance_upward(replacing);
         }
 
-        size_--;
+        --size_;
         return result;
     }
 
@@ -325,7 +325,7 @@ public:
                         break;
                     }
                 }
-                else { // if (value == it->value)
+                else { // if (key == it->key)
                     throw tf::exception("search tree: insert: key already exists");
                 }
             }
@@ -333,7 +333,7 @@ public:
             rebalance_upward(it);
         }
 
-        size_++;
+        ++size_;
     }
 
     // O(log(n))

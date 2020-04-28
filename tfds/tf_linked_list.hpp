@@ -95,7 +95,7 @@ public:
         else
             new_end_node(value);
 
-        length_++;
+        ++length_;
     }
 
     // O(1)
@@ -105,7 +105,7 @@ public:
         else
             new_start_node(value);
 
-        length_++;
+        ++length_;
     }
 
     // O(n)
@@ -122,7 +122,7 @@ public:
                     it->next = new_node;
                 }
             
-                length_++;
+                ++length_;
                 return;
             }
 
@@ -146,7 +146,7 @@ public:
                     it->prev = new_node;
                 }
             
-                length_++;
+                ++length_;
                 return;
             }
 
@@ -174,7 +174,7 @@ public:
                 }
                 
                 free(it);
-                length_--;
+                --length_;
                 return;
             }
 
@@ -210,7 +210,7 @@ public:
         node *to_delete = end_node;
         slide_end_node();
         free(to_delete);
-        length_--;
+        --length_;
 
         return result;
     }
@@ -225,7 +225,7 @@ public:
         node *to_delete = start_node;
         slide_start_node();
         free(to_delete);
-        length_--;
+        --length_;
 
         return result;
     }

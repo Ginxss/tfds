@@ -30,6 +30,7 @@ private:
         if (vn) {
             free_values(vn->next);
             free(vn);
+            --size_;
         }
     }
 
@@ -333,8 +334,6 @@ private:
             update_height(replacing->right);
             rebalance_upward(replacing);
         }
-
-        size_--;
     }
 
 public:
@@ -379,18 +378,13 @@ public:
                     }
                 }
                 else { // if (key == it->key)
-                    value_node *value_it = it->start_value;
-                    while (value_it->next) {
-                        value_it = value_it->next;
-                    }
-
-                    value_it->next = alloc_value_node(value, nullptr);
+                    it->start_value = alloc_value_node(value, it->start_value);
                     break;
                 }
             }
         }
 
-        size_++;
+        ++size_;
     }
 
     // O(log(n))
@@ -444,6 +438,7 @@ public:
                         }
 
                         free(value_it);
+                        --size_;
                         return result;
                     }
 
@@ -542,6 +537,7 @@ public:
             remove_node(it);
         }
 
+        --size_;
         return result;
     }
 
@@ -565,6 +561,7 @@ public:
             remove_node(it);
         }
 
+        --size_;
         return result;
     }
 
