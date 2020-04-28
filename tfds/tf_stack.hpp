@@ -1,6 +1,7 @@
 #ifndef TF_STACK_H
 #define TF_STACK_H
 
+#include <cstdlib> // malloc
 #include "tf_exception.hpp"
 
 namespace tf {

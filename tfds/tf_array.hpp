@@ -1,6 +1,7 @@
 #ifndef TF_ARRAY_H
 #define TF_ARRAY_H
 
+#include <cstdlib> // malloc
 #include <cstring> // memset
 #include "tf_exception.hpp"
 
