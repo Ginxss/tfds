@@ -8,7 +8,7 @@
 namespace tf {
 
 /*
-* Dynamic array that reallocates when accessed out of bounds.
+* Array that by default reallocates when accessed out of bounds.
 */
 template <typename T>
 class array {
@@ -16,6 +16,7 @@ private:
     // VARIABLES
 
     int capacity_;
+    bool autom_realloc;
     T *buffer;
 
     // METHODS
@@ -23,8 +24,13 @@ private:
     // reallocation size is the smallest multiple of the current capacity that can hold the index.
     void check_index(const int index) {
         if (index >= capacity_) {
-            capacity_ *= (int)((index / capacity_) + 1);
-            buffer = (T *)realloc(buffer, capacity_ * sizeof(T));
+            if (autom_realloc) {
+                capacity_ *= (int)((index / capacity_) + 1);
+                buffer = (T *)realloc(buffer, capacity_ * sizeof(T));
+            }
+            else {
+                throw tf::exception("array: index larger than capacity");
+            }
         }
         else if (index < 0) {
             throw tf::exception("array: index negative");
@@ -32,8 +38,9 @@ private:
     }
 
 public:
-    array(const int initial_capacity = 10):
+    array(const int initial_capacity = 10, const bool autom_realloc = true):
         capacity_(initial_capacity),
+        autom_realloc(autom_realloc),
         buffer((T *)malloc(capacity_ * sizeof(T))) {}
 
     ~array() {
@@ -61,6 +68,17 @@ public:
     // O(1)
     int capacity() const {
         return capacity_;
+    }
+
+    // O(1)
+    bool autom_reallocating() const {
+        return autom_realloc;
+    }
+
+    // O(n)
+    void reallocate(const int new_capacity) {
+        capacity_ = new_capacity;
+        buffer = (T *)realloc(buffer, capacity_ * sizeof(T));
     }
 
     // O(n)

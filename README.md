@@ -26,7 +26,7 @@ Note that all these data structures do is allocate and deallocate the memory nee
 ---
 
 ## Array
-Dynamic array that reallocates with an appropriate size when accessed out of bounds. The reallocation size is the smallest multiple of the current size that can fit the new index (in most cases 2 * old index).
+Dynamic array that can reallocate with an appropriate size when accessed out of bounds. The reallocation size is the smallest multiple of the current size that can fit the new index (in most cases 2 * old index). Automatic reallocation can be turned off in the constructor.
 
 The default initial capacity is 10. The more the initial capacity approaches the maximum index, the less reallocating has to be performed by the array.
 
@@ -37,21 +37,22 @@ The array deallocates on destruction.
 ---
 
 ### Constructor
-Default constructor with type `int` and initial capacity 10:
+Default constructor with type `int`, initial capacity 10 and automatic reallocation turned on:
 ```
 tf::array<int> array;
 ```
-A custom initial capacity, in this case 100, can be set in the constructor:
+A custom initial capacity (in this case 100) and the reallocation behaviour can be set in the constructor:
 ```
-tf::array<int> array(100);
+tf::array<int> array(100, false);
 ```
+If the array is accessed out of bounds and automatic reallocation is set to false, the array throws a tf::exception.
 
 ---
 
 ### insert(index, value)
 *Runtime:* **O(1)** / O(n) on reallocation
 
-*Exceptions:* Throws a tf::exception if the index is negative.
+*Exceptions:* Throws a tf::exception if the index is negative, or if the index is bigger than the current capacity and automatic reallocation is turned off.
 
 Inserts the value 3 at index 1:
 ```
@@ -63,7 +64,7 @@ array.insert(1, 3);
 ### get(index)
 *Runtime:* **O(1)** / O(n) on reallocation
 
-*Exceptions:* Throws a tf::exception if the index is negative.
+*Exceptions:* Throws a tf::exception if the index is negative, or if the index is bigger than the current capacity and automatic reallocation is turned off.
 
 Returns a constant reference to the value at index 1:
 ```
@@ -75,7 +76,7 @@ int value = array.get(1);
 ### [index]
 *Runtime:* **O(1)** / O(n) on reallocation
 
-*Exceptions:* Throws a tf::exception if the index is negative.
+*Exceptions:* Throws a tf::exception if the index is negative, or if the index is bigger than the current capacity and automatic reallocation is turned off.
 
 Returns a reference to the value at index 1:
 ```
@@ -91,6 +92,26 @@ int value = array[1];
 Returns the current capacity of the array:
 ```
 int array_capacity = array.capacity();
+```
+
+---
+
+### autom_reallocating()
+*Runtime:* **O(1)**
+
+Returns `true` if the array is reallocating when accessed out of bounds.
+```
+bool array_is_reallocating = array.autom_reallocating();
+```
+
+---
+
+### reallocate(new capacity)
+*Runtime:* **O(1)**
+
+Reallocates the array with the new capacity 20:
+```
+array.reallocate(20);
 ```
 
 ---
