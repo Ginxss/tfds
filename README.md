@@ -14,7 +14,7 @@
 
 Why not just use the standard C++ data structures, you ask? Well, there's a couple of reasons:
 
-First of all, every one of these data structures is faster than their C++ counterpart in almost all scenarios (The only exception being std::vector, which is slightly faster than tf::array because tf::array automatically allocates new space if accessed out of bounds, while std::vector just throws an exception. So these two structures actually behave quite differently and can't really be compared).
+First of all, most of these data structures are faster than their C++ counterpart in almost all scenarios (The only exception being std::vector, which is slightly faster than tf::array because tf::array can automatically allocate new space if accessed out of bounds, while std::vector just throws an exception. So these two structures actually behave quite differently and can't really be compared).
 
 Second, i like to know what going on under the hood. Have you ever tried looking into an std::priority_queue (or any of the C++ data structures, for that matter) to see how it is implemented? If so, you will know that it's just not possible, and that these data structures are supposed to be black boxes to the programmer. With **tfds** (or any self-implemented data structure), you can just open the *.hpp and see exactly what happens if a certain function is called.
 
