@@ -20,6 +20,8 @@ Second, i like to know what going on under the hood. Have you ever tried looking
 
 Third, because there are so many (poorly named) data structures available in C++, many programmers just resort to using std::vector for basically all tasks, because they don't want to spend time researching which one of these is the best data structure for the job. **tfds** is a small collection of the most basic and important data structures, which makes picking the right one a trivial task.
 
+Note that all these data structures do is allocate and deallocate the memory needed for the elements. So if you are programming object oriented for example, destructors are not getting called.
+
 ---
 ---
 
