@@ -1,7 +1,7 @@
 #ifndef TF_STACK_H
 #define TF_STACK_H
 
-#include <cstdlib> // malloc
+#include <algorithm> // std::copy_n
 #include "tf_exception.hpp"
 
 namespace tf {
@@ -20,17 +20,21 @@ public:
     stack(const int initial_capacity = 10):
         capacity(initial_capacity),
         top_index(-1),
-        buffer((T *)malloc(capacity * sizeof(T))) {}
+        buffer(new T[capacity]) {}
 
     ~stack() {
-        free(buffer);
+        delete[] buffer;
     }
 
     // O(1) / O(n) if capacity is full
     void put(const T &value) {
         if (++top_index >= capacity) {
-            capacity *= 2;
-            buffer = (T *)realloc(buffer, capacity * sizeof(T));
+            int new_capacity = capacity * 2;
+            T *new_buffer = new T[new_capacity];
+            std::copy_n(buffer, capacity, new_buffer);
+            capacity = new_capacity;
+            delete[] buffer;
+            buffer = new_buffer;
         }
         
         buffer[top_index] = value;

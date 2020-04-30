@@ -1,7 +1,6 @@
 #ifndef TF_MULTI_SEARCH_TREE_H
 #define TF_MULTI_SEARCH_TREE_H
 
-#include <cstdlib> // malloc
 #include "tf_exception.hpp"
 
 namespace tf {
@@ -20,17 +19,23 @@ private:
     };
 
     value_node *alloc_value_node(const V &value, value_node *next) {
-        value_node *vn = (value_node *)malloc(sizeof(value_node));
+        value_node *vn = new value_node;
         vn->value = value;
         vn->next = next;
+        ++size_;
         return vn;
     }
 
-    void free_values(value_node *vn) {
-        if (vn) {
-            free_values(vn->next);
-            free(vn);
-            --size_;
+    void free_value_node(value_node *vn) {
+        --size_;
+        delete vn;
+    }
+
+    void free_value_nodes(value_node *vn) {
+        while (vn) {
+            value_node *to_delete = vn;
+            vn = vn->next;
+            free_value_node(to_delete);
         }
     }
 
@@ -46,7 +51,7 @@ private:
     };
 
     node *alloc_node(const K &key, const V &value, int height, node *parent, node *left, node *right) {
-        node *n = (node *)malloc(sizeof(node));
+        node *n = new node;
         n->key = key;
         n->start_value = alloc_value_node(value, nullptr);
         n->height = height;
@@ -54,6 +59,10 @@ private:
         n->left = left;
         n->right = right;
         return n;
+    }
+
+    void free_node(node *n) {
+        delete n;
     }
 
     int node_height(node *n) const {
@@ -242,6 +251,7 @@ private:
         return new_root;
     }
 
+    // i dont think 2 cases can happen after 1 insert, and testing supports that. if it makes problems, just remove the return statements.
     void rebalance_upward(node *n) {
         node *it = n;
         while (it) {
@@ -250,19 +260,23 @@ private:
             if (balance > 1) {
                 if (node_height(it->right->right) > node_height(it->right->left)) {
                     it = left_rotation(it);
+                    return;
                 }
                 else {
                     it->right = right_rotation(it->right);
                     it = left_rotation(it);
+                    return;
                 }
             }
             else if (balance < -1) {
                 if (node_height(it->left->left) > node_height(it->left->right)) {
                     it = right_rotation(it);
+                    return;
                 }
                 else {
                     it->left = left_rotation(it->left);
                     it = right_rotation(it);
+                    return;
                 }
             }
 
@@ -282,8 +296,8 @@ private:
         }
 
         if (delete_values)
-            free_values(to_delete->start_value);
-        free(to_delete);
+            free_value_nodes(to_delete->start_value);
+        free_node(to_delete);
     }
 
     void remove_single_parent(node *to_delete, bool delete_values = true) {
@@ -300,15 +314,15 @@ private:
         }
 
         if (delete_values)
-            free_values(to_delete->start_value);
-        free(to_delete);
+            free_value_nodes(to_delete->start_value);
+        free_node(to_delete);
     }
 
     void remove_double_parent(node *to_delete) {
         node *succ = successor(to_delete);
         
         to_delete->key = succ->key;
-        free_values(to_delete->start_value);
+        free_value_nodes(to_delete->start_value);
         to_delete->start_value = succ->start_value;
 
         if (succ->right)
@@ -383,8 +397,6 @@ public:
                 }
             }
         }
-
-        ++size_;
     }
 
     // O(log(n))
@@ -435,8 +447,7 @@ public:
                             }
                         }
 
-                        free(value_it);
-                        --size_;
+                        free_value_node(value_it);
                         return result;
                     }
 
@@ -529,13 +540,12 @@ public:
 
         value_node *to_delete = it->start_value;
         it->start_value = to_delete->next;
-        free(to_delete);
+        free_value_node(to_delete);
 
         if (it->start_value == nullptr) {
             remove_node(it);
         }
 
-        --size_;
         return result;
     }
 
@@ -553,13 +563,12 @@ public:
 
         value_node *to_delete = it->start_value;
         it->start_value = to_delete->next;
-        free(to_delete);
+        free_value_node(to_delete);
 
         if (it->start_value == nullptr) {
             remove_node(it);
         }
 
-        --size_;
         return result;
     }
 
@@ -620,12 +629,10 @@ public:
                     root = nullptr;
                 }
 
-                free_values(to_delete->start_value);
-                free(to_delete);
+                free_value_nodes(to_delete->start_value);
+                free_node(to_delete);
             }
         }
-
-        size_ = 0;
     }
 };
 

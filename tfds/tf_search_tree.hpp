@@ -1,7 +1,6 @@
 #ifndef TF_SEARCH_TREE_H
 #define TF_SEARCH_TREE_H
 
-#include <cstdlib> // malloc
 #include "tf_exception.hpp"
 
 namespace tf {
@@ -22,14 +21,20 @@ private:
     };
 
     node *alloc_node(const K &key, const V &value, int height, node *parent, node *left, node *right) {
-        node *n = (node *)malloc(sizeof(node));
+        node *n = new node;
         n->key = key;
         n->value = value;
         n->height = height;
         n->parent = parent;
         n->left = left;
         n->right = right;
+        ++size_;
         return n;
+    }
+
+    void free_node(node *n) {
+        --size_;
+        delete n;
     }
 
     int node_height(node *n) const {
@@ -193,6 +198,7 @@ private:
         return new_root;
     }
 
+    // i dont think 2 cases can happen after 1 insert, and testing supports that. if it makes problems, just remove the return statements.
     void rebalance_upward(node *n) {
         node *it = n;
         while (it) {
@@ -201,19 +207,23 @@ private:
             if (balance > 1) {
                 if (node_height(it->right->right) > node_height(it->right->left)) {
                     it = left_rotation(it);
+                    return;
                 }
                 else {
                     it->right = right_rotation(it->right);
                     it = left_rotation(it);
+                    return;
                 }
             }
             else if (balance < -1) {
                 if (node_height(it->left->left) > node_height(it->left->right)) {
                     it = right_rotation(it);
+                    return;
                 }
                 else {
                     it->left = left_rotation(it->left);
                     it = right_rotation(it);
+                    return;
                 }
             }
 
@@ -232,7 +242,7 @@ private:
             root = nullptr;
         }
 
-        free(to_delete);
+        free_node(to_delete);
     }
 
     void remove_single_parent(node *to_delete) {
@@ -248,7 +258,7 @@ private:
             root = new_root;
         }
 
-        free(to_delete);
+        free_node(to_delete);
     }
 
     void remove_double_parent(node *to_delete) {
@@ -282,7 +292,6 @@ private:
             rebalance_upward(replacing);
         }
 
-        --size_;
         return result;
     }
 
@@ -332,8 +341,6 @@ public:
 
             rebalance_upward(it);
         }
-
-        ++size_;
     }
 
     // O(log(n))
@@ -499,11 +506,9 @@ public:
                     root = nullptr;
                 }
 
-                free(to_delete);
+                free_node(to_delete);
             }
         }
-
-        size_ = 0;
     }
 };
 

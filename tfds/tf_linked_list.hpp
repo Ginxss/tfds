@@ -1,7 +1,6 @@
 #ifndef TF_LINKED_LIST_H
 #define TF_LINKED_LIST_H
 
-#include <cstdlib> // malloc
 #include "tf_exception.hpp"
 
 namespace tf {
@@ -16,14 +15,21 @@ private:
         T value;
         node *prev;
         node *next;
+
+        node(const T &value) : value(value) {}
     };
 
     node *alloc_node(const T &value, node *prev, node *next) {
-        node *n = (node *)malloc(sizeof(node));
-        n->value = value;
+        node *n = new node(value);
         n->prev = prev;
         n->next = next;
+        ++length_;
         return n;
+    }
+
+    void free_node(node *n) {
+        --length_;
+        delete n;
     }
 
 public:
@@ -94,8 +100,6 @@ public:
             end_node = start_node = alloc_node(value, nullptr, nullptr);
         else
             new_end_node(value);
-
-        ++length_;
     }
 
     // O(1)
@@ -104,8 +108,6 @@ public:
             end_node = start_node = alloc_node(value, nullptr, nullptr);
         else
             new_start_node(value);
-
-        ++length_;
     }
 
     // O(n)
@@ -122,7 +124,6 @@ public:
                     it->next = new_node;
                 }
             
-                ++length_;
                 return;
             }
 
@@ -146,7 +147,6 @@ public:
                     it->prev = new_node;
                 }
             
-                ++length_;
                 return;
             }
 
@@ -173,8 +173,7 @@ public:
                     it->next->prev = it->prev;
                 }
                 
-                free(it);
-                --length_;
+                free_node(it);
                 return;
             }
 
@@ -209,8 +208,7 @@ public:
 
         node *to_delete = end_node;
         slide_end_node();
-        free(to_delete);
-        --length_;
+        free_node(to_delete);
 
         return result;
     }
@@ -224,8 +222,7 @@ public:
 
         node *to_delete = start_node;
         slide_start_node();
-        free(to_delete);
-        --length_;
+        free_node(to_delete);
 
         return result;
     }
@@ -274,10 +271,9 @@ public:
         while (it) {
             node *to_delete = it;
             it = it->next;
-            free(to_delete);
+            free_node(to_delete);
         }
 
-        length_ = 0;
         start_node = nullptr;
         end_node = nullptr;
     }

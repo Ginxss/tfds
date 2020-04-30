@@ -14,13 +14,11 @@
 
 Why not just use the standard C++ data structures, you ask? Well, there's a couple of reasons:
 
-First of all, most of these data structures are faster than their C++ counterpart in almost all scenarios (The only exception being std::vector, which is slightly faster than tf::array because tf::array can automatically allocate new space if accessed out of bounds, while std::vector just throws an exception. So these two structures actually behave quite differently and can't really be compared).
+First of all, every one of these data structures is faster than their C++ counterpart. While i did not test every possible scenario, all of my test cases yielded a positive result for **tfds** in comparison to the STL containers (specifics in test_results.txt).
 
 Second, i like to know what going on under the hood. Have you ever tried looking into an std::priority_queue (or any of the C++ data structures, for that matter) to see how it is implemented? If so, you will know that it's just not possible, and that these data structures are supposed to be black boxes to the programmer. With **tfds** (or any self-implemented data structure), you can just open the *.hpp and see exactly what happens if a certain function is called.
 
 Third, because there are so many (poorly named) data structures available in C++, many programmers just resort to using std::vector for basically all tasks, because they don't want to spend time researching which one of these is the best data structure for the job. **tfds** is a small collection of the most basic and important data structures, which makes picking the right one a trivial task.
-
-Note that all these data structures do is allocate and deallocate the memory needed for the elements. So if you are programming object oriented for example, destructors are not getting called.
 
 ---
 ---
@@ -29,8 +27,6 @@ Note that all these data structures do is allocate and deallocate the memory nee
 Dynamic array that can reallocate with an appropriate size when accessed out of bounds. The reallocation size is the smallest multiple of the current size that can fit the new index (in most cases 2 * old index). Automatic reallocation can be turned off in the constructor.
 
 The default initial capacity is 10. The more the initial capacity approaches the maximum index, the less reallocating has to be performed by the array.
-
-This dynamic array is roughly half as fast as a native c array.
 
 The array deallocates on destruction.
 
@@ -112,16 +108,6 @@ bool array_is_reallocating = array.autom_reallocating();
 Reallocates the array with the new capacity 20:
 ```
 array.reallocate(20);
-```
-
----
-
-### clear()
-*Runtime:* **O(n)**
-
-Sets the entire memory of the array to 0:
-```
-array.clear();
 ```
 
 ---

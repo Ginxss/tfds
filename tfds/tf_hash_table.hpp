@@ -80,20 +80,27 @@ private:
         K key;
         V value;
         bucket *next;
+
+        bucket(const K &key, const V &value) : key(key), value(value) {}
     };
 
     bucket *alloc_bucket(const K &key, const V &value, bucket *next) {
-        bucket *b = (bucket *)malloc(sizeof(bucket));
-        b->key = key;
-        b->value = value;
+        bucket *b = new bucket(key, value);
         b->next = next;
+        ++size_;
         return b;
     }
 
     void free_bucket(bucket *b) {
-        if (b) {
-            free_bucket(b->next);
-            free(b);
+        --size_;
+        delete b;
+    }
+
+    void free_buckets(bucket *b) {
+        while (b) {
+            bucket *to_delete = b;
+            b = b->next;
+            free_bucket(b);
         }
     }
 
@@ -145,7 +152,7 @@ public:
 
     ~hash_table() {
         for (int i = 0; i < table_size_; ++i) {
-            free_bucket(*(buckets + i));
+            free_buckets(*(buckets + i));
         }
 
         free(buckets);
@@ -171,8 +178,6 @@ public:
         else {
             *(buckets + index) = alloc_bucket(key, value, nullptr);
         }
-
-        ++size_;
     }
 
     // average: O(1) / worst: O(n)
@@ -184,8 +189,7 @@ public:
             *(buckets + index) = to_delete->next;
 
             V result = to_delete->value;
-            free(to_delete);
-            --size_;
+            free_bucket(to_delete);
             return result;
         }
         else {
@@ -196,8 +200,7 @@ public:
                     prev->next = it->next;
                     
                     V result = it->value;
-                    free(it);
-                    --size_;
+                    free_bucket(it);
                     return result;
                 }
 
@@ -287,11 +290,10 @@ public:
     // O(n)
     void clear() {
         for (int i = 0; i < table_size_; ++i) {
-            free_bucket(*(buckets + i));
+            free_buckets(*(buckets + i));
         }
 
         memset(buckets, 0, table_size_ * sizeof(bucket *));
-        size_ = 0;
     }
 };
 

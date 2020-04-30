@@ -1,0 +1,120 @@
+TEST RESULTS:
+Every result is the average time over 100 runs.
+While this is probably not the most waterproof way to determine the performance, i think its pretty clear that, at least on my machine, tfds is (sometimes significantly) faster than the STL containers.
+
+The referred to "struct" was:
+struct Object {
+    char c;
+    short s;
+    int i;
+    long l;
+    float f;
+};
+
+
+ARRAY TEST
+
+tf::array inserted 1000000 ints: 6 ms
+std::vector pushed 1000000 ints: 22 ms
+
+tf::array inserted 1000000 ints: 4 ms (with reserved space)
+std::vector pushed 1000000 ints: 20 ms (with reserved space)
+
+tf::array inserted 1000000 structs: 25 ms
+std::vector pushed 1000000 structs: 47 ms
+
+tf::array inserted 1000000 structs: 17 ms (with reserved space)
+std::vector pushed 1000000 structs: 35 ms (with reserved space)
+
+tf::array accessed 1000000 ints: 3 ms
+std::vector accessed 1000000 ints: 3 ms
+
+tf::array accessed 1000000 structs: 11 ms
+std::vector accessed 1000000 structs: 11 ms
+
+STACK TEST
+
+tf::stack pushed 1000000 ints: 9 ms
+tf::stack pushed 1000000 ints: 8 ms (with reserved space)
+std::stack pushed 1000000 ints: 67 ms
+
+tf::stack pushed 1000000 structs: 27 ms
+tf::stack pushed 1000000 structs: 20 ms (with reserved space)
+std::stack pushed 1000000 structs: 112 ms
+
+tf::stack pushed and popped 1000000 ints: 14 ms
+tf::stack pushed and popped 1000000 ints: 13 ms (with reserved space)
+std::stack pushed and popped 1000000 ints: 133 ms
+
+tf::stack pushed and popped 1000000 structs: 41 ms
+tf::stack pushed and popped 1000000 structs: 33 ms (with reserved space)
+std::stack pushed and popped 1000000 structs: 184 ms
+
+LINKED LIST TEST
+
+tf::linked_list added 1000000 ints: 45 ms
+std::list added 1000000 ints: 91 ms
+
+tf::linked_list added 1000000 structs: 61 ms
+std::list added 1000000 structs: 96 ms
+
+tf::linked_list added and popped 1000000 ints: 75 ms
+std::list added and popped 1000000 ints: 129 ms
+
+tf::linked_list added and popped 1000000 structs: 113 ms
+std::list added and popped 1000000 structs: 151 ms
+
+tf::linked_list iterated over 1000000 ints: 10 ms
+std::list iterated over 1000000 ints: 21 ms
+
+tf::linked_list iterated over 1000000 structs: 21 ms
+std::list iterated over 1000000 structs: 33 ms
+
+HASH TABLE TEST
+
+tf::hash_table inserted 1000000 (int, int) pairs: 111 ms
+std::unordered_map inserted 1000000 (int, int) pairs: 292 ms
+
+tf::hash_table inserted 1000000 (std::string, struct) pairs: 249 ms
+std::unordered_map inserted 1000000 (std::string, struct) pairs: 504 ms
+
+tf::hash_table accessed 1000000 int values with int keys: 71 ms
+std::unordered_map accessed 1000000 int values with int keys: 137 ms
+
+tf::hash_table accessed 1000000 struct values with std::string keys: 200 ms
+std::unordered_map accessed 1000000 struct values with std::string keys: 307 ms
+
+SEARCH TREE TEST
+
+tf::search_tree inserted 1000000 (int, int) pairs: 205 ms
+std::map inserted 1000000 (int, int) pairs: 387 ms
+
+tf::search_tree inserted 1000000 (std::string, struct) pairs: 1290 ms
+std::map inserted 1000000 (std::string, struct) pairs: 1444 ms
+
+tf::search_tree accessed 1000000 int values with int keys: 85 ms
+std::map accessed 1000000 int values with int keys: 235 ms
+
+tf::search_tree accessed 1000000 struct values with std::string keys: 889 ms
+std::map accessed 1000000 struct values with std::string keys: 934 ms
+
+tf::search_tree iterated over 1000000 int values with int keys: 32 ms
+std::map iterated over 1000000 int values with int keys: 65 ms
+
+tf::search_tree iterated over 1000000 struct values with std::string keys: 83 ms
+std::map iterated over 1000000 struct values with std::string keys: 85 ms
+
+MULTI SEARCH TREE TEST
+
+tf::multi_search_tree inserted 1000000 unique (int, int) pairs: 247 ms
+tf::multi_search_tree inserted 1000000 mixed (int, int) pairs: 177 ms
+tf::multi_search_tree inserted 1000000 identical (int, int) pairs: 38 ms
+std::multimap inserted 1000000 unique (int, int) pairs: 393 ms
+std::map inserted 1000000 mixed (int, int) pairs: 394 ms
+std::multimap inserted 1000000 identical (int, int) pairs: 396 ms
+
+tf::multi_search_tree iterated over 1000000 int values with int keys: 44 ms (unique entries)
+std::multimap iterated over 1000000 int values with int keys: 65 ms (unique entries)
+
+tf::multi_search_tree iterated over 1000000 int values with int keys: 13 ms (identical entries)
+std::map iterated over 1000000 int values with int keys: 64 ms (identical entries)
