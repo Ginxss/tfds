@@ -109,6 +109,7 @@ Reallocates the array with the new capacity 20:
 ```
 array.reallocate(20);
 ```
+The content of the array does not get erased, it gets copied into the new buffer.
 
 ---
 ---
