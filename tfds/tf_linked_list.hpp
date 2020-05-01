@@ -16,7 +16,7 @@ private:
         node *prev;
         node *next;
 
-        node(const T &value) : value(value) {}
+        node(const T &value_) : value(value_) {}
     };
 
     node *alloc_node(const T &value, node *prev, node *next) {

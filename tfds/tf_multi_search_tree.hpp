@@ -6,7 +6,7 @@
 namespace tf {
 
 /*
-* Ordered multimap (iterative implementation of an AVL tree).
+* Ordered multimap (iterative implementation of an AVL tree, every node has a list of values).
 */
 template <typename K, typename V>
 class multi_search_tree {
@@ -16,11 +16,12 @@ private:
     struct value_node {
         V value;
         value_node *next;
+
+        value_node(const V &value_) : value(value_) {}
     };
 
     value_node *alloc_value_node(const V &value, value_node *next) {
-        value_node *vn = new value_node;
-        vn->value = value;
+        value_node *vn = new value_node(value);
         vn->next = next;
         ++size_;
         return vn;
@@ -48,11 +49,12 @@ private:
         node *parent;
         node *left;
         node *right;
+
+        node(const K &key_) : key(key_) {}
     };
 
     node *alloc_node(const K &key, const V &value, int height, node *parent, node *left, node *right) {
-        node *n = new node;
-        n->key = key;
+        node *n = new node(key);
         n->start_value = alloc_value_node(value, nullptr);
         n->height = height;
         n->parent = parent;

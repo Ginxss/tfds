@@ -81,7 +81,7 @@ private:
         V value;
         bucket *next;
 
-        bucket(const K &key, const V &value) : key(key), value(value) {}
+        bucket(const K &key_, const V &value_) : key(key_), value(value_) {}
     };
 
     bucket *alloc_bucket(const K &key, const V &value, bucket *next) {
