@@ -76,6 +76,9 @@ public:
 
     // O(n)
     void reallocate(const int new_capacity) {
+        if (new_capacity < 1)
+            throw new tf::exception("array: reallocate: new capacity is negative or zero");
+
         T *new_buffer = new T[new_capacity];
         std::copy_n(buffer, std::min(capacity_, new_capacity), new_buffer);
         capacity_ = new_capacity;

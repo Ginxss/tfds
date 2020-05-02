@@ -19,7 +19,7 @@ private:
         node *left;
         node *right;
 
-        node(const K &key_, const V &value) : key(key_), value(value_) {}
+        node(const K &key_, const V &value_) : key(key_), value(value_) {}
     };
 
     node *alloc_node(const K &key, const V &value, int height, node *parent, node *left, node *right) {
