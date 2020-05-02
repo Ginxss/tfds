@@ -37,7 +37,7 @@ inline unsigned long byte_hash(unsigned char *bytes, int length) {
 
 template <typename K>
 inline unsigned long hash(const K &key) {
-    const int key_size = sizeof(K);
+    const size_t key_size = sizeof(K);
     unsigned char bytes[key_size];
     memcpy(bytes, &key, key_size);
     return byte_hash(bytes, key_size);
@@ -104,7 +104,7 @@ private:
         }
     }
 
-    bucket *next_bucket(bucket *curr_b, int *curr_index) {
+    bucket *next_bucket(bucket *curr_b, size_t *curr_index) {
         if (curr_b->next) {
             return curr_b->next;
         }
@@ -123,7 +123,7 @@ public:
     class iterator {
     public:
         hash_table *table;
-        int index;
+        size_t index;
         bucket *b;
 
         V &operator*() { return b->value; }
@@ -134,14 +134,14 @@ public:
     };
 
 private:
-    const int table_size_;
-    int size_;
+    const size_t table_size_;
+    size_t size_;
     bucket **buckets;
 
     iterator start_it;
 
 public:
-    hash_table(const int table_size = 100):
+    hash_table(const size_t table_size = 100):
         table_size_(table_size),
         size_(0),
         buckets((bucket **)malloc(table_size_ * sizeof(bucket *)))
@@ -151,7 +151,7 @@ public:
     }
 
     ~hash_table() {
-        for (int i = 0; i < table_size_; ++i) {
+        for (size_t i = 0; i < table_size_; ++i) {
             free_buckets(*(buckets + i));
         }
 
@@ -273,12 +273,12 @@ public:
     }
 
     // O(1)
-    int table_size() const {
+    size_t table_size() const {
         return table_size_;
     }
 
     // O(1)
-    int size() const  {
+    size_t size() const  {
         return size_;
     }
 
@@ -289,7 +289,7 @@ public:
 
     // O(n)
     void clear() {
-        for (int i = 0; i < table_size_; ++i) {
+        for (size_t i = 0; i < table_size_; ++i) {
             free_buckets(*(buckets + i));
         }
 

@@ -14,7 +14,7 @@ private:
     struct node {
         K key;
         V value;
-        int height;
+        size_t height;
         node *parent;
         node *left;
         node *right;
@@ -43,8 +43,8 @@ private:
 
     void update_height(node *n) {
         if (n) {
-            int left_height = node_height(n->left);
-            int right_height = node_height(n->right);
+            size_t left_height = node_height(n->left);
+            size_t right_height = node_height(n->right);
             n->height = ((right_height > left_height) ? right_height : left_height) + 1;
         }
     }
@@ -142,7 +142,7 @@ public:
 private:
     // VARIABLES
 
-    int size_;
+    size_t size_;
     node *root;
 
     iterator start_it;
@@ -468,12 +468,12 @@ public:
     }
 
     // O(1)
-    int height() const {
+    size_t height() const {
         return node_height(root);
     }
 
     // O(1)
-    int size() const {
+    size_t size() const {
         return size_;
     }
 

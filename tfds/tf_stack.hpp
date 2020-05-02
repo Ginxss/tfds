@@ -12,14 +12,14 @@ namespace tf {
 template <typename T>
 class stack {
 private:
-    int capacity;
-    int top_index;
+    size_t capacity;
+    size_t top_index;
     T *buffer;
 
 public:
-    stack(const int initial_capacity = 10):
+    stack(const size_t initial_capacity = 10):
         capacity(initial_capacity),
-        top_index(-1),
+        top_index(0),
         buffer(new T[capacity]) {}
 
     ~stack() {
@@ -28,8 +28,11 @@ public:
 
     // O(1) / O(n) if capacity is full
     void put(const T &value) {
-        if (++top_index >= capacity) {
-            int new_capacity = capacity * 2;
+        if (top_index >= capacity) {
+            size_t new_capacity = capacity * 2;
+            if (new_capacity < capacity)
+                throw tf::exception("stack: put: capacity too large");
+
             T *new_buffer = new T[new_capacity];
             std::copy_n(buffer, capacity, new_buffer);
             capacity = new_capacity;
@@ -37,7 +40,7 @@ public:
             buffer = new_buffer;
         }
         
-        buffer[top_index] = value;
+        buffer[top_index++] = value;
     }
 
     // O(1)
@@ -45,7 +48,7 @@ public:
         if (empty())
             throw tf::exception("stack: peek: stack is empty");
         
-        return buffer[top_index];
+        return buffer[top_index - 1];
     }
 
     // O(1)
@@ -53,22 +56,22 @@ public:
         if (empty())
             throw tf::exception("stack: pop: stack is empty");
 
-        return buffer[top_index--];
+        return buffer[--top_index];
     }
 
     // O(1)
-    int size() const {
-        return top_index + 1;
+    size_t size() const {
+        return top_index;
     }
 
     // O(1)
     bool empty() const {
-        return top_index < 0;
+        return top_index == 0;
     }
 
     // O(1)
     void clear() {
-        top_index = -1;
+        top_index = 0;
     }
 };
 

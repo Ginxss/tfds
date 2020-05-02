@@ -14,17 +14,20 @@ class array {
 private:
     // VARIABLES
 
-    int capacity_;
+    size_t capacity_;
     bool autom_realloc;
     T *buffer;
 
     // METHODS
 
     // reallocation size is the smallest multiple of the current capacity that can hold the index.
-    void check_index(const int index) {
+    void check_index(const size_t index) {
         if (index >= capacity_) {
             if (autom_realloc) {
-                int new_capacity = capacity_ * ((int)(index / capacity_) + 1);
+                size_t new_capacity = capacity_ * ((size_t)(index / capacity_) + 1);
+                if (new_capacity < capacity_)
+                    throw tf::exception("array: capacity too large");
+                
                 reallocate(new_capacity);
             }
             else {
@@ -37,7 +40,7 @@ private:
     }
 
 public:
-    array(const int initial_capacity = 10, const bool autom_realloc = true):
+    array(const size_t initial_capacity = 10, const bool autom_realloc = true):
         capacity_(initial_capacity),
         autom_realloc(autom_realloc),
         buffer(new T[capacity_]) {}
@@ -47,25 +50,25 @@ public:
     }
 
     // O(1) / O(n) if index > capacity and reallocating turned on
-    void insert(const int index, const T &value) {
+    void insert(const size_t index, const T &value) {
         check_index(index);
         buffer[index] = value;
     }
 
     // O(1) / O(n) if index > capacity and reallocating turned on
-    const T &get(const int index) {
+    const T &get(const size_t index) {
         check_index(index);
         return buffer[index];
     }
 
     // O(1) / O(n) if index > capacity and reallocating turned on
-    T &operator[](const int index) {
+    T &operator[](const size_t index) {
         check_index(index);
         return buffer[index];
     }
 
     // O(1)
-    int capacity() const {
+    size_t capacity() const {
         return capacity_;
     }
 
@@ -75,10 +78,7 @@ public:
     }
 
     // O(n)
-    void reallocate(const int new_capacity) {
-        if (new_capacity < 1)
-            throw new tf::exception("array: reallocate: new capacity is negative or zero");
-
+    void reallocate(const size_t new_capacity) {
         T *new_buffer = new T[new_capacity];
         std::copy_n(buffer, std::min(capacity_, new_capacity), new_buffer);
         capacity_ = new_capacity;

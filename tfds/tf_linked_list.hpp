@@ -49,7 +49,7 @@ public:
 private:
     // VARIABLES
 
-    int length_;
+    size_t length_;
     node *start_node;
     node *end_node;
     
@@ -255,7 +255,7 @@ public:
     }
 
     // O(1)
-    int length() const {
+    size_t length() const {
         return length_;
     }
 

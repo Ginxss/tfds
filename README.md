@@ -85,7 +85,7 @@ int value = array[1];
 
 Returns the current capacity of the array:
 ```
-int array_capacity = array.capacity();
+size_t array_capacity = array.capacity();
 ```
 
 ---
@@ -175,7 +175,7 @@ int top_value = stack.pop();
 
 Returns the number of elements on the stack:
 ```
-int num_elements = stack.size();
+size_t num_elements = stack.size();
 ```
 
 ---
@@ -362,7 +362,7 @@ bool contains_value = list.contains(3);
 
 Returns the number of elements in the list:
 ```
-int num_elements = list.length();
+size_t num_elements = list.length();
 ```
 
 ---
@@ -491,7 +491,7 @@ bool contains_value = table.contains(3);
 
 Returns the number of entries in the hash table.
 ```
-int num_entries = table.size();
+size_t num_entries = table.size();
 ```
 
 ---
@@ -511,7 +511,7 @@ bool table_empty = table.empty();
 
 Returns the number of buckets in the hash table:
 ```
-bool num_buckets = table.table_size();
+size_t num_buckets = table.table_size();
 ```
 
 ---
@@ -655,7 +655,7 @@ bool key_present = tree.contains(1);
 
 Returns the height of the search tree.
 ```
-int tree_height = tree.height();
+size_t tree_height = tree.height();
 ```
 
 ---
@@ -665,7 +665,7 @@ int tree_height = tree.height();
 
 Returns the number of entries in the search tree:
 ```
-int num_entries = tree.size();
+size_t num_entries = tree.size();
 ```
 
 ---
@@ -830,7 +830,7 @@ bool key_present = tree.contains(1);
 
 Returns the height of the multi search tree.
 ```
-int tree_height = tree.height();
+size_t tree_height = tree.height();
 ```
 
 ---
@@ -840,7 +840,7 @@ int tree_height = tree.height();
 
 Returns the number of entries in the multi search tree:
 ```
-int num_entries = tree.size();
+size_t num_entries = tree.size();
 ```
 
 ---
@@ -918,7 +918,7 @@ bool contains_value = queue.contains(3);
 
 Returns the number of elements in the FIFO queue:
 ```
-int num_elements = queue.length();
+size_t num_elements = queue.length();
 ```
 
 ---
@@ -1012,7 +1012,7 @@ bool contains_value = queue.contains(3);
 
 Returns the number of elements in the priority queue.
 ```
-int num_entries = queue.length();
+size_t num_entries = queue.length();
 ```
 
 ---
@@ -1104,7 +1104,7 @@ bool contains_value = queue.contains(3);
 
 Returns the number of elements in the multi priority queue.
 ```
-int num_entries = queue.length();
+size_t num_entries = queue.length();
 ```
 
 ---

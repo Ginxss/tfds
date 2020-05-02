@@ -50,7 +50,7 @@ public:
     }
 
     // O(1)
-    int length() const {
+    size_t length() const {
         return tree.size();
     }
 
