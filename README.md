@@ -12,13 +12,11 @@
 
 ---
 
-Why not just use the standard C++ data structures, you ask? Well, there's a couple of reasons:
+Every one of these data structures is faster than their C++ counterpart. While i did not test every possible scenario, all of my test cases yielded a positive result for **tfds** in comparison to the STL containers (specifics in test_results.txt).
 
-First of all, every one of these data structures is faster than their C++ counterpart. While i did not test every possible scenario, all of my test cases yielded a positive result for **tfds** in comparison to the STL containers (specifics in test_results.txt).
+Also, i like to know what going on under the hood. With a self-implemented data structure you can just open the *.hpp and see exactly what happens if a certain function is called, which is really not the case with STL containers.
 
-Second, i like to know what going on under the hood. Have you ever tried looking into an std::priority_queue (or any of the C++ data structures, for that matter) to see how it is implemented? If so, you will know that it's just not possible, and that these data structures are supposed to be black boxes to the programmer. With **tfds** (or any self-implemented data structure), you can just open the *.hpp and see exactly what happens if a certain function is called.
-
-Third, because there are so many (poorly named) data structures available in C++, many programmers just resort to using std::vector for basically all tasks, because they don't want to spend time researching which one of these is the best data structure for the job. **tfds** is a small collection of the most basic and important data structures, which makes picking the right one a trivial task.
+By the way, the `iterator`s that are used in most of these classes behave differently than a usual iterator, which is why you can't use range-based for loops.
 
 ---
 ---
