@@ -53,6 +53,11 @@ inline unsigned long hash<const char *>(const char * const &key) {
     return string_hash((unsigned char *)key);
 }
 
+template <>
+inline unsigned long hash<char *>(char * const &key) {
+    return string_hash((unsigned char *)key);
+}
+
 // COMPARE
 
 template <typename K>
@@ -67,6 +72,11 @@ inline bool compare<std::string>(const std::string &key1, const std::string &key
 
 template <>
 inline bool compare<const char *>(const char * const &key1, const char * const &key2) {
+    return strcmp(key1, key2) == 0;
+}
+
+template <>
+inline bool compare<char *>(char * const &key1, char * const &key2) {
     return strcmp(key1, key2) == 0;
 }
 
