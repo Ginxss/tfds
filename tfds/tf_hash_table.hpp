@@ -110,7 +110,7 @@ private:
         while (b) {
             bucket *to_delete = b;
             b = b->next;
-            free_bucket(b);
+            free_bucket(to_delete);
         }
     }
 
