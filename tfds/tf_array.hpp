@@ -24,8 +24,8 @@ private:
     void check_index(const size_t index) {
         if (index >= capacity_) {
             if (autom_realloc) {
-                size_t new_capacity = capacity_ * ((size_t)(index / capacity_) + 1);
-                if (new_capacity < capacity_)
+                size_t new_capacity = capacity_ * ((index / capacity_) + 1);
+                if (new_capacity < index)
                     throw tf::exception("array: capacity too large");
                 
                 reallocate(new_capacity);
@@ -33,9 +33,6 @@ private:
             else {
                 throw tf::exception("array: index larger than capacity");
             }
-        }
-        else if (index < 0) {
-            throw tf::exception("array: index negative");
         }
     }
 
@@ -45,6 +42,28 @@ public:
         autom_realloc(autom_realloc),
         buffer(new T[capacity_]) {}
 
+    // copy constructor
+    array(const array &other):
+        capacity_(other.capacity_),
+        autom_realloc(other.autom_realloc),
+        buffer(new T[capacity_])
+    {
+        std::copy_n(other.buffer, other.capacity_, buffer);
+    }
+
+    // copy assignment operator
+    array &operator=(const array &other) {
+        std::cout << "in here" << std::endl;
+        if (this == &other)
+            return *this;
+        
+        delete[] buffer;
+        capacity_ = other.capacity_;
+        buffer = new T[capacity_];
+        std::copy_n(other.buffer, other.capacity_, buffer);
+        return *this;
+    }
+
     ~array() {
         delete[] buffer;
     }
@@ -53,6 +72,12 @@ public:
     void insert(const size_t index, const T &value) {
         check_index(index);
         buffer[index] = value;
+    }
+
+    // O(1) / O(n) if index > capacity and reallocating turned on
+    void insert(const size_t index, T &&rvalue) {
+        check_index(index);
+        buffer[index] = std::move(rvalue);
     }
 
     // O(1) / O(n) if index > capacity and reallocating turned on

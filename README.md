@@ -40,13 +40,14 @@ A custom initial capacity (in this case 100) and the reallocation behaviour can 
 tf::array<int> array(100, false);
 ```
 If the array is accessed out of bounds and automatic reallocation is set to false, the array throws a tf::exception.
+Copy constructor and copy assignment operator also exist.
 
 ---
 
 ### insert(index, value)
 *Runtime:* **O(1)** / O(n) on reallocation
 
-*Exceptions:* Throws a tf::exception if the index is negative, or if the index is bigger than the current capacity and automatic reallocation is turned off.
+*Exceptions:* Automatic reallocation off: throws a tf::exception if index out of bounds; Automatic reallocation on: throws a tf::exception if buffer overflow occurs.
 
 Inserts the value 3 at index 1:
 ```
@@ -58,7 +59,7 @@ array.insert(1, 3);
 ### get(index)
 *Runtime:* **O(1)** / O(n) on reallocation
 
-*Exceptions:* Throws a tf::exception if the index is negative, or if the index is bigger than the current capacity and automatic reallocation is turned off.
+*Exceptions:* Automatic reallocation off: throws a tf::exception if index out of bounds; Automatic reallocation on: throws a tf::exception if buffer overflow occurs.
 
 Returns a constant reference to the value at index 1:
 ```
@@ -70,7 +71,7 @@ int value = array.get(1);
 ### [index]
 *Runtime:* **O(1)** / O(n) on reallocation
 
-*Exceptions:* Throws a tf::exception if the index is negative, or if the index is bigger than the current capacity and automatic reallocation is turned off.
+*Exceptions:* Automatic reallocation off: throws a tf::exception if index out of bounds; Automatic reallocation on: throws a tf::exception if buffer overflow occurs.
 
 Returns a reference to the value at index 1:
 ```
