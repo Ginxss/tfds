@@ -144,20 +144,70 @@ public:
     };
 
 private:
-    const size_t table_size_;
+    size_t table_size_;
     size_t size_;
+    bool allow_duplicate_keys_;
     bucket **buckets;
 
     iterator start_it;
 
 public:
-    hash_table(const size_t table_size = 100):
+    hash_table(const size_t table_size = 100, const bool allow_duplicate_keys = false):
         table_size_(table_size),
         size_(0),
+        allow_duplicate_keys_(allow_duplicate_keys),
         buckets((bucket **)malloc(table_size_ * sizeof(bucket *)))
     {
         memset(buckets, 0, table_size_ * sizeof(bucket *));
         start_it.table = this;
+    }
+
+    // O(n)
+    hash_table(const hash_table &other):
+        table_size_(other.table_size_),
+        size_(0),
+        allow_duplicate_keys_(other.allow_duplicate_keys_),
+        buckets((bucket **)malloc(table_size_ * sizeof(bucket *)))
+    {
+        memset(buckets, 0, table_size_ * sizeof(bucket *));
+        start_it.table = this;
+
+        for (size_t i = 0; i < table_size_; ++i) {
+            bucket *b = *(other.buckets + i);
+
+            while (b) {
+                *(buckets + i) = alloc_bucket(b->key, b->value, *(buckets + i));
+                b = b->next;
+            }
+        }
+    }
+
+    // O(n)
+    hash_table &operator=(const hash_table &other) {
+        if (this == &other)
+            return *this;
+
+        for (size_t i = 0; i < table_size_; ++i) {
+            free_buckets(*(buckets + i));
+        }
+        free(buckets);
+
+        table_size_ = other.table_size_;
+        size_ = 0;
+        allow_duplicate_keys_ = other.allow_duplicate_keys_;
+        buckets = (bucket **)malloc(table_size_ * sizeof(bucket *));
+        memset(buckets, 0, table_size_ * sizeof(bucket *));
+
+        for (size_t i = 0; i < table_size_; ++i) {
+            bucket *b = *(other.buckets + i);
+
+            while (b) {
+                *(buckets + i) = alloc_bucket(b->key, b->value, *(buckets + i));
+                b = b->next;
+            }
+        }
+
+        return *this;
     }
 
     ~hash_table() {
@@ -174,16 +224,22 @@ public:
 
         if (*(buckets + index)) {
             bucket *it = *(buckets + index);
-            if (compare<K>(key, it->key))
-                throw tf::exception("hash table: insert: key already exists");
-            
-            while (it->next) {
-                it = it->next;
+
+            if (allow_duplicate_keys_) {
+                *(buckets + index) = alloc_bucket(key, value, *(buckets + index));
+            }
+            else {
                 if (compare<K>(key, it->key))
                     throw tf::exception("hash table: insert: key already exists");
-            }
+                
+                while (it->next) {
+                    it = it->next;
+                    if (compare<K>(key, it->key))
+                        throw tf::exception("hash table: insert: key already exists");
+                }
 
-            it->next = alloc_bucket(key, value, nullptr);
+                it->next = alloc_bucket(key, value, nullptr);
+            }
         }
         else {
             *(buckets + index) = alloc_bucket(key, value, nullptr);
@@ -290,6 +346,11 @@ public:
     // O(1)
     size_t size() const  {
         return size_;
+    }
+
+    // O(1)
+    bool allows_duplicate_keys() const {
+        return allow_duplicate_keys_;
     }
 
     // O(1)

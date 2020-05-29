@@ -21,6 +21,29 @@ public:
         capacity(initial_capacity),
         top_index(0),
         buffer(new T[capacity]) {}
+    
+    // O(n)
+    stack(const stack &other):
+        capacity(other.capacity),
+        top_index(other.top_index),
+        buffer(new T[capacity])
+    {
+        std::copy_n(other.buffer, capacity, buffer);
+    }
+
+    // O(n)
+    stack &operator=(const stack &other) {
+        if (this == &other)
+            return *this;
+        
+        delete[] buffer;
+        capacity = other.capacity;
+        top_index = other.top_index;
+        buffer = new T[capacity];
+        std::copy_n(other.buffer, capacity, buffer);
+
+        return *this;
+    }
 
     ~stack() {
         delete[] buffer;

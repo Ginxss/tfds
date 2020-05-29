@@ -360,6 +360,30 @@ public:
         start_it.tree = this;
         end_it.tree = this;
     }
+
+    // O(n)
+    multi_search_tree(multi_search_tree &other):
+        size_(0),
+        root(nullptr)
+    {
+        start_it.tree = this;
+        end_it.tree = this;
+
+        // maybe copy breadth-first to avoid constant rebalancing
+        for (auto it = other.begin(); it.condition(); ++it) {
+            insert(it.key(), it.value());
+        }
+    }
+
+    // O(n)
+    multi_search_tree &operator=(multi_search_tree &other) {
+        clear();
+
+        // same here
+        for (auto it = other.begin(); it.condition(); ++it) {
+            insert(it.key(), it.value());
+        }
+    }
     
     ~multi_search_tree() {
         clear();

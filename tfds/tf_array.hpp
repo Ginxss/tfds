@@ -42,7 +42,7 @@ public:
         autom_realloc(autom_realloc),
         buffer(new T[capacity_]) {}
 
-    // copy constructor
+    // O(n)
     array(const array &other):
         capacity_(other.capacity_),
         autom_realloc(other.autom_realloc),
@@ -51,16 +51,16 @@ public:
         std::copy_n(other.buffer, other.capacity_, buffer);
     }
 
-    // copy assignment operator
+    // O(n)
     array &operator=(const array &other) {
-        std::cout << "in here" << std::endl;
         if (this == &other)
             return *this;
         
         delete[] buffer;
         capacity_ = other.capacity_;
         buffer = new T[capacity_];
-        std::copy_n(other.buffer, other.capacity_, buffer);
+        std::copy_n(other.buffer, capacity_, buffer);
+        
         return *this;
     }
 
@@ -72,12 +72,6 @@ public:
     void insert(const size_t index, const T &value) {
         check_index(index);
         buffer[index] = value;
-    }
-
-    // O(1) / O(n) if index > capacity and reallocating turned on
-    void insert(const size_t index, T &&rvalue) {
-        check_index(index);
-        buffer[index] = std::move(rvalue);
     }
 
     // O(1) / O(n) if index > capacity and reallocating turned on

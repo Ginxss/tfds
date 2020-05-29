@@ -90,6 +90,30 @@ public:
         start_node(nullptr),
         end_node(nullptr) {}
 
+    // O(n)
+    linked_list(const linked_list &other):
+        length_(0),
+        start_node(nullptr),
+        end_node(nullptr)
+    {
+        node *it = other.start_node;
+        while (it) {
+            add_back(it->value);
+            it = it->next;
+        }
+    }
+
+    // O(n)
+    linked_list &operator=(const linked_list &other) {
+        clear();
+
+        node *it = other.start_node;
+        while (it) {
+            add_back(it.value);
+            it = it->next;
+        }
+    }
+
     ~linked_list() {
         clear();
     }

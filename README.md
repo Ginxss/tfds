@@ -40,6 +40,7 @@ A custom initial capacity (in this case 100) and the reallocation behaviour can 
 tf::array<int> array(100, false);
 ```
 If the array is accessed out of bounds and automatic reallocation is set to false, the array throws a tf::exception.
+
 Copy constructor and copy assignment operator also exist.
 
 ---
@@ -133,6 +134,7 @@ A custom initial capacity, in this case 100, can be set in the constructor:
 ```
 tf::stack<int> stack(100);
 ```
+Copy constructor and copy assignment operator also exist.
 
 ---
 
@@ -221,6 +223,7 @@ Constructor with type `int`:
 ```
 tf::linked_list<int> list;
 ```
+Copy constructor and copy assignment operator also exist.
 
 ---
 
@@ -402,14 +405,17 @@ The hash table deallocates on destruction.
 ---
 
 ### Constructor
-Default constructor with `int` keys and `int` values and table size 100:
+Default constructor with `int` keys and `int` values and table size 100 and checking for duplicate keys:
 ```
 tf::hash_table<int, int> table;
 ```
-A custom table size, in this case 10, can be set in the constructor:
+A custom table size, in this case 10, and the behaviour with duplicate keys can be set in the constructor:
 ```
-tf::hash_table<int, int> table(10);
+tf::hash_table<int, int> table(10, true);
 ```
+In this case, the hash table will not check the existing entries for duplicate keys when inserting. This makes inserting way faster since new entries just get appended to the beginning of a bucket list. Note that this flag is mainly supposed to speed up insertion time if you KNOW that there can never be identical keys. If there are multiple keys inside the table, all functions like get(...) and remove(...) will only find one of the inserted pairs.
+
+Copy constructor and copy assignment operator also exist.
 
 ---
 
@@ -431,12 +437,13 @@ In general, the hash table is not a data structure made for efficient iteration.
 ### insert(key, value)
 *Runtime:* average case: **O(1)** / worst case: O(n)
 
-*Exceptions:* Throws a tf::exception if the key already exists.
+*Exceptions:* Duplicate Keys not allowed: throws a tf::exception if the key already exists.
 
 Inserts the value 3 with key 1 into the hash table:
 ```
 table.insert(1, 3);
 ```
+Insertion is faster if keys are not checked for duplicates before inserting.
 
 ---
 
@@ -497,6 +504,16 @@ size_t num_entries = table.size();
 
 ---
 
+### allows_duplicate_keys()
+*Runtime:* **O(1)**
+
+Returns `true` if the hash table allows duplicate keys:
+```
+bool table_checking_duplicate_keys = table.allow_duplicate_keys();
+```
+
+---
+
 ### empty()
 *Runtime:* **O(1)**
 
@@ -546,6 +563,7 @@ Constructor with `int` keys and `int` values:
 ```
 tf::search_tree<int, int> tree;
 ```
+Copy constructor and copy assignment operator also exist (although they are not very effitient just yet).
 
 ---
 
@@ -710,6 +728,7 @@ Constructor with `int` keys and `int` values:
 ```
 tf::multi_search_tree<int, int> tree;
 ```
+Copy constructor and copy assignment operator also exist (although they are not very effitient just yet).
 
 ---
 
