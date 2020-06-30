@@ -4,6 +4,8 @@
 #include <string> // std::string
 #include <cstring> // std::strcmp, std::memcpy, std::memset
 
+namespace tf {
+
 template <typename T>
 inline bool compare(const T &key1, const T &key2) {
     return key1 == key2;
@@ -22,6 +24,8 @@ inline bool compare<const char *>(const char * const &key1, const char * const &
 template <>
 inline bool compare<char *>(char * const &key1, char * const &key2) {
     return std::strcmp(key1, key2) == 0;
+}
+
 }
 
 #endif
