@@ -1,13 +1,10 @@
 #ifndef TF_HASH_TABLE_H
 #define TF_HASH_TABLE_H
 
-#include <string> // std::string
-#include <cstring> // memcpy, memset
 #include "tf_exception.hpp"
+#include "tf_compare_functions.hpp"
 
 namespace tf {
-
-// HASH
 
 // src: http://www.cse.yorku.ca/~oz/hash.html
 // the actual djb2 algorithm which iterates over a string until a '0' is found
@@ -39,7 +36,7 @@ template <typename K>
 inline unsigned long hash(const K &key) {
     const size_t key_size = sizeof(K);
     unsigned char bytes[key_size];
-    memcpy(bytes, &key, key_size);
+    std::memcpy(bytes, &key, key_size);
     return byte_hash(bytes, key_size);
 }
 
@@ -56,28 +53,6 @@ inline unsigned long hash<const char *>(const char * const &key) {
 template <>
 inline unsigned long hash<char *>(char * const &key) {
     return string_hash((unsigned char *)key);
-}
-
-// COMPARE
-
-template <typename K>
-inline bool compare(const K &key1, const K &key2) {
-    return key1 == key2;
-}
-
-template <>
-inline bool compare<std::string>(const std::string &key1, const std::string &key2) {
-    return key1.compare(key2) == 0;
-}
-
-template <>
-inline bool compare<const char *>(const char * const &key1, const char * const &key2) {
-    return strcmp(key1, key2) == 0;
-}
-
-template <>
-inline bool compare<char *>(char * const &key1, char * const &key2) {
-    return strcmp(key1, key2) == 0;
 }
 
 /*
@@ -158,7 +133,7 @@ public:
         allow_duplicate_keys_(allow_duplicate_keys),
         buckets((bucket **)malloc(table_size_ * sizeof(bucket *)))
     {
-        memset(buckets, 0, table_size_ * sizeof(bucket *));
+        std::memset(buckets, 0, table_size_ * sizeof(bucket *));
         start_it.table = this;
     }
 
@@ -169,7 +144,7 @@ public:
         allow_duplicate_keys_(other.allow_duplicate_keys_),
         buckets((bucket **)malloc(table_size_ * sizeof(bucket *)))
     {
-        memset(buckets, 0, table_size_ * sizeof(bucket *));
+        std::memset(buckets, 0, table_size_ * sizeof(bucket *));
         start_it.table = this;
 
         for (size_t i = 0; i < table_size_; ++i) {
@@ -196,7 +171,7 @@ public:
         size_ = 0;
         allow_duplicate_keys_ = other.allow_duplicate_keys_;
         buckets = (bucket **)malloc(table_size_ * sizeof(bucket *));
-        memset(buckets, 0, table_size_ * sizeof(bucket *));
+        std::memset(buckets, 0, table_size_ * sizeof(bucket *));
 
         for (size_t i = 0; i < table_size_; ++i) {
             bucket *b = *(other.buckets + i);
@@ -230,12 +205,12 @@ public:
             }
             else {
                 if (compare<K>(key, it->key))
-                    throw tf::exception("hash table: insert: key already exists");
+                    throw exception("hash table: insert: key already exists");
                 
                 while (it->next) {
                     it = it->next;
                     if (compare<K>(key, it->key))
-                        throw tf::exception("hash table: insert: key already exists");
+                        throw exception("hash table: insert: key already exists");
                 }
 
                 it->next = alloc_bucket(key, value, nullptr);
@@ -275,7 +250,7 @@ public:
             }
         }
 
-        throw tf::exception("hash table: remove: key not found");
+        throw exception("hash table: remove: key not found");
     }
 
     // average: O(1) / worst: O(n)
@@ -291,7 +266,7 @@ public:
             it = it->next;
         }
 
-        throw tf::exception("hash table: get: key not found");
+        throw exception("hash table: get: key not found");
     }
 
     // average: O(1) / worst: O(n)
@@ -307,7 +282,7 @@ public:
             it = it->next;
         }
 
-        throw tf::exception("hash table: []: key not found");
+        throw exception("hash table: []: key not found");
     }
 
     // average: O(1) / worst: O(n)
@@ -364,7 +339,7 @@ public:
             free_buckets(*(buckets + i));
         }
 
-        memset(buckets, 0, table_size_ * sizeof(bucket *));
+        std::memset(buckets, 0, table_size_ * sizeof(bucket *));
     }
 };
 

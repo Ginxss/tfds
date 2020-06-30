@@ -396,7 +396,7 @@ list.clear();
 An unordered map (Separate Chaining Hash Map).
 
 Any type with non-changing memory can be used as the key, because the hash is built from the memory block of the key.
-Strings can be used as keys as well, `std::string` and `const char *` with the same string produce the same hash.
+Strings can be used as keys as well (C++ strings and C strings with the same text will produce the same hash).
 
 The default table size is 100 (table size = number of buckets, bucket = linked list of entries). The table size is fixed and can only be modified on construction. For the best possible performance, the table size should be roughly the maximum number of elements. The average case performance of **O(1)** can only be ensured if the table is big enough.
 
@@ -550,7 +550,7 @@ An ordered map (iterative AVL Tree).
 
 The entries are sorted by the key. If only sorting by value is needed, the values should just have themselves as keys. If duplicate keys are expected, the use of [ Multi Search Tree](#multi-search-tree) is recommended.
 
-The keys for the search tree have to be comparable with `operator<` and `operator>`.
+The keys for the search tree have to be comparable with `operator==`, `operator<` and `operator>`.
 
 Can also be used as a Priority Queue, although the use of the wrapper [Priority Queue](#priority-queue) is recommended for that, because of its simpler interface.
 
@@ -563,7 +563,7 @@ Constructor with `int` keys and `int` values:
 ```
 tf::search_tree<int, int> tree;
 ```
-Copy constructor and copy assignment operator also exist (although they are not very effitient just yet).
+Copy constructor and copy assignment operator also exist (although they are not very efficient just yet).
 
 ---
 
@@ -715,7 +715,7 @@ Behaves just like the [Search Tree](#search-tree) while allowing duplicate keys.
 
 The entries are sorted by the key. Values with the same key are not ordered in any particular order. If no duplicate keys are expected, the use of [Search Tree](#search-tree) is recommended, because of its slightly higher speed.
 
-The keys for the multi search tree have to be comparable with `operator<` and `operator>` and the values must be comparable with `operator==`.
+The keys for the multi search tree have to be comparable with `operator==`, `operator<` and `operator>`.
 
 Can also be used as a Multi Priority Queue, although the use of the wrapper [Multi Priority Queue](#multi-priority-queue) is recommended for that, because of its simpler interface.
 
@@ -728,7 +728,7 @@ Constructor with `int` keys and `int` values:
 ```
 tf::multi_search_tree<int, int> tree;
 ```
-Copy constructor and copy assignment operator also exist (although they are not very effitient just yet).
+Copy constructor and copy assignment operator also exist (although they are not very efficient just yet).
 
 ---
 
@@ -898,6 +898,7 @@ Constructor with type `int`:
 ```
 tf::fifo_queue<int> queue;
 ```
+Copy constructor and copy assignment operator also exist.
 
 ---
 
@@ -978,6 +979,7 @@ Constructor with `int` keys and `int` values:
 ```
 tf::prio_queue<int, int> queue;
 ```
+Copy constructor and copy assignment operator also exist.
 
 ---
 
@@ -1072,6 +1074,7 @@ Constructor with `int` keys and `int` values:
 ```
 tf::multi_prio_queue<int, int> queue;
 ```
+Copy constructor and copy assignment operator also exist.
 
 ---
 

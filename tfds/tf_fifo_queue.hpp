@@ -11,9 +11,21 @@ namespace tf {
 template <typename T>
 class fifo_queue {
 private:
-    tf::linked_list<T> list;
+    linked_list<T> list;
 
 public:
+    fifo_queue() {}
+
+    // O(n)
+    fifo_queue(const fifo_queue &other) {
+        list = other.list;
+    }
+
+    // O(n)
+    fifo_queue &operator=(const fifo_queue &other) {
+        list = other.list;
+    }
+
     // O(1)
     void add(const T &value) {
         list.add_front(value);
@@ -24,8 +36,8 @@ public:
         try {
             return list.pop_back();
         }
-        catch (tf::exception &e) {
-            throw tf::exception("fifo queue: next: queue is empty");
+        catch (exception &e) {
+            throw exception("fifo queue: next: queue is empty");
         }
     }
 

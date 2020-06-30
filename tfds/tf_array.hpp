@@ -25,13 +25,13 @@ private:
         if (index >= capacity_) {
             if (autom_realloc) {
                 size_t new_capacity = capacity_ * ((index / capacity_) + 1);
-                if (new_capacity < index)
-                    throw tf::exception("array: capacity too large");
+                if (new_capacity <= index)
+                    throw exception("array: capacity too large");
                 
                 reallocate(new_capacity);
             }
             else {
-                throw tf::exception("array: index larger than capacity");
+                throw exception("array: index larger than capacity");
             }
         }
     }

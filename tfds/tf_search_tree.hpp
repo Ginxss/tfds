@@ -198,7 +198,7 @@ private:
         return new_root;
     }
 
-    // i dont think 2 cases can happen after 1 insert, and testing supports that. if it makes problems, just remove the return statements.
+    // i dont think 2 cases can happen after 1 insert. if it makes problems, just remove the return statements.
     void rebalance_upward(node *n) {
         node *it = n;
         while (it) {
@@ -359,7 +359,7 @@ public:
                     }
                 }
                 else { // if (key == it->key)
-                    throw tf::exception("search tree: insert: key already exists");
+                    throw exception("search tree: insert: key already exists");
                 }
             }
 
@@ -382,7 +382,7 @@ public:
             }
         }
 
-        throw tf::exception("search tree: remove: key not found");
+        throw exception("search tree: remove: key not found");
     }
 
     // O(log(n))
@@ -400,7 +400,7 @@ public:
             }
         }
 
-        throw tf::exception("search tree: get: key not found");
+        throw exception("search tree: get: key not found");
     }
 
     // O(log(n))
@@ -418,7 +418,7 @@ public:
             }
         }
 
-        throw tf::exception("search tree: []: key not found");
+        throw exception("search tree: []: key not found");
     }
 
     // O(log(n))
@@ -450,7 +450,7 @@ public:
     // O(log(n))
     V pop_min() {
         if (empty())
-            throw tf::exception("search tree: pop_min: tree is empty");
+            throw exception("search tree: pop_min: tree is empty");
 
         node *it = root;
         while (it->left) {
@@ -463,7 +463,7 @@ public:
     // O(log(n))
     V pop_max() {
         if (empty())
-            throw tf::exception("search tree: pop_max: tree is empty");
+            throw exception("search tree: pop_max: tree is empty");
         
         node *it = root;
         while (it->right) {

@@ -11,9 +11,21 @@ namespace tf {
 template <typename K, typename V>
 class multi_prio_queue {
 private:
-    tf::multi_search_tree<K, V> tree;
+    multi_search_tree<K, V> tree;
 
 public:
+    multi_prio_queue() {}
+
+    // O(n)
+    multi_prio_queue(const multi_prio_queue &other) {
+        tree = other.tree;
+    }
+
+    // O(n)
+    multi_prio_queue &operator=(const multi_prio_queue &other) {
+        tree = other.tree;
+    }
+
     // O(log(n))
     void insert(const K &key, const V &value) {
         tree.insert(key, value);
@@ -24,8 +36,8 @@ public:
         try {
             return tree.pop_min();
         }
-        catch (tf::exception &e) {
-            throw tf::exception("prio queue: next_min: queue is empty");
+        catch (exception &e) {
+            throw exception("prio queue: next_min: queue is empty");
         }
     }
 
@@ -34,8 +46,8 @@ public:
         try {
             return tree.pop_max();
         }
-        catch (tf::exception &e) {
-            throw tf::exception("prio queue: next_max: queue is empty");
+        catch (exception &e) {
+            throw exception("prio queue: next_max: queue is empty");
         }
     }
 

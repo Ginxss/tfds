@@ -2,6 +2,7 @@
 #define TF_MULTI_SEARCH_TREE_H
 
 #include "tf_exception.hpp"
+#include "tf_compare_functions.hpp"
 
 namespace tf {
 
@@ -442,7 +443,7 @@ public:
             }
         }
 
-        throw tf::exception("search tree: remove: key not found");
+        throw exception("search tree: remove: key not found");
     }
 
     // O(log(n) + #values with that key)
@@ -459,7 +460,7 @@ public:
                 value_node *value_it = it->start_value;
                 value_node *prev = nullptr;
                 while (value_it) {
-                    if (value_it->value == value) {
+                    if (compare<K>(value_it->value, value)) {
                         const V result = value_it->value;
 
                         if (prev) {
@@ -481,11 +482,11 @@ public:
                     value_it = value_it->next;
                 }
 
-                throw tf::exception("search tree: remove_value: value not found");
+                throw exception("search tree: remove_value: value not found");
             }
         }
 
-        throw tf::exception("search tree: remove_value: key not found");
+        throw exception("search tree: remove_value: key not found");
     }
 
     // O(log(n))
@@ -503,7 +504,7 @@ public:
             }
         }
 
-        throw tf::exception("search tree: get: key not found");
+        throw exception("search tree: get: key not found");
     }
 
     // O(log(n))
@@ -521,7 +522,7 @@ public:
             }
         }
 
-        throw tf::exception("search tree: []: key not found");
+        throw exception("search tree: []: key not found");
     }
 
     // O(log(n))
@@ -555,7 +556,7 @@ public:
     // O(log(n))
     V pop_min() {
         if (empty())
-            throw tf::exception("search tree: pop_min: tree is empty");
+            throw exception("search tree: pop_min: tree is empty");
 
         node *it = root;
         while (it->left) {
@@ -578,7 +579,7 @@ public:
     // O(log(n))
     V pop_max() {
         if (empty())
-            throw tf::exception("search tree: pop_max: tree is empty");
+            throw exception("search tree: pop_max: tree is empty");
         
         node *it = root;
         while (it->right) {

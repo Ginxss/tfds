@@ -2,6 +2,7 @@
 #define TF_LINKED_LIST_H
 
 #include "tf_exception.hpp"
+#include "tf_compare_functions.hpp"
 
 namespace tf {
 
@@ -138,7 +139,7 @@ public:
     void add_after(const T &new_value, const T &existing_value) {
         node *it = start_node;
         while (it) {
-            if (existing_value == it->value) {
+            if (compare<T>(existing_value, it->value)) {
                 if (it == end_node) {
                     new_end_node(new_value);
                 }
@@ -154,14 +155,14 @@ public:
             it = it->next;
         }
 
-        throw tf::exception("linked list: add_after: existing_value not found");
+        throw exception("linked list: add_after: existing_value not found");
     }
 
     // O(n)
     void add_before(const T &new_value, const T &existing_value) {
         node *it = start_node;
         while (it) {
-            if (existing_value == it->value) {
+            if (compare<T>(existing_value, it->value)) {
                 if (it == start_node) {
                     new_start_node(new_value);
                 }
@@ -177,7 +178,7 @@ public:
             it = it->next;
         }
 
-        throw tf::exception("linked list: add_before: existing_value not found");
+        throw exception("linked list: add_before: existing_value not found");
     }
 
     // O(n)
@@ -185,12 +186,12 @@ public:
         node *it = start_node;
 
         while (it) {
-            if (value == it->value) {
-                if (it == start_node || it == end_node) {
-                    if (it == start_node)
-                        slide_start_node();
-                    else //if (it == end_node)
-                        slide_end_node();
+            if (compare<T>(value, it->value)) {
+                if (it == start_node) {
+                    slide_start_node();
+                }
+                else if (it == end_node) {
+                    slide_end_node();
                 }
                 else {
                     it->prev->next = it->next;
@@ -204,13 +205,13 @@ public:
             it = it->next;
         }
 
-        throw tf::exception("linked list: remove: value not found");
+        throw exception("linked list: remove: value not found");
     }
 
     // O(1)
     T &back() {
         if (empty())
-            throw tf::exception("linked list: pop_front: list is empty");
+            throw exception("linked list: pop_front: list is empty");
         
         return end_node->value;
     }
@@ -218,7 +219,7 @@ public:
     // O(1)
     T &front() {
         if (empty())
-            throw tf::exception("linked list: pop_front: list is empty");
+            throw exception("linked list: pop_front: list is empty");
         
         return start_node->value;
     }
@@ -226,7 +227,7 @@ public:
     // O(1)
     T pop_back() {
         if (empty())
-            throw tf::exception("linked list: pop_back: list is empty");
+            throw exception("linked list: pop_back: list is empty");
         
         T result = end_node->value;
 
@@ -240,7 +241,7 @@ public:
     // O(1)
     T pop_front() {
         if (empty())
-            throw tf::exception("linked list: pop_front: list is empty");
+            throw exception("linked list: pop_front: list is empty");
         
         T result = start_node->value;
 
@@ -268,7 +269,7 @@ public:
         node *it = start_node;
 
         while (it) {
-            if (value == it->value) {
+            if (compare<T>(value, it->value)) {
                 return true;
             }
 

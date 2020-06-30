@@ -53,8 +53,8 @@ public:
     void put(const T &value) {
         if (top_index >= capacity) {
             size_t new_capacity = capacity * 2;
-            if (new_capacity < capacity)
-                throw tf::exception("stack: put: capacity too large");
+            if (new_capacity <= top_index)
+                throw exception("stack: put: capacity too large");
 
             T *new_buffer = new T[new_capacity];
             std::copy_n(buffer, capacity, new_buffer);
@@ -69,7 +69,7 @@ public:
     // O(1)
     T &peek() {
         if (empty())
-            throw tf::exception("stack: peek: stack is empty");
+            throw exception("stack: peek: stack is empty");
         
         return buffer[top_index - 1];
     }
@@ -77,7 +77,7 @@ public:
     // O(1)
     T pop() {
         if (empty())
-            throw tf::exception("stack: pop: stack is empty");
+            throw exception("stack: pop: stack is empty");
 
         return buffer[--top_index];
     }
