@@ -460,7 +460,7 @@ public:
                 value_node *value_it = it->start_value;
                 value_node *prev = nullptr;
                 while (value_it) {
-                    if (compare<K>(value_it->value, value)) {
+                    if (compare<V>(value_it->value, value)) {
                         const V result = value_it->value;
 
                         if (prev) {
