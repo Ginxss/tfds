@@ -1,6 +1,5 @@
 TEST RESULTS:
 Every result is the average time over 100 runs.
-While this is probably not the most waterproof way to determine the performance, i think its pretty clear that, at least on my machine, tfds is (sometimes significantly) faster than the STL containers.
 
 The referred to "struct" was:
 struct Object {
