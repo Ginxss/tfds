@@ -37,12 +37,13 @@ private:
     }
 
 public:
+    // constructor
     array(const size_t initial_capacity = 10, const bool autom_realloc = true):
         capacity_(initial_capacity),
         autom_realloc(autom_realloc),
         buffer(new T[capacity_]) {}
 
-    // O(n)
+    // copy constructor
     array(const array &other):
         capacity_(other.capacity_),
         autom_realloc(other.autom_realloc),
@@ -51,21 +52,34 @@ public:
         std::copy_n(other.buffer, other.capacity_, buffer);
     }
 
-    // O(n)
-    array &operator=(const array &other) {
-        if (this == &other)
-            return *this;
-        
+    // destructor
+    ~array() {
         delete[] buffer;
-        capacity_ = other.capacity_;
-        buffer = new T[capacity_];
-        std::copy_n(other.buffer, capacity_, buffer);
-        
+    }
+
+    // copy assignment operator
+    array &operator=(array other) {
+        swap(*this, other);
         return *this;
     }
 
-    ~array() {
-        delete[] buffer;
+    // swap
+    friend void swap(array &first, array &second) {
+        using std::swap;
+        swap(first.capacity_, second.capacity_);
+        swap(first.autom_realloc, second.autom_realloc);
+        swap(first.buffer, second.buffer);
+    }
+
+    // move constructor
+    array(array &&other) noexcept : array() {
+        swap(*this, other);
+    }
+
+    // move assignment operator
+    array &operator=(array &&other) {
+        swap(*this, other);
+        return *this;
     }
 
     // O(1) / O(n) if index > capacity and reallocating turned on
