@@ -22,7 +22,10 @@ private:
 
     // reallocation size is the smallest multiple of the current capacity that can hold the index.
     void check_index(const size_t index) {
-        if (index >= capacity_) {
+        if (index < 0) {
+            throw exception("array: negative index");
+        }
+        else if (index >= capacity_) {
             if (autom_realloc) {
                 size_t new_capacity = capacity_ * ((index / capacity_) + 1);
                 if (new_capacity <= index)
@@ -39,7 +42,7 @@ private:
 public:
     // constructor
     array(const size_t initial_capacity = 10, const bool autom_realloc = true):
-        capacity_(initial_capacity),
+        capacity_((initial_capacity > 0) ? initial_capacity : 1),
         autom_realloc(autom_realloc),
         buffer(new T[capacity_]) {}
 
@@ -112,11 +115,13 @@ public:
 
     // O(n)
     void reallocate(const size_t new_capacity) {
-        T *new_buffer = new T[new_capacity];
-        std::copy_n(buffer, std::min(capacity_, new_capacity), new_buffer);
-        capacity_ = new_capacity;
-        delete[] buffer;
-        buffer = new_buffer;
+        if (new_capacity > 0) {
+            T *new_buffer = new T[new_capacity];
+            std::copy_n(buffer, std::min(capacity_, new_capacity), new_buffer);
+            capacity_ = new_capacity;
+            delete[] buffer;
+            buffer = new_buffer;
+        }
     }
 };
 
