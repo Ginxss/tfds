@@ -1,7 +1,7 @@
 TEST RESULTS:
 Every result is the average time over 100 runs.
 
-The referred to "struct" was:
+The referred to "struct" is:
 struct Object {
     char c;
     short s;
