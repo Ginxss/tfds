@@ -363,26 +363,46 @@ public:
     }
 
     // O(n)
-    multi_search_tree(multi_search_tree &other):
+    multi_search_tree(const multi_search_tree &other):
         size_(0),
         root(nullptr)
     {
         start_it.tree = this;
         end_it.tree = this;
 
-        // maybe copy breadth-first to avoid constant rebalancing
-        for (auto it = other.begin(); it.condition(); ++it) {
-            insert(it.key(), it.value());
+        // mimic iterator
+        node *it = root;
+        if (it) {
+            while (it->left) {
+                it = it->left;
+            }
+        }
+        value_node *vn = it->start_value;
+
+        while (it != nullptr) {
+            insert(it->key, vn->value);
+            vn = next_value_node(vn, &it);
         }
     }
 
     // O(n)
-    multi_search_tree &operator=(multi_search_tree &other) {
+    multi_search_tree &operator=(const multi_search_tree &other) {
+        start_it.tree = this;
+        end_it.tree = this;
         clear();
 
-        // same here
-        for (auto it = other.begin(); it.condition(); ++it) {
-            insert(it.key(), it.value());
+        // mimic iterator
+        node *it = root;
+        if (it) {
+            while (it->left) {
+                it = it->left;
+            }
+        }
+        value_node *vn = it->start_value;
+
+        while (it != nullptr) {
+            insert(it->key, vn->value);
+            vn = next_value_node(vn, &it);
         }
     }
     

@@ -305,26 +305,44 @@ public:
     }
 
     // O(n)
-    search_tree(search_tree &other):
+    search_tree(const search_tree &other):
         size_(0),
         root(nullptr)
     {
         start_it.tree = this;
         end_it.tree = this;
 
-        // maybe copy breadth-first to avoid constant rebalancing
-        for (auto it = other.begin(); it.condition(); ++it) {
-            insert(it.key(), it.value());
+        // mimic iterator
+        node *it = other.root;
+        if (it) {
+            while (it->left) {
+                it = it->left;
+            }
+        }
+
+        while (it != nullptr) {
+            insert(it->key, it->value);
+            it = successor(it);
         }
     }
 
     // O(n)
-    search_tree &operator=(search_tree &other) {
+    search_tree &operator=(const search_tree &other) {
+        start_it.tree = this;
+        end_it.tree = this;
         clear();
 
-        // same here
-        for (auto it = other.begin(); it.condition(); ++it) {
-            insert(it.key(), it.value());
+        // mimic iterator
+        node *it = other.root;
+        if (it) {
+            while (it->left) {
+                it = it->left;
+            }
+        }
+
+        while (it != nullptr) {
+            insert(it->key, it->value);
+            it = successor(it);
         }
     }
     
