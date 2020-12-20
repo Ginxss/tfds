@@ -371,7 +371,7 @@ public:
         end_it.tree = this;
 
         // mimic iterator
-        node *it = root;
+        node *it = other.root;
         if (it) {
             while (it->left) {
                 it = it->left;
@@ -392,7 +392,7 @@ public:
         clear();
 
         // mimic iterator
-        node *it = root;
+        node *it = other.root;
         if (it) {
             while (it->left) {
                 it = it->left;
