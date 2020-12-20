@@ -12,11 +12,10 @@
 
 ---
 
-Every one of these data structures is faster than their C++ counterpart. While i did not test every possible scenario, all of my test cases yielded a positive result for **tfds** in comparison to the STL containers (specifics in test_results.txt).
+This is a collection of data structures in C++. In all of my tests **tfds** was (sometimes significantly) faster or equally as fast as their STL counterpart.
+That being said, i did not test very thoroughly for every scenario. For specifics see test_results.txt.
 
-Also, i like to know what going on under the hood. With a self-implemented data structure you can just open the *.hpp and see exactly what happens if a certain function is called, which is really not the case with STL containers.
-
-By the way, the `iterator`s that are used in most of these classes behave differently than a usual iterator, which is why you can't use range-based for loops.
+Also, the `iterator`s that are used in **tfds**-classes behave differently than usual iterators, which is why you can't use range-based for loops (That's because these `iterator`s allow both forward and backward iteration with the same syntax).
 
 ---
 ---
