@@ -1,6 +1,7 @@
 #ifndef TF_LINKED_LIST_H
 #define TF_LINKED_LIST_H
 
+#include <algorithm> // std::swap
 #include "tf_exception.hpp"
 #include "tf_compare_functions.hpp"
 
@@ -86,12 +87,13 @@ private:
     }
 
 public:
+    // constructor
     linked_list():
         length_(0),
         start_node(nullptr),
         end_node(nullptr) {}
 
-    // O(n)
+    // copy constructor
     linked_list(const linked_list &other):
         length_(0),
         start_node(nullptr),
@@ -104,19 +106,35 @@ public:
         }
     }
 
-    // O(n)
-    linked_list &operator=(const linked_list &other) {
-        clear();
-
-        node *it = other.start_node;
-        while (it) {
-            add_back(it.value);
-            it = it->next;
-        }
-    }
-
+    // destructor
     ~linked_list() {
         clear();
+    }
+
+    friend void swap(linked_list &first, linked_list & second) {
+        using std::swap;
+        swap(first.length_, second.length_);
+        swap(first.start_node, second.start_node);
+        swap(first.end_node, second.end_node);
+        swap(first.start_it, second.start_it);
+        swap(first.end_it, second.end_it);
+    }
+
+    // copy assignment operator
+    linked_list &operator=(linked_list other) {
+        swap(*this, other);
+        return *this;
+    }
+
+    // move constructor
+    linked_list(linked_list && other) noexcept : linked_list() {
+        swap(*this, other);
+    }
+
+    // move assignment operator
+    linked_list &operator=(linked_list &&other) {
+        swap(*this, other);
+        return *this;
     }
 
     // O(1)

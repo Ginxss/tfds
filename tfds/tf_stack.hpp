@@ -1,7 +1,7 @@
 #ifndef TF_STACK_H
 #define TF_STACK_H
 
-#include <algorithm> // std::copy_n
+#include <algorithm> // std::copy_n, std::swap
 #include "tf_exception.hpp"
 
 namespace tf {
@@ -17,12 +17,13 @@ private:
     T *buffer;
 
 public:
+    // constructor
     stack(const size_t initial_capacity = 10):
-        capacity(initial_capacity),
+        capacity((initial_capacity > 0) ? initial_capacity : 1),
         top_index(0),
         buffer(new T[capacity]) {}
     
-    // O(n)
+    // copy constructor
     stack(const stack &other):
         capacity(other.capacity),
         top_index(other.top_index),
@@ -31,22 +32,33 @@ public:
         std::copy_n(other.buffer, capacity, buffer);
     }
 
-    // O(n)
-    stack &operator=(const stack &other) {
-        if (this == &other)
-            return *this;
-        
+    // destructor
+    ~stack() {
         delete[] buffer;
-        capacity = other.capacity;
-        top_index = other.top_index;
-        buffer = new T[capacity];
-        std::copy_n(other.buffer, capacity, buffer);
+    }
 
+    friend void swap(stack &first, stack &second) {
+        using std::swap;
+        swap(first.capacity, second.capacity);
+        swap(first.top_index, second.top_index);
+        swap(first.buffer, second.buffer);
+    }
+
+    // copy assignment operator
+    stack &operator=(stack other) {
+        swap(*this, other);
         return *this;
     }
 
-    ~stack() {
-        delete[] buffer;
+    // move constructor
+    stack(stack &&other) noexcept : stack() {
+        swap(*this, other);
+    }
+
+    // move assignment operator
+    stack &operator=(stack &&other) {
+        swap(*this, other);
+        return *this;
     }
 
     // O(1) / O(n) if capacity is full

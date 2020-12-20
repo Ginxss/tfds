@@ -1,6 +1,7 @@
 #ifndef TF_MULTI_SEARCH_TREE_H
 #define TF_MULTI_SEARCH_TREE_H
 
+#include <algorithm> // std::swap
 #include "tf_exception.hpp"
 #include "tf_compare_functions.hpp"
 
@@ -354,6 +355,7 @@ private:
     }
 
 public:
+    // constructor
     multi_search_tree():
         size_(0),
         root(nullptr)
@@ -362,7 +364,7 @@ public:
         end_it.tree = this;
     }
 
-    // O(n)
+    // copy constructor
     multi_search_tree(const multi_search_tree &other):
         size_(0),
         root(nullptr)
@@ -384,30 +386,35 @@ public:
             vn = next_value_node(vn, &it);
         }
     }
-
-    // O(n)
-    multi_search_tree &operator=(const multi_search_tree &other) {
-        start_it.tree = this;
-        end_it.tree = this;
-        clear();
-
-        // mimic iterator
-        node *it = other.root;
-        if (it) {
-            while (it->left) {
-                it = it->left;
-            }
-        }
-        value_node *vn = it->start_value;
-
-        while (it != nullptr) {
-            insert(it->key, vn->value);
-            vn = next_value_node(vn, &it);
-        }
-    }
     
+    // destructor
     ~multi_search_tree() {
         clear();
+    }
+
+    friend void swap(multi_search_tree &first, multi_search_tree &second) {
+        using std::swap;
+        swap(first.size_, second.size_);
+        swap(first.root, second.root);
+        swap(first.start_it, second.start_it);
+        swap(first.end_it, second.end_it);
+    }
+
+    // copy assignment operator
+    multi_search_tree &operator=(multi_search_tree other) {
+        swap(*this, other);
+        return *this;
+    }
+
+    // move constructor
+    multi_search_tree(multi_search_tree &&other) noexcept : multi_search_tree() {
+        swap(*this, other);
+    }
+
+    // move assignment operator
+    multi_search_tree &operator=(multi_search_tree &&other) {
+        swap(*this, other);
+        return *this;
     }
 
     // O(log(n))

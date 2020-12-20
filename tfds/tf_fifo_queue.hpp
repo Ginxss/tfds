@@ -14,16 +14,33 @@ private:
     linked_list<T> list;
 
 public:
+    // constructor
     fifo_queue() {}
 
-    // O(n)
-    fifo_queue(const fifo_queue &other) {
-        list = other.list;
+    // copy constructor
+    fifo_queue(const fifo_queue &other):
+        list(other.list) {}
+
+    friend void swap(fifo_queue &first, fifo_queue &second) {
+        using std::swap;
+        swap(first.list, second.list);
     }
 
-    // O(n)
-    fifo_queue &operator=(const fifo_queue &other) {
-        list = other.list;
+    // copy assignment operator
+    fifo_queue &operator=(fifo_queue other) {
+        swap(*this, other);
+        return *this;
+    }
+
+    // move constructor
+    fifo_queue(fifo_queue &&other) noexcept : fifo_queue() {
+        swap(*this, other);
+    }
+
+    // move assignment operator
+    fifo_queue &operator=(fifo_queue &&other) {
+        swap(*this, other);
+        return *this;
     }
 
     // O(1)

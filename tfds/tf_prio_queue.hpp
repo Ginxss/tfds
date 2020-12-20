@@ -14,16 +14,33 @@ private:
     search_tree<K, V> tree;
 
 public:
+    // constructor
     prio_queue() {}
 
-    // O(n)
-    prio_queue(const prio_queue &other) {
-        tree = other.tree;
+    // copy constructor
+    prio_queue(const prio_queue &other):
+        tree(other.tree) {}
+
+    friend void swap(prio_queue &first, prio_queue &second) {
+        using std::swap;
+        swap(first.tree, second.tree);
     }
 
-    // O(n)
-    prio_queue &operator=(const prio_queue &other) {
-        tree = other.tree;
+    // copy assignment operator
+    prio_queue &operator=(prio_queue other) {
+        swap(*this, other);
+        return *this;
+    }
+
+    // move constructor
+    prio_queue(prio_queue &&other) noexcept : prio_queue() {
+        swap(*this, other);
+    }
+
+    // move assignment operator
+    prio_queue &operator=(prio_queue &&other) {
+        swap(*this, other);
+        return *this;
     }
 
     // O(log(n))

@@ -1,6 +1,7 @@
 #ifndef TF_HASH_TABLE_H
 #define TF_HASH_TABLE_H
 
+#include <algorithm> // std::swap
 #include "tf_exception.hpp"
 #include "tf_compare_functions.hpp"
 
@@ -127,8 +128,9 @@ private:
     iterator start_it;
 
 public:
+    // constructor
     hash_table(const size_t table_size = 100, const bool allow_duplicate_keys = false):
-        table_size_(table_size),
+        table_size_((table_size > 0) ? table_size : 1),
         size_(0),
         allow_duplicate_keys_(allow_duplicate_keys),
         buckets((bucket **)malloc(table_size_ * sizeof(bucket *)))
@@ -137,7 +139,7 @@ public:
         start_it.table = this;
     }
 
-    // O(n)
+    // copy constructor
     hash_table(const hash_table &other):
         table_size_(other.table_size_),
         size_(0),
@@ -157,40 +159,39 @@ public:
         }
     }
 
-    // O(n)
-    hash_table &operator=(const hash_table &other) {
-        if (this == &other)
-            return *this;
-
-        for (size_t i = 0; i < table_size_; ++i) {
-            free_buckets(*(buckets + i));
-        }
-        free(buckets);
-
-        table_size_ = other.table_size_;
-        size_ = 0;
-        allow_duplicate_keys_ = other.allow_duplicate_keys_;
-        buckets = (bucket **)malloc(table_size_ * sizeof(bucket *));
-        std::memset(buckets, 0, table_size_ * sizeof(bucket *));
-
-        for (size_t i = 0; i < table_size_; ++i) {
-            bucket *b = *(other.buckets + i);
-
-            while (b) {
-                *(buckets + i) = alloc_bucket(b->key, b->value, *(buckets + i));
-                b = b->next;
-            }
-        }
-
-        return *this;
-    }
-
+    // destructor
     ~hash_table() {
         for (size_t i = 0; i < table_size_; ++i) {
             free_buckets(*(buckets + i));
         }
 
         free(buckets);
+    }
+
+    friend void swap(hash_table &first, hash_table &second) {
+        using std::swap;
+        swap(first.table_size_, second.table_size_);
+        swap(first.size_, second.size_);
+        swap(first.allows_duplicate_keys_, second.allows_duplicate_keys_);
+        swap(first.buckets, second.buckets);
+        swap(first.start_it, second.start_it);
+    }
+
+    // copy assignment operator
+    hash_table &operator=(hash_table other) {
+        swap(*this, other);
+        return *this;
+    }
+
+    // move constructor
+    hash_table(hash_table &&other) noexcept : hash_table() {
+        swap(*this, other);
+    }
+
+    // move assignment operator
+    hash_table &operator=(hash_table &&other) {
+        swap(*this, other);
+        return *this;
     }
 
     // average: O(1) / worst: O(n)

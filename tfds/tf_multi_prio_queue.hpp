@@ -14,16 +14,34 @@ private:
     multi_search_tree<K, V> tree;
 
 public:
+    // constructor
     multi_prio_queue() {}
 
-    // O(n)
+    // copy constructor
     multi_prio_queue(const multi_prio_queue &other) {
         tree = other.tree;
     }
 
-    // O(n)
-    multi_prio_queue &operator=(const multi_prio_queue &other) {
-        tree = other.tree;
+    friend void swap(multi_prio_queue &first, multi_prio_queue &second) {
+        using std::swap;
+        swap(first.tree, second.tree);
+    }
+
+    // copy assignment operator
+    multi_prio_queue &operator=(multi_prio_queue other) {
+        swap(*this, other);
+        return *this;
+    }
+
+    // move constructor
+    multi_prio_queue(multi_prio_queue &&other) noexcept : multi_prio_queue() {
+        swap(*this, other);
+    }
+
+    // move assignment operator
+    multi_prio_queue &operator=(multi_prio_queue &&other) {
+        swap(*this, other);
+        return *this;
     }
 
     // O(log(n))

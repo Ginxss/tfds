@@ -1,7 +1,7 @@
 #ifndef TF_ARRAY_H
 #define TF_ARRAY_H
 
-#include <algorithm> // std::copy_n
+#include <algorithm> // std::copy_n, std::swap, std::min
 #include "tf_exception.hpp"
 
 namespace tf {
@@ -60,18 +60,17 @@ public:
         delete[] buffer;
     }
 
-    // copy assignment operator
-    array &operator=(array other) {
-        swap(*this, other);
-        return *this;
-    }
-
-    // swap
     friend void swap(array &first, array &second) {
         using std::swap;
         swap(first.capacity_, second.capacity_);
         swap(first.autom_realloc, second.autom_realloc);
         swap(first.buffer, second.buffer);
+    }
+
+    // copy assignment operator
+    array &operator=(array other) {
+        swap(*this, other);
+        return *this;
     }
 
     // move constructor

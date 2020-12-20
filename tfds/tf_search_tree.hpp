@@ -1,6 +1,7 @@
 #ifndef TF_SEARCH_TREE_H
 #define TF_SEARCH_TREE_H
 
+#include <algorithm> // std::swap
 #include "tf_exception.hpp"
 
 namespace tf {
@@ -296,6 +297,7 @@ private:
     }
 
 public:
+    // constructor
     search_tree():
         size_(0),
         root(nullptr)
@@ -304,7 +306,7 @@ public:
         end_it.tree = this;
     }
 
-    // O(n)
+    // copy constructor
     search_tree(const search_tree &other):
         size_(0),
         root(nullptr)
@@ -325,29 +327,35 @@ public:
             it = successor(it);
         }
     }
-
-    // O(n)
-    search_tree &operator=(const search_tree &other) {
-        start_it.tree = this;
-        end_it.tree = this;
-        clear();
-
-        // mimic iterator
-        node *it = other.root;
-        if (it) {
-            while (it->left) {
-                it = it->left;
-            }
-        }
-
-        while (it != nullptr) {
-            insert(it->key, it->value);
-            it = successor(it);
-        }
-    }
     
+    // destructor
     ~search_tree() {
         clear();
+    }
+
+    friend void swap(search_tree &first, search_tree &second) {
+        using std::swap;
+        swap(first.size_, second.size_);
+        swap(first.root, second.root);
+        swap(first.start_it, second.start_it);
+        swap(first.end_it, second.end_it);
+    }
+
+    // copy assignment operator
+    search_tree &operator=(search_tree other) {
+        swap(*this, other);
+        return *this;
+    }
+
+    // move constructor
+    search_tree(search_tree &&other) noexcept : search_tree() {
+        swap(*this, other);
+    }
+
+    // move assignment operator
+    search_tree &operator=(search_tree &&other) {
+        swap(*this, other);
+        return *this;
     }
 
     // O(log(n))
