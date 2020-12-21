@@ -25,8 +25,6 @@ Dynamic array that can reallocate with an appropriate size when accessed out of 
 
 The default initial capacity is 10. The more the initial capacity approaches the maximum index, the less reallocating has to be performed by the array.
 
-The array deallocates on destruction.
-
 ---
 
 ### Constructor
@@ -40,7 +38,7 @@ tf::array<int> array(100, false);
 ```
 If the array is accessed out of bounds and automatic reallocation is set to false, the array throws a tf::exception.
 
-Copy constructor and copy assignment operator also exist.
+Copy constructor, copy assignment operator, move constructor and move assignment operator also exist.
 
 ---
 
@@ -120,8 +118,6 @@ Internally works as an array with a top index, which reallocates with twice its 
 
 The default initial capacity is 10. The more the initial capacity approaches the maximum number of elements, the less reallocating has to be performed by the stack. If sparse memory is required, the use of [Linked List](#linked-list) is recommended.
 
-The stack deallocates on destruction.
-
 ---
 
 ### Constructor
@@ -133,7 +129,7 @@ A custom initial capacity, in this case 100, can be set in the constructor:
 ```
 tf::stack<int> stack(100);
 ```
-Copy constructor and copy assignment operator also exist.
+Copy constructor, copy assignment operator, move constructor and move assignment operator also exist.
 
 ---
 
@@ -209,11 +205,9 @@ A doubly linked list.
 
 Allows iteration both forwards and backwards.
 
-Can also be used as a FIFO Queue, although the use of the wrapper [FIFO Queue](#fifo-queue) is recommended for that, because of its simpler interface.
+Can also be used as a FIFO Queue, although the use of the wrapper [FIFO Queue](#fifo-queue) is recommended for that because of its simpler interface.
 
-Can also be used as a stack, but if memory overhead is of little to no concern, the use of [Stack](#stack) is recommended for that, because of its much higher speed.
-
-The linked list deallocates on destruction.
+Can also be used as a stack, but if memory overhead is of little to no concern, the use of [Stack](#stack) is recommended because of its much higher performance.
 
 ---
 
@@ -222,7 +216,7 @@ Constructor with type `int`:
 ```
 tf::linked_list<int> list;
 ```
-Copy constructor and copy assignment operator also exist.
+Copy constructor, copy assignment operator, move constructor and move assignment operator also exist.
 
 ---
 
@@ -394,12 +388,10 @@ list.clear();
 ## Hash Table
 An unordered map (Separate Chaining Hash Map).
 
-Any type with non-changing memory can be used as the key, because the hash is built from the memory block of the key.
+Any type with non-changing memory can be used as the key, as the hash is built from the memory block of the key.
 Strings can be used as keys as well (C++ strings and C strings with the same text will produce the same hash).
 
 The default table size is 100 (table size = number of buckets, bucket = linked list of entries). The table size is fixed and can only be modified on construction. For the best possible performance, the table size should be roughly the maximum number of elements. The average case performance of **O(1)** can only be ensured if the table is big enough.
-
-The hash table deallocates on destruction.
 
 ---
 
@@ -412,9 +404,9 @@ A custom table size, in this case 10, and the behaviour with duplicate keys can 
 ```
 tf::hash_table<int, int> table(10, true);
 ```
-In this case, the hash table will not check the existing entries for duplicate keys when inserting. This makes inserting way faster since new entries just get appended to the beginning of a bucket list. Note that this flag is mainly supposed to speed up insertion time if you KNOW that there can never be identical keys. If there are multiple keys inside the table, all functions like get(...) and remove(...) will only find one of the inserted pairs.
+In this case, the hash table will not check the existing entries for duplicate keys when inserting to improve performance. Note that this flag is mainly supposed to speed up insertion time if you KNOW that there can never be identical keys. If there are multiple keys inside the table, all functions like get(...) and remove(...) will only find one of the inserted pairs.
 
-Copy constructor and copy assignment operator also exist.
+Copy constructor, copy assignment operator, move constructor and move assignment operator also exist.
 
 ---
 
@@ -429,7 +421,7 @@ The iterator is of the type `tf::hash_table<int, int>::iterator`, but for simpli
 
 The value of the iterator can be accessed with either `*it` or the method `it.value()`. These two methods are identical and are interchangeable. The key of the iterator can be accessed with the method `it.key()`.
 
-In general, the hash table is not a data structure made for efficient iteration. If consistent and fast iteration is required, the use of [Linked List](#linked-list) is recommended.
+The hash table is not a data structure made for efficient iteration. If consistent and fast iteration is required, the use of [Linked List](#linked-list) is recommended.
 
 ---
 
@@ -551,9 +543,7 @@ The entries are sorted by the key. If only sorting by value is needed, the value
 
 The keys for the search tree have to be comparable with `operator==`, `operator<` and `operator>`.
 
-Can also be used as a Priority Queue, although the use of the wrapper [Priority Queue](#priority-queue) is recommended for that, because of its simpler interface.
-
-The search tree deallocates on destruction.
+Can also be used as a Priority Queue, although the use of the wrapper [Priority Queue](#priority-queue) is recommended because of its simpler interface.
 
 ---
 
@@ -562,7 +552,7 @@ Constructor with `int` keys and `int` values:
 ```
 tf::search_tree<int, int> tree;
 ```
-Copy constructor and copy assignment operator also exist (although they are not very efficient just yet).
+Copy constructor, copy assignment operator, move constructor and move assignment operator also exist.
 
 ---
 
@@ -712,13 +702,11 @@ tree.clear();
 ## Multi Search Tree
 Behaves just like the [Search Tree](#search-tree) while allowing duplicate keys.
 
-The entries are sorted by the key. Values with the same key are not ordered in any particular order. If no duplicate keys are expected, the use of [Search Tree](#search-tree) is recommended, because of its slightly higher speed.
+The entries are sorted by the key. Values with the same key are not ordered in any particular order. If no duplicate keys are expected, the use of [Search Tree](#search-tree) is recommended because of its better performance.
 
 The keys for the multi search tree have to be comparable with `operator==`, `operator<` and `operator>`.
 
-Can also be used as a Multi Priority Queue, although the use of the wrapper [Multi Priority Queue](#multi-priority-queue) is recommended for that, because of its simpler interface.
-
-The multi search tree deallocates on destruction.
+Can also be used as a Multi Priority Queue, although the use of the wrapper [Multi Priority Queue](#multi-priority-queue) is recommended because of its simpler interface.
 
 ---
 
@@ -727,7 +715,7 @@ Constructor with `int` keys and `int` values:
 ```
 tf::multi_search_tree<int, int> tree;
 ```
-Copy constructor and copy assignment operator also exist (although they are not very efficient just yet).
+Copy constructor, copy assignment operator, move constructor and move assignment operator also exist.
 
 ---
 
@@ -888,8 +876,6 @@ tree.clear();
 ## FIFO Queue
 This is just a wrapper for the [Linked List](#linked-list), which provides only the functionality of a FIFO queue.
 
-The queue deallocates on destruction.
-
 ---
 
 ### Constructor
@@ -897,7 +883,7 @@ Constructor with type `int`:
 ```
 tf::fifo_queue<int> queue;
 ```
-Copy constructor and copy assignment operator also exist.
+Copy constructor, copy assignment operator, move constructor and move assignment operator also exist.
 
 ---
 
@@ -969,8 +955,6 @@ This is just a wrapper for the [Search Tree](#search-tree), which provides only 
 
 The entries are sorted by the key. If only sorting by value is needed, the values should just have themselves as keys. If duplicate keys are expected, the use of [Multi Priority Queue](#multi-priority-queue) is recommended.
 
-The priority queue deallocates on destruction.
-
 ---
 
 ### Constructor
@@ -978,7 +962,7 @@ Constructor with `int` keys and `int` values:
 ```
 tf::prio_queue<int, int> queue;
 ```
-Copy constructor and copy assignment operator also exist.
+Copy constructor, copy assignment operator, move constructor and move assignment operator also exist.
 
 ---
 
@@ -1062,9 +1046,7 @@ queue.clear();
 ## Multi Priority Queue
 This is just a wrapper for the [Multi Search Tree](#multi-search-tree), which provides only the functionality of a multi priority queue.
 
-The entries are sorted by the key. Values with the same key are not ordered in any particular order. If no duplicate keys are expected, the use of [Priority Queue](#priority-queue) is recommended, because of its slightly higher speed.
-
-The multi priority queue deallocates on destruction.
+The entries are sorted by the key. Values with the same key are not ordered in any particular order. If no duplicate keys are expected, the use of [Priority Queue](#priority-queue) is recommended because of its better performance.
 
 ---
 
@@ -1073,7 +1055,7 @@ Constructor with `int` keys and `int` values:
 ```
 tf::multi_prio_queue<int, int> queue;
 ```
-Copy constructor and copy assignment operator also exist.
+Copy constructor, copy assignment operator, move constructor and move assignment operator also exist.
 
 ---
 
