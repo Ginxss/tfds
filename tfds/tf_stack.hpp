@@ -51,7 +51,7 @@ public:
     }
 
     // move constructor
-    stack(stack &&other) noexcept : stack() {
+    stack(stack &&other) noexcept : stack(1) {
         swap(*this, other);
     }
 

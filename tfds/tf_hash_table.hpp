@@ -184,7 +184,7 @@ public:
     }
 
     // move constructor
-    hash_table(hash_table &&other) noexcept : hash_table() {
+    hash_table(hash_table &&other) noexcept : hash_table(1) {
         swap(*this, other);
     }
 

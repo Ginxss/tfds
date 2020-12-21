@@ -74,7 +74,7 @@ public:
     }
 
     // move constructor
-    array(array &&other) noexcept : array() {
+    array(array &&other) noexcept : array(1) {
         swap(*this, other);
     }
 
