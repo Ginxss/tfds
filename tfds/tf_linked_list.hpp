@@ -111,7 +111,7 @@ public:
         clear();
     }
 
-    friend void swap(linked_list &first, linked_list & second) {
+    friend void swap(linked_list &first, linked_list &second) noexcept {
         using std::swap;
         swap(first.length_, second.length_);
         swap(first.start_node, second.start_node);
@@ -127,7 +127,7 @@ public:
     }
 
     // move constructor
-    linked_list(linked_list && other) noexcept : linked_list() {
+    linked_list(linked_list &&other) noexcept : linked_list() {
         swap(*this, other);
     }
 

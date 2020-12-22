@@ -60,7 +60,7 @@ public:
         delete[] buffer;
     }
 
-    friend void swap(array &first, array &second) {
+    friend void swap(array &first, array &second) noexcept {
         using std::swap;
         swap(first.capacity_, second.capacity_);
         swap(first.autom_realloc, second.autom_realloc);

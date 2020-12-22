@@ -168,7 +168,7 @@ public:
         free(buckets);
     }
 
-    friend void swap(hash_table &first, hash_table &second) {
+    friend void swap(hash_table &first, hash_table &second) noexcept {
         using std::swap;
         swap(first.table_size_, second.table_size_);
         swap(first.size_, second.size_);

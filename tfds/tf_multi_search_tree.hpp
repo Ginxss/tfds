@@ -392,7 +392,7 @@ public:
         clear();
     }
 
-    friend void swap(multi_search_tree &first, multi_search_tree &second) {
+    friend void swap(multi_search_tree &first, multi_search_tree &second) noexcept {
         using std::swap;
         swap(first.size_, second.size_);
         swap(first.root, second.root);

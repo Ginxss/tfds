@@ -21,7 +21,7 @@ public:
     prio_queue(const prio_queue &other):
         tree(other.tree) {}
 
-    friend void swap(prio_queue &first, prio_queue &second) {
+    friend void swap(prio_queue &first, prio_queue &second) noexcept {
         using std::swap;
         swap(first.tree, second.tree);
     }

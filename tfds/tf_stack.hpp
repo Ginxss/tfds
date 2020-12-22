@@ -37,7 +37,7 @@ public:
         delete[] buffer;
     }
 
-    friend void swap(stack &first, stack &second) {
+    friend void swap(stack &first, stack &second) noexcept {
         using std::swap;
         swap(first.capacity, second.capacity);
         swap(first.top_index, second.top_index);

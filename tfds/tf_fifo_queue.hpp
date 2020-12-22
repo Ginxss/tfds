@@ -21,7 +21,7 @@ public:
     fifo_queue(const fifo_queue &other):
         list(other.list) {}
 
-    friend void swap(fifo_queue &first, fifo_queue &second) {
+    friend void swap(fifo_queue &first, fifo_queue &second) noexcept {
         using std::swap;
         swap(first.list, second.list);
     }

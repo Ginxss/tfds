@@ -22,7 +22,7 @@ public:
         tree = other.tree;
     }
 
-    friend void swap(multi_prio_queue &first, multi_prio_queue &second) {
+    friend void swap(multi_prio_queue &first, multi_prio_queue &second) noexcept {
         using std::swap;
         swap(first.tree, second.tree);
     }
