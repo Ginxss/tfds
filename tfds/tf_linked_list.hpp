@@ -18,18 +18,17 @@ private:
         node *prev;
         node *next;
 
-        node(const T &value_) : value(value_) {}
+        node(const T &value, node *prev, node *next):
+            value(value), prev(prev), next(next) {}
     };
 
-    node *alloc_node(const T &value, node *prev, node *next) {
-        node *n = new node(value);
-        n->prev = prev;
-        n->next = next;
+    node *new_node(const T &value, node *prev, node *next) {
+        node *n = new node(value, prev, next);
         ++length_;
         return n;
     }
 
-    void free_node(node *n) {
+    void delete_node(node *n) {
         --length_;
         delete n;
     }
@@ -61,12 +60,12 @@ private:
     // METHODS
     
     void new_end_node(const T &value) {
-        end_node->next = alloc_node(value, end_node, nullptr);
+        end_node->next = new_node(value, end_node, nullptr);
         end_node = end_node->next;
     }
 
     void new_start_node(const T &value) {
-        start_node->prev = alloc_node(value, nullptr, start_node);
+        start_node->prev = new_node(value, nullptr, start_node);
         start_node = start_node->prev;
     }
 
@@ -140,7 +139,7 @@ public:
     // O(1)
     void add_back(const T &value) {
         if (empty())
-            end_node = start_node = alloc_node(value, nullptr, nullptr);
+            end_node = start_node = new_node(value, nullptr, nullptr);
         else
             new_end_node(value);
     }
@@ -148,7 +147,7 @@ public:
     // O(1)
     void add_front(const T &value) {
         if (empty())
-            end_node = start_node = alloc_node(value, nullptr, nullptr);
+            end_node = start_node = new_node(value, nullptr, nullptr);
         else
             new_start_node(value);
     }
@@ -162,7 +161,7 @@ public:
                     new_end_node(new_value);
                 }
                 else {
-                    node *new_node = alloc_node(new_value, it, it->next);
+                    node *new_node = new_node(new_value, it, it->next);
                     it->next->prev = new_node;
                     it->next = new_node;
                 }
@@ -185,7 +184,7 @@ public:
                     new_start_node(new_value);
                 }
                 else {
-                    node *new_node = alloc_node(new_value, it->prev, it);
+                    node *new_node = new_node(new_value, it->prev, it);
                     it->prev->next = new_node;
                     it->prev = new_node;
                 }
@@ -216,7 +215,7 @@ public:
                     it->next->prev = it->prev;
                 }
                 
-                free_node(it);
+                delete_node(it);
                 return;
             }
 
@@ -251,7 +250,7 @@ public:
 
         node *to_delete = end_node;
         slide_end_node();
-        free_node(to_delete);
+        delete_node(to_delete);
 
         return result;
     }
@@ -265,7 +264,7 @@ public:
 
         node *to_delete = start_node;
         slide_start_node();
-        free_node(to_delete);
+        delete_node(to_delete);
 
         return result;
     }
@@ -314,7 +313,7 @@ public:
         while (it) {
             node *to_delete = it;
             it = it->next;
-            free_node(to_delete);
+            delete_node(to_delete);
         }
 
         start_node = nullptr;

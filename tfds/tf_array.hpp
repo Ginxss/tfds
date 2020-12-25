@@ -15,7 +15,7 @@ private:
     // VARIABLES
 
     size_t capacity_;
-    bool autom_realloc;
+    bool auto_realloc;
     T *buffer;
 
     // METHODS
@@ -26,7 +26,7 @@ private:
             throw exception("array: negative index");
         }
         else if (index >= capacity_) {
-            if (autom_realloc) {
+            if (auto_realloc) {
                 size_t new_capacity = capacity_ * ((index / capacity_) + 1);
                 if (new_capacity <= index)
                     throw exception("array: capacity too large");
@@ -41,15 +41,15 @@ private:
 
 public:
     // constructor
-    array(const size_t initial_capacity = 10, const bool autom_realloc = true):
+    array(const size_t initial_capacity = 10, const bool auto_realloc = true):
         capacity_((initial_capacity > 0) ? initial_capacity : 1),
-        autom_realloc(autom_realloc),
+        auto_realloc(auto_realloc),
         buffer(new T[capacity_]) {}
 
     // copy constructor
     array(const array &other):
         capacity_(other.capacity_),
-        autom_realloc(other.autom_realloc),
+        auto_realloc(other.auto_realloc),
         buffer(new T[capacity_])
     {
         std::copy_n(other.buffer, other.capacity_, buffer);
@@ -63,7 +63,7 @@ public:
     friend void swap(array &first, array &second) noexcept {
         using std::swap;
         swap(first.capacity_, second.capacity_);
-        swap(first.autom_realloc, second.autom_realloc);
+        swap(first.auto_realloc, second.auto_realloc);
         swap(first.buffer, second.buffer);
     }
 
@@ -108,8 +108,8 @@ public:
     }
 
     // O(1)
-    bool autom_reallocating() const {
-        return autom_realloc;
+    bool auto_reallocating() const {
+        return auto_realloc;
     }
 
     // O(n)

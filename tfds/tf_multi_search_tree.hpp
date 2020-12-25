@@ -19,26 +19,26 @@ private:
         V value;
         value_node *next;
 
-        value_node(const V &value_) : value(value_) {}
+        value_node(const V &value, value_node *next):
+            value(value), next(next) {}
     };
 
-    value_node *alloc_value_node(const V &value, value_node *next) {
-        value_node *vn = new value_node(value);
-        vn->next = next;
+    value_node *new_value_node(const V &value, value_node *next) {
+        value_node *vn = new value_node(value, next);
         ++size_;
         return vn;
     }
 
-    void free_value_node(value_node *vn) {
+    void delete_value_node(value_node *vn) {
         --size_;
         delete vn;
     }
 
-    void free_value_nodes(value_node *vn) {
+    void delete_value_nodes(value_node *vn) {
         while (vn) {
             value_node *to_delete = vn;
             vn = vn->next;
-            free_value_node(to_delete);
+            delete_value_node(to_delete);
         }
     }
 
@@ -52,20 +52,20 @@ private:
         node *left;
         node *right;
 
-        node(const K &key_) : key(key_) {}
+        node(const K &key, value_node *start_value, const size_t height, node *parent, node *left, node *right):
+            key(key), start_value(start_value), height(height), parent(parent), left(left), right(right) {}
     };
 
-    node *alloc_node(const K &key, const V &value, int height, node *parent, node *left, node *right) {
-        node *n = new node(key);
-        n->start_value = alloc_value_node(value, nullptr);
-        n->height = height;
-        n->parent = parent;
-        n->left = left;
-        n->right = right;
+    node *new_node(const K &key, const V &value, node *parent) {
+        node *n = new node(key, new_value_node(value, nullptr), 1, parent, nullptr, nullptr);
         return n;
     }
 
-    void free_node(node *n) {
+    void delete_node(node *n, const bool delete_values = true) {
+        if (delete_values) {
+            delete_value_nodes(n->start_value);
+        }
+
         delete n;
     }
 
@@ -255,7 +255,6 @@ private:
         return new_root;
     }
 
-    // i dont think 2 cases can happen after 1 insert, and testing supports that. if it makes problems, just remove the return statements.
     void rebalance_upward(node *n) {
         node *it = n;
         while (it) {
@@ -299,9 +298,7 @@ private:
             root = nullptr;
         }
 
-        if (delete_values)
-            free_value_nodes(to_delete->start_value);
-        free_node(to_delete);
+        delete_node(to_delete, delete_values);
     }
 
     void remove_single_parent(node *to_delete, bool delete_values = true) {
@@ -317,16 +314,14 @@ private:
             root = new_root;
         }
 
-        if (delete_values)
-            free_value_nodes(to_delete->start_value);
-        free_node(to_delete);
+        delete_node(to_delete, delete_values);
     }
 
     void remove_double_parent(node *to_delete) {
         node *succ = successor(to_delete);
         
         to_delete->key = succ->key;
-        free_value_nodes(to_delete->start_value);
+        delete_value_nodes(to_delete->start_value);
         to_delete->start_value = succ->start_value;
 
         if (succ->right)
@@ -335,7 +330,7 @@ private:
             remove_leaf(succ, false);
     }
 
-    // uses one of the three methods above to remove a node and return its value.
+    // uses one of the three methods above to remove a node and return its value
     void remove_node(node *n) {
         node *parent = n->parent;
 
@@ -420,7 +415,7 @@ public:
     // O(log(n))
     void insert(const K &key, const V &value) {
         if (empty()) {
-            root = alloc_node(key, value, 1, nullptr, nullptr, nullptr);
+            root = new_node(key, value, nullptr);
         }
         else {
             node *it = root;
@@ -430,7 +425,7 @@ public:
                         it = it->left;
                     }
                     else {
-                        it->left = alloc_node(key, value, 1, it, nullptr, nullptr);
+                        it->left = new_node(key, value, it);
                         rebalance_upward(it);
                         break;
                     }
@@ -440,13 +435,13 @@ public:
                         it = it->right;
                     }
                     else {
-                        it->right = alloc_node(key, value, 1, it, nullptr, nullptr);
+                        it->right = new_node(key, value, it);
                         rebalance_upward(it);
                         break;
                     }
                 }
                 else { // if (key == it->key)
-                    it->start_value = alloc_value_node(value, it->start_value);
+                    it->start_value = new_value_node(value, it->start_value);
                     break;
                 }
             }
@@ -501,7 +496,7 @@ public:
                             }
                         }
 
-                        free_value_node(value_it);
+                        delete_value_node(value_it);
                         return result;
                     }
 
@@ -594,7 +589,7 @@ public:
 
         value_node *to_delete = it->start_value;
         it->start_value = to_delete->next;
-        free_value_node(to_delete);
+        delete_value_node(to_delete);
 
         if (it->start_value == nullptr) {
             remove_node(it);
@@ -617,7 +612,7 @@ public:
 
         value_node *to_delete = it->start_value;
         it->start_value = to_delete->next;
-        free_value_node(to_delete);
+        delete_value_node(to_delete);
 
         if (it->start_value == nullptr) {
             remove_node(it);
@@ -683,8 +678,7 @@ public:
                     root = nullptr;
                 }
 
-                free_value_nodes(to_delete->start_value);
-                free_node(to_delete);
+                delete_node(to_delete);
             }
         }
     }

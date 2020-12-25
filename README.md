@@ -89,12 +89,12 @@ size_t array_capacity = array.capacity();
 
 ---
 
-### autom_reallocating()
+### auto_reallocating()
 *Runtime:* **O(1)**
 
-Returns `true` if the array is reallocating when accessed out of bounds.
+Returns `true` if the array automatically reallocates when accessed out of bounds.
 ```
-bool array_is_reallocating = array.autom_reallocating();
+bool array_is_reallocating = array.auto_reallocating();
 ```
 
 ---

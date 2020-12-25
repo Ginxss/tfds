@@ -67,26 +67,26 @@ private:
         V value;
         bucket *next;
 
-        bucket(const K &key_, const V &value_) : key(key_), value(value_) {}
+        bucket(const K &key, const V &value, bucket *next):
+            key(key), value(value), next(next) {}
     };
 
-    bucket *alloc_bucket(const K &key, const V &value, bucket *next) {
-        bucket *b = new bucket(key, value);
-        b->next = next;
+    bucket *new_bucket(const K &key, const V &value, bucket *next) {
+        bucket *b = new bucket(key, value, next);
         ++size_;
         return b;
     }
 
-    void free_bucket(bucket *b) {
+    void delete_bucket(bucket *b) {
         --size_;
         delete b;
     }
 
-    void free_buckets(bucket *b) {
+    void delete_buckets(bucket *b) {
         while (b) {
             bucket *to_delete = b;
             b = b->next;
-            free_bucket(to_delete);
+            delete_bucket(to_delete);
         }
     }
 
@@ -97,7 +97,7 @@ private:
 
         ++(*curr_index);
         while ((*curr_index) < table_size_) {
-            bucket *b = *(buckets + (*curr_index)++);
+            bucket *b = buckets[(*curr_index)++];
             if (b) {
                 return b;
             }
@@ -133,10 +133,13 @@ public:
         table_size_((table_size > 0) ? table_size : 1),
         size_(0),
         allow_duplicate_keys_(allow_duplicate_keys),
-        buckets((bucket **)malloc(table_size_ * sizeof(bucket *)))
+        buckets(new bucket*[table_size_])
     {
-        std::memset(buckets, 0, table_size_ * sizeof(bucket *));
         start_it.table = this;
+
+        for (size_t i = 0; i < table_size_; ++i) {
+            buckets[i] = nullptr;
+        }
     }
 
     // copy constructor
@@ -144,16 +147,16 @@ public:
         table_size_(other.table_size_),
         size_(0),
         allow_duplicate_keys_(other.allow_duplicate_keys_),
-        buckets((bucket **)malloc(table_size_ * sizeof(bucket *)))
+        buckets(new bucket*[table_size_])
     {
-        std::memset(buckets, 0, table_size_ * sizeof(bucket *));
         start_it.table = this;
 
         for (size_t i = 0; i < table_size_; ++i) {
-            bucket *b = *(other.buckets + i);
+            buckets[i] = nullptr;
 
+            bucket *b = other.buckets[i];
             while (b) {
-                *(buckets + i) = alloc_bucket(b->key, b->value, *(buckets + i));
+                buckets[i] = new_bucket(b->key, b->value, buckets[i]);
                 b = b->next;
             }
         }
@@ -161,11 +164,8 @@ public:
 
     // destructor
     ~hash_table() {
-        for (size_t i = 0; i < table_size_; ++i) {
-            free_buckets(*(buckets + i));
-        }
-
-        free(buckets);
+        clear();
+        delete[] buckets;
     }
 
     friend void swap(hash_table &first, hash_table &second) noexcept {
@@ -198,11 +198,11 @@ public:
     void insert(const K &key, const V &value) {
         unsigned long index = hash<K>(key) % table_size_;
 
-        if (*(buckets + index)) {
-            bucket *it = *(buckets + index);
+        if (buckets[index]) {
+            bucket *it = buckets[index];
 
             if (allow_duplicate_keys_) {
-                *(buckets + index) = alloc_bucket(key, value, *(buckets + index));
+                buckets[index] = new_bucket(key, value, buckets[index]);
             }
             else {
                 if (compare<K>(key, it->key))
@@ -214,11 +214,11 @@ public:
                         throw exception("hash table: insert: key already exists");
                 }
 
-                it->next = alloc_bucket(key, value, nullptr);
+                it->next = new_bucket(key, value, nullptr);
             }
         }
         else {
-            *(buckets + index) = alloc_bucket(key, value, nullptr);
+            buckets[index] = new_bucket(key, value, nullptr);
         }
     }
 
@@ -226,28 +226,32 @@ public:
     const V remove(const K &key) {
         unsigned long index = hash<K>(key) % table_size_;
 
-        if (compare<K>(key, (*(buckets + index))->key)) {
-            bucket *to_delete = *(buckets + index);
-            *(buckets + index) = to_delete->next;
+        if (buckets[index]) {
+            bucket *to_delete = nullptr;
 
-            V result = to_delete->value;
-            free_bucket(to_delete);
-            return result;
-        }
-        else {
-            bucket *it = (*(buckets + index))->next;
-            bucket *prev = *(buckets + index);
-            while (it) {
-                if (compare<K>(key, it->key)) {
-                    prev->next = it->next;
-                    
-                    V result = it->value;
-                    free_bucket(it);
-                    return result;
+            if (compare<K>(key, buckets[index]->key)) {
+                to_delete = buckets[index];
+                buckets[index] = to_delete->next;
+            }
+            else {
+                bucket *it = buckets[index]->next;
+                bucket *prev = buckets[index];
+                while (it) {
+                    if (compare<K>(key, it->key)) {
+                        to_delete = it;
+                        prev->next = it->next;
+                        break;
+                    }
+
+                    prev = it;
+                    it = it->next;
                 }
+            }
 
-                prev = it;
-                it = it->next;
+            if (to_delete) {
+                V result = to_delete->value;
+                delete_bucket(to_delete);
+                return result;
             }
         }
 
@@ -257,7 +261,7 @@ public:
     // average: O(1) / worst: O(n)
     const V &get(const K &key) const {
         unsigned long index = hash<K>(key) % table_size_;
-        bucket *it = *(buckets + index);
+        bucket *it = buckets[index];
 
         while (it) {
             if (compare<K>(key, it->key)) {
@@ -273,7 +277,7 @@ public:
     // average: O(1) / worst: O(n)
     V &operator[](const K &key) {
         unsigned long index = hash<K>(key) % table_size_;
-        bucket *it = *(buckets + index);
+        bucket *it = buckets[index];
         
         while (it) {
             if (compare<K>(key, it->key)) {
@@ -289,7 +293,7 @@ public:
     // average: O(1) / worst: O(n)
     bool contains(const K &key) const {
         unsigned long index = hash<K>(key) % table_size_;
-        bucket *it = *(buckets + index);
+        bucket *it = buckets[index];
 
         while (it) {
             if (compare<K>(key, it->key)) {
@@ -304,11 +308,10 @@ public:
 
     iterator begin() {
         start_it.index = 0;
-        start_it.b = *buckets;
+        start_it.b = buckets[start_it.index];
 
         while (!start_it.b) {
-            ++start_it.index;
-            start_it.b = *(buckets + start_it.index);
+            start_it.b = buckets[++start_it.index];
         }
 
         return start_it;
@@ -337,10 +340,9 @@ public:
     // O(n)
     void clear() {
         for (size_t i = 0; i < table_size_; ++i) {
-            free_buckets(*(buckets + i));
+            delete_buckets(buckets[i]);
+            buckets[i] = nullptr;
         }
-
-        std::memset(buckets, 0, table_size_ * sizeof(bucket *));
     }
 };
 

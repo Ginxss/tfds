@@ -20,20 +20,17 @@ private:
         node *left;
         node *right;
 
-        node(const K &key_, const V &value_) : key(key_), value(value_) {}
+        node(const K &key, const V &value, const size_t height, node *parent, node *left, node *right):
+            key(key), value(value), height(height), parent(parent), left(left), right(right) {}
     };
 
-    node *alloc_node(const K &key, const V &value, int height, node *parent, node *left, node *right) {
-        node *n = new node(key, value);
-        n->height = height;
-        n->parent = parent;
-        n->left = left;
-        n->right = right;
+    node *new_node(const K &key, const V &value, node *parent) {
+        node *n = new node(key, value, 1, parent, nullptr, nullptr);
         ++size_;
         return n;
     }
 
-    void free_node(node *n) {
+    void delete_node(node *n) {
         --size_;
         delete n;
     }
@@ -199,7 +196,6 @@ private:
         return new_root;
     }
 
-    // i dont think 2 cases can happen after 1 insert. if it makes problems, just remove the return statements.
     void rebalance_upward(node *n) {
         node *it = n;
         while (it) {
@@ -243,7 +239,7 @@ private:
             root = nullptr;
         }
 
-        free_node(to_delete);
+        delete_node(to_delete);
     }
 
     void remove_single_parent(node *to_delete) {
@@ -259,7 +255,7 @@ private:
             root = new_root;
         }
 
-        free_node(to_delete);
+        delete_node(to_delete);
     }
 
     void remove_double_parent(node *to_delete) {
@@ -361,7 +357,7 @@ public:
     // O(log(n))
     void insert(const K &key, const V &value) {
         if (empty()) {
-            root = alloc_node(key, value, 1, nullptr, nullptr, nullptr);
+            root = new_node(key, value, nullptr);
         }
         else {
             node *it = root;
@@ -371,7 +367,7 @@ public:
                         it = it->left;
                     }
                     else {
-                        it->left = alloc_node(key, value, 1, it, nullptr, nullptr);
+                        it->left = new_node(key, value, it);
                         break;
                     }
                 }
@@ -380,7 +376,7 @@ public:
                         it = it->right;
                     }
                     else {
-                        it->right = alloc_node(key, value, 1, it, nullptr, nullptr);
+                        it->right = new_node(key, value, it);
                         break;
                     }
                 }
@@ -556,7 +552,7 @@ public:
                     root = nullptr;
                 }
 
-                free_node(to_delete);
+                delete_node(to_delete);
             }
         }
     }
