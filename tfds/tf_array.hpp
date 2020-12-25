@@ -21,7 +21,7 @@ private:
     // METHODS
 
     // reallocation size is the smallest multiple of the current capacity that can hold the index.
-    void check_index(const size_t index) {
+    void check_index_realloc_if_on(const size_t index) {
         if (index < 0) {
             throw exception("array: negative index");
         }
@@ -36,6 +36,15 @@ private:
             else {
                 throw exception("array: index larger than capacity");
             }
+        }
+    }
+
+    void check_index_always_except(const size_t index) const {
+        if (index < 0) {
+            throw exception("array: negative index");
+        }
+        else if (index >= capacity_) {
+            throw exception("array: index larger than capacity");
         }
     }
 
@@ -86,19 +95,19 @@ public:
 
     // O(1) / O(n) if index > capacity and reallocating turned on
     void insert(const size_t index, const T &value) {
-        check_index(index);
+        check_index_realloc_if_on(index);
         buffer[index] = value;
     }
 
     // O(1) / O(n) if index > capacity and reallocating turned on
-    const T &get(const size_t index) {
-        check_index(index);
+    const T &get(const size_t index) const {
+        check_index_always_except(index);
         return buffer[index];
     }
 
     // O(1) / O(n) if index > capacity and reallocating turned on
     T &operator[](const size_t index) {
-        check_index(index);
+        check_index_realloc_if_on(index);
         return buffer[index];
     }
 

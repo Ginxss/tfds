@@ -13,7 +13,7 @@
 ---
 
 This is a collection of data structures in C++. In all of my tests **tfds** was (sometimes significantly) faster or equally as fast as their STL counterpart.
-That being said, i did not test very thoroughly for every scenario. For specifics see test_results.txt.
+That being said, i did not test very thoroughly for every scenario yet.
 
 Also, the `iterator`s that are used in **tfds**-classes behave differently than usual iterators, which is why you can't use range-based for loops (That's because these `iterator`s allow both forward and backward iteration with the same syntax).
 
@@ -23,7 +23,7 @@ Also, the `iterator`s that are used in **tfds**-classes behave differently than 
 ## Array
 Dynamic array that can reallocate with an appropriate size when accessed out of bounds. The reallocation size is the smallest multiple of the current size that can fit the new index (in most cases 2 * old index). Automatic reallocation can be turned off in the constructor.
 
-The default initial capacity is 10. The more the initial capacity approaches the maximum index, the less reallocating has to be performed by the array.
+Obviously automatic reallocation is **dangerous** and should not be used in any kind of production code. But i thought it could be useful for quickly testing something or setting up a quick prototype, as the array can pretty much be treated like pseudo-code.
 
 ---
 
