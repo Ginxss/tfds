@@ -101,12 +101,25 @@ void test_copying(const tf::stack<std::string> &s) {
 	assert(s3.current_capacity() == 1);
 }
 
+void test_clear(tf::stack<std::string> &s) {
+	assert(s.size() == 3);
+	assert(s.empty() == false);
+	assert(s.current_capacity() == 4);
+	assert(s.peek() == "three");
+
+	s.clear();
+	assert(s.size() == 0);
+	assert(s.empty() == true);
+	assert(s.current_capacity() == 4);
+}
+
 int main(int argc, char *argv[]) {
 	try {
 		tf::stack<std::string> result = test_construction();
 		test_put_peek_pop(result);
 		test_reallocation(result);
 		test_copying(result);
+		test_clear(result);
 	}
 	catch (tf::exception &e) {
 		std::cout << e.what() << std::endl;

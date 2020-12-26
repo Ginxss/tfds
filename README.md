@@ -79,6 +79,16 @@ int value = array[1];
 
 ---
 
+### set_all(value)
+*Runtime:* **O(n)**
+
+Sets every entry to the value 0:
+```
+array.set_all(0);
+```
+
+---
+
 ### capacity()
 *Runtime:* **O(1)**
 
@@ -178,6 +188,17 @@ size_t num_elements = stack.size();
 
 ---
 
+### current_capacity()
+*Runtime:* **O(1)**
+
+Returns the current size of the internal buffer.
+```
+size_t buffer_size = stack.current_capacity();
+```
+The buffer size is usually not of any importance. This method exists mostly for troubleshooting purposes.
+
+---
+
 ### empty()
 *Runtime:* **O(1)**
 
@@ -205,9 +226,7 @@ A doubly linked list.
 
 Allows iteration both forwards and backwards.
 
-Can also be used as a FIFO Queue, although the use of the wrapper [FIFO Queue](#fifo-queue) is recommended for that because of its simpler interface.
-
-Can also be used as a stack, but if memory overhead is of little to no concern, the use of [Stack](#stack) is recommended because of its much higher performance.
+Can be used as a FIFO Queue, although the use of the wrapper [FIFO Queue](#fifo-queue) is recommended for that because of its simpler interface.
 
 ---
 
@@ -233,10 +252,9 @@ for (auto it = list.end(); it.condition(); --it) {
     std::cout << it.value() << std::endl;
 }
 ```
-The iterator is of the type `tf::linked_list<int>::iterator`, but for simplicity,  the use of `auto` is recommended.
 
-The value of the iterator can be accessed with either `*it` or the method `it.value()`. These two methods are identical and are interchangeable.
-The methods `it.next_value()` and `it.prev_value()` return pointers to the following or previous value of the iterator if they exist, otherwise `nullptr`.
+The value of the iterator can be accessed with either `*it` or the method `it.value()` (both methods are identical and interchangeable).
+The methods `it.next_value()` and `it.prev_value()` return pointers to the following or previous value if they exist, otherwise `nullptr`.
  
 ---
 
@@ -400,11 +418,11 @@ Default constructor with `int` keys and `int` values and table size 100 and chec
 ```
 tf::hash_table<int, int> table;
 ```
-A custom table size, in this case 10, and the behaviour with duplicate keys can be set in the constructor:
+You can set a custom table size and turn of checking for duplicate key in the constructor:
 ```
-tf::hash_table<int, int> table(10, true);
+tf::hash_table<int, int> table(10, false);
 ```
-In this case, the hash table will not check the existing entries for duplicate keys when inserting to improve performance. Note that this flag is mainly supposed to speed up insertion time if you KNOW that there can never be identical keys. If there are multiple keys inside the table, all functions like get(...) and remove(...) will only find one of the inserted pairs.
+In this case, the hash table will not check the existing entries for duplicate keys when inserting to improve performance. Note that this flag is mainly supposed to speed up insertion time if you KNOW that there can never be identical keys. In this case, if there are duplicate keys inside the table, functions like get(...) and remove(...) will only find one of the inserted pairs.
 
 Copy constructor, copy assignment operator, move constructor and move assignment operator also exist.
 
@@ -417,9 +435,9 @@ for (auto it = table.begin(); it.condition(); ++it) {
     std::cout << *it << std::endl;
 }
 ```
-The iterator is of the type `tf::hash_table<int, int>::iterator`, but for simplicity,  the use of `auto` is recommended. Backward iteration is not supported, since the order of the entries is random and does not matter.
+Backward iteration is not supported, since the order of the entries is random and does not matter.
 
-The value of the iterator can be accessed with either `*it` or the method `it.value()`. These two methods are identical and are interchangeable. The key of the iterator can be accessed with the method `it.key()`.
+The value of the iterator can be accessed with either `*it` or the method `it.value()` (both methods are identical and interchangeable). The key of the iterator can be accessed with the method `it.key()`.
 
 The hash table is not a data structure made for efficient iteration. If consistent and fast iteration is required, the use of [Linked List](#linked-list) is recommended.
 
@@ -428,7 +446,7 @@ The hash table is not a data structure made for efficient iteration. If consiste
 ### insert(key, value)
 *Runtime:* average case: **O(1)** / worst case: O(n)
 
-*Exceptions:* Duplicate Keys not allowed: throws a tf::exception if the key already exists.
+*Exceptions:* Checks duplicate keys: throws a tf::exception if the key already exists.
 
 Inserts the value 3 with key 1 into the hash table:
 ```
@@ -478,9 +496,9 @@ table[1] = 4;
 ### contains(key)
 *Runtime:* average case: **O(1)** / worst case: O(n)
 
-Returns `true` if an entry with key 3 is found in the hash table:
+Returns `true` if an entry with key 1 is found in the hash table:
 ```
-bool contains_value = table.contains(3);
+bool contains_value = table.contains(1);
 ```
 
 ---
@@ -488,19 +506,19 @@ bool contains_value = table.contains(3);
 ### size()
 *Runtime:* **O(1)**
 
-Returns the number of entries in the hash table.
+Returns the number of entries in the hash table:
 ```
 size_t num_entries = table.size();
 ```
 
 ---
 
-### allows_duplicate_keys()
+### checks_duplicate_keys()
 *Runtime:* **O(1)**
 
-Returns `true` if the hash table allows duplicate keys:
+Returns `true` if the hash table looks for duplicate keys when inserting:
 ```
-bool table_checking_duplicate_keys = table.allow_duplicate_keys();
+bool table_checking_duplicate_keys = table.checks_duplicate_keys();
 ```
 
 ---

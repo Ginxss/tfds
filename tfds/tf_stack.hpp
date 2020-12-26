@@ -79,7 +79,15 @@ public:
     }
 
     // O(1)
-    T &peek() const {
+    T &peek() {
+        if (empty())
+            throw exception("stack: peek: stack is empty");
+        
+        return buffer[top_index - 1];
+    }
+
+    // O(1)
+    const T &peek() const {
         if (empty())
             throw exception("stack: peek: stack is empty");
         

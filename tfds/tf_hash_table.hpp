@@ -90,53 +90,103 @@ private:
         }
     }
 
-    bucket *next_bucket(bucket *curr_b, size_t *curr_index) {
-        if (curr_b->next) {
-            return curr_b->next;
-        }
-
-        ++(*curr_index);
-        while ((*curr_index) < table_size_) {
-            bucket *b = buckets[(*curr_index)++];
-            if (b) {
-                return b;
-            }
-        }
-        return nullptr;
-    }
-
 public:
     class iterator {
-    public:
-        hash_table *table;
-        size_t index;
-        bucket *b;
+    private:
+        bucket **buckets;
+        size_t num_buckets;
+        bucket *current_bucket;
+        size_t current_index;
 
-        V &operator*() { return b->value; }
-        K &key() { return b->key; }
-        V &value() { return b->value; }
-        void operator++() { b = table->next_bucket(b, &index); }
-        bool condition() { return b != nullptr; }
+        void next_bucket() {
+            if (current_bucket->next) {
+                current_bucket = current_bucket->next;
+                return;
+            }
+
+            while (++current_index < num_buckets) {
+                if (buckets[current_index]) {
+                    current_bucket = buckets[current_index];
+                    return;
+                }
+            }
+
+            current_bucket = nullptr;
+        }
+
+    public:
+        iterator(bucket **buckets, size_t num_buckets):
+            buckets(buckets), num_buckets(num_buckets)
+        {
+            current_index = 0;
+            current_bucket = buckets[current_index];
+            while (!current_bucket && ++current_index < num_buckets) {
+                current_bucket = buckets[current_index];
+            }
+        }
+
+        const K &key() const { return current_bucket->key; }
+        V &operator*() { return current_bucket->value; }
+        V &value() { return current_bucket->value; }
+        void operator++() { next_bucket(); }
+        bool condition() const { return current_bucket != nullptr; }
+    };
+
+    class const_iterator {
+    private:
+        bucket **buckets;
+        size_t num_buckets;
+        bucket *current_bucket;
+        size_t current_index;
+
+        void next_bucket() {
+            if (current_bucket->next) {
+                current_bucket = current_bucket->next;
+                return;
+            }
+
+            while (++current_index < num_buckets) {
+                if (buckets[current_index]) {
+                    current_bucket = buckets[current_index];
+                    return;
+                }
+            }
+
+            current_bucket = nullptr;
+        }
+
+    public:
+        const_iterator(bucket **buckets, size_t num_buckets):
+            buckets(buckets), num_buckets(num_buckets)
+        {
+            current_index = 0;
+            current_bucket = buckets[current_index];
+            while (!current_bucket && ++current_index < num_buckets) {
+                current_bucket = buckets[current_index];
+            }
+        }
+
+        const K &key() const { return current_bucket->key; }
+        const V &operator*() const { return current_bucket->value; }
+        const V &value() const { return current_bucket->value; }
+        void operator++() { next_bucket(); }
+        bool condition() const { return current_bucket != nullptr; }
     };
 
 private:
     size_t table_size_;
     size_t size_;
-    bool allow_duplicate_keys_;
+    bool check_duplicate_keys;
     bucket **buckets;
-
-    iterator start_it;
 
 public:
     // constructor
-    hash_table(const size_t table_size = 100, const bool allow_duplicate_keys = false):
+    hash_table(const size_t table_size = 100, const bool check_duplicate_keys = true):
         table_size_((table_size > 0) ? table_size : 1),
         size_(0),
-        allow_duplicate_keys_(allow_duplicate_keys),
+        check_duplicate_keys(check_duplicate_keys),
         buckets(new bucket*[table_size_])
     {
-        start_it.table = this;
-
         for (size_t i = 0; i < table_size_; ++i) {
             buckets[i] = nullptr;
         }
@@ -146,11 +196,9 @@ public:
     hash_table(const hash_table &other):
         table_size_(other.table_size_),
         size_(0),
-        allow_duplicate_keys_(other.allow_duplicate_keys_),
+        check_duplicate_keys(other.check_duplicate_keys),
         buckets(new bucket*[table_size_])
     {
-        start_it.table = this;
-
         for (size_t i = 0; i < table_size_; ++i) {
             buckets[i] = nullptr;
 
@@ -172,9 +220,8 @@ public:
         using std::swap;
         swap(first.table_size_, second.table_size_);
         swap(first.size_, second.size_);
-        swap(first.allows_duplicate_keys_, second.allows_duplicate_keys_);
+        swap(first.check_duplicate_keys, second.check_duplicate_keys);
         swap(first.buckets, second.buckets);
-        swap(first.start_it, second.start_it);
     }
 
     // copy assignment operator
@@ -199,12 +246,8 @@ public:
         unsigned long index = hash<K>(key) % table_size_;
 
         if (buckets[index]) {
-            bucket *it = buckets[index];
-
-            if (allow_duplicate_keys_) {
-                buckets[index] = new_bucket(key, value, buckets[index]);
-            }
-            else {
+            if (check_duplicate_keys) {
+                bucket *it = buckets[index];
                 if (compare<K>(key, it->key))
                     throw exception("hash table: insert: key already exists");
                 
@@ -216,6 +259,9 @@ public:
 
                 it->next = new_bucket(key, value, nullptr);
             }
+            else {
+                buckets[index] = new_bucket(key, value, buckets[index]);
+            }
         }
         else {
             buckets[index] = new_bucket(key, value, nullptr);
@@ -223,7 +269,7 @@ public:
     }
 
     // average: O(1) / worst: O(n)
-    const V remove(const K &key) {
+    V remove(const K &key) {
         unsigned long index = hash<K>(key) % table_size_;
 
         if (buckets[index]) {
@@ -261,8 +307,8 @@ public:
     // average: O(1) / worst: O(n)
     const V &get(const K &key) const {
         unsigned long index = hash<K>(key) % table_size_;
-        bucket *it = buckets[index];
 
+        bucket *it = buckets[index];
         while (it) {
             if (compare<K>(key, it->key)) {
                 return it->value;
@@ -277,8 +323,24 @@ public:
     // average: O(1) / worst: O(n)
     V &operator[](const K &key) {
         unsigned long index = hash<K>(key) % table_size_;
+
         bucket *it = buckets[index];
-        
+        while (it) {
+            if (compare<K>(key, it->key)) {
+                return it->value;
+            }
+
+            it = it->next;
+        }
+
+        throw exception("hash table: []: key not found");
+    }
+
+    // average: O(1) / worst: O(n)
+    const V &operator[](const K &key) const {
+        unsigned long index = hash<K>(key) % table_size_;
+
+        bucket *it = buckets[index];
         while (it) {
             if (compare<K>(key, it->key)) {
                 return it->value;
@@ -293,8 +355,8 @@ public:
     // average: O(1) / worst: O(n)
     bool contains(const K &key) const {
         unsigned long index = hash<K>(key) % table_size_;
-        bucket *it = buckets[index];
 
+        bucket *it = buckets[index];
         while (it) {
             if (compare<K>(key, it->key)) {
                 return true;
@@ -307,14 +369,11 @@ public:
     }
 
     iterator begin() {
-        start_it.index = 0;
-        start_it.b = buckets[start_it.index];
+        return iterator(buckets, table_size_);
+    }
 
-        while (!start_it.b) {
-            start_it.b = buckets[++start_it.index];
-        }
-
-        return start_it;
+    const_iterator begin() const {
+        return const_iterator(buckets, table_size_);
     }
 
     // O(1)
@@ -328,8 +387,8 @@ public:
     }
 
     // O(1)
-    bool allows_duplicate_keys() const {
-        return allow_duplicate_keys_;
+    bool checks_duplicate_keys() const {
+        return check_duplicate_keys;
     }
 
     // O(1)

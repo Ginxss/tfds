@@ -112,6 +112,19 @@ public:
     }
 
     // O(1)
+    const T &operator[](const size_t index) const {
+        check_index_always_except(index);
+        return buffer[index];
+    }
+
+    // O(n)
+    void set_all(const T &value) {
+        for (int i = 0; i < capacity_; ++i) {
+            buffer[i] = value;
+        }
+    }
+
+    // O(1)
     size_t capacity() const {
         return capacity_;
     }

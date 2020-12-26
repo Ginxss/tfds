@@ -35,16 +35,37 @@ private:
 
 public:
     class iterator {
-    public:
+    private:
         node *nd;
 
+    public:
+        iterator(node *nd):
+            nd(nd) {}
+        
         T &operator*() { return nd->value; }
         T &value() { return nd->value; }
         T *next_value() { return (nd->next) ? &nd->next->value : nullptr; };
         T *prev_value() { return (nd->prev) ? &nd->prev->value : nullptr; };
         void operator++() { nd = nd->next; }
         void operator--() { nd = nd->prev; }
-        bool condition() { return nd != nullptr; }
+        bool condition() const { return nd != nullptr; }
+    };
+
+    class const_iterator {
+    private:
+        node *nd;
+
+    public:
+        const_iterator(node *nd):
+            nd(nd) {}
+        
+        const T &operator*() const { return nd->value; }
+        const T &value() const { return nd->value; }
+        const T *next_value() const { return (nd->next) ? &nd->next->value : nullptr; };
+        const T *prev_value() const { return (nd->prev) ? &nd->prev->value : nullptr; };
+        void operator++() { nd = nd->next; }
+        void operator--() { nd = nd->prev; }
+        bool condition() const { return nd != nullptr; }
     };
 
 private:
@@ -54,9 +75,6 @@ private:
     node *start_node;
     node *end_node;
     
-    iterator start_it;
-    iterator end_it;
-
     // METHODS
     
     void new_end_node(const T &value) {
@@ -115,8 +133,6 @@ public:
         swap(first.length_, second.length_);
         swap(first.start_node, second.start_node);
         swap(first.end_node, second.end_node);
-        swap(first.start_it, second.start_it);
-        swap(first.end_it, second.end_it);
     }
 
     // copy assignment operator
@@ -161,9 +177,9 @@ public:
                     new_end_node(new_value);
                 }
                 else {
-                    node *new_node = new_node(new_value, it, it->next);
-                    it->next->prev = new_node;
-                    it->next = new_node;
+                    node *new_node_ = new_node(new_value, it, it->next);
+                    it->next->prev = new_node_;
+                    it->next = new_node_;
                 }
             
                 return;
@@ -184,9 +200,9 @@ public:
                     new_start_node(new_value);
                 }
                 else {
-                    node *new_node = new_node(new_value, it->prev, it);
-                    it->prev->next = new_node;
-                    it->prev = new_node;
+                    node *new_node_ = new_node(new_value, it->prev, it);
+                    it->prev->next = new_node_;
+                    it->prev = new_node_;
                 }
             
                 return;
@@ -228,7 +244,15 @@ public:
     // O(1)
     T &back() {
         if (empty())
-            throw exception("linked list: pop_front: list is empty");
+            throw exception("linked list: back: list is empty");
+        
+        return end_node->value;
+    }
+
+    // O(1)
+    const T &back() const {
+        if (empty())
+            throw exception("linked list: back: list is empty");
         
         return end_node->value;
     }
@@ -236,7 +260,15 @@ public:
     // O(1)
     T &front() {
         if (empty())
-            throw exception("linked list: pop_front: list is empty");
+            throw exception("linked list: front: list is empty");
+        
+        return start_node->value;
+    }
+
+    // O(1)
+    const T &front() const {
+        if (empty())
+            throw exception("linked list: front: list is empty");
         
         return start_node->value;
     }
@@ -271,14 +303,22 @@ public:
 
     // O(1)
     iterator begin() {
-        start_it.nd = start_node;
-        return start_it;
+        return iterator(start_node);
+    }
+
+    // O(1)
+    const_iterator begin() const {
+        return const_iterator(start_node);
     }
 
     // O(1)
     iterator end() {
-        end_it.nd = end_node;
-        return end_it;
+        return iterator(end_node);
+    }
+
+    // O(1)
+    const_iterator end() const {
+        return const_iterator(end_node);
     }
 
     // O(n)

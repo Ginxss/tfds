@@ -111,12 +111,29 @@ void test_copying(const tf::array<std::string> &a) {
 	assert(a3.auto_reallocating() == 1);
 }
 
+void test_set_all(tf::array<std::string> &a) {
+	assert(a.capacity() == 24);
+	assert(a.auto_reallocating() == true);
+	assert(a.get(0) == "zero");
+	assert(a.get(1) == "one");
+	assert(a.get(2) == "two");
+	assert(a.get(3) == "three");
+	assert(a.get(4) == "four");
+	assert(a.get(20) == "twenty");
+
+	a.set_all("all");
+	for (int i = 0; i < a.capacity(); ++i) {
+		assert(a[i] == "all");
+	}
+}
+
 int main(int argc, char *argv[]) {
 	try {
 		tf::array<std::string> result = test_construction();
 		test_insert_and_get(result);
 		test_reallocation(result);
 		test_copying(result);
+		test_set_all(result);
 	}
 	catch (tf::exception &e) {
 		std::cout << e.what() << std::endl;
