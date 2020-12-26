@@ -55,9 +55,9 @@ array.insert(1, 3);
 ---
 
 ### get(index)
-*Runtime:* **O(1)** / O(n) on reallocation
+*Runtime:* **O(1)**
 
-*Exceptions:* Automatic reallocation off: throws a tf::exception if index out of bounds; Automatic reallocation on: throws a tf::exception if buffer overflow occurs.
+*Exceptions:* throws a tf::exception if index out of bounds.
 
 Returns a constant reference to the value at index 1:
 ```

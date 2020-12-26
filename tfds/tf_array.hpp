@@ -99,7 +99,7 @@ public:
         buffer[index] = value;
     }
 
-    // O(1) / O(n) if index > capacity and reallocating turned on
+    // O(1)
     const T &get(const size_t index) const {
         check_index_always_except(index);
         return buffer[index];
