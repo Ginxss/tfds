@@ -7,12 +7,13 @@ void print_array_info(const tf::array<std::string> &a, const std::string &messag
 	std::cout << message << ":" << std::endl << std::endl;
 	std::cout << "Capacity: " << a.capacity() << std::endl;
 	std::cout << "Auto-Reallocating: " << a.auto_reallocating() << std::endl;
+
 	std::cout << "Content: ";
 	for (int i = 0; i < a.capacity(); ++i) {
 		std::cout << a.get(i) << " | ";
 	}
-	std::cout << std::endl << std::endl;
-	std::cout << "----------------------------------------" << std::endl << std::endl;
+	
+	std::cout << std::endl << std::endl << "----------------------------------------" << std::endl << std::endl;
 }
 
 tf::array<std::string> test_construction() {

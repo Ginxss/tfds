@@ -79,7 +79,7 @@ public:
     }
 
     // O(1)
-    T &peek() {
+    T &peek() const {
         if (empty())
             throw exception("stack: peek: stack is empty");
         
@@ -97,6 +97,11 @@ public:
     // O(1)
     size_t size() const {
         return top_index;
+    }
+
+    // O(1)
+    size_t current_capacity() const {
+        return capacity;
     }
 
     // O(1)
