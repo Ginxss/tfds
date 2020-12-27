@@ -50,12 +50,10 @@ public:
 
     // O(1)
     T next() {
-        try {
-            return list.pop_back();
-        }
-        catch (exception &e) {
+        if (empty())
             throw exception("fifo queue: next: queue is empty");
-        }
+
+        return list.pop_back();
     }
 
     // O(n)

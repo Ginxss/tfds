@@ -51,22 +51,18 @@ public:
 
     // O(log(n))
     V next_min() {
-        try {
-            return tree.pop_min();
-        }
-        catch (exception &e) {
+        if (empty())
             throw exception("prio queue: next_min: queue is empty");
-        }
+
+        return tree.pop_min();
     }
 
     // O(log(n))
     V next_max() {
-        try {
-            return tree.pop_max();
-        }
-        catch (exception &e) {
+        if (empty())
             throw exception("prio queue: next_max: queue is empty");
-        }
+
+        return tree.pop_max();
     }
 
     // O(log(n))

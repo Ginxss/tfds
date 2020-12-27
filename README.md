@@ -1,11 +1,12 @@
 # tfds
 **A collection of data structures in C++:**
 * [Array](#array)
-* [Stack](#stack)
+* [Vector](#vector)
 * [Linked List](#linked-list)
 * [Hash Table](#hash-table)
 * [Search Tree](#search-tree)
 * [Multi Search Tree](#multi-search-tree)
+* [Stack](#stack)
 * [FIFO Queue](#fifo-queue)
 * [Priority Queue](#priority-queue)
 * [Multi Priority Queue](#multi-priority-queue)
@@ -23,21 +24,19 @@ Also, the `iterator`s that are used in **tfds**-classes behave differently than 
 ## Array
 Dynamic array that can reallocate with an appropriate size when accessed out of bounds. The reallocation size is the smallest multiple of the current size that can fit the new index (in most cases 2 * old index). Automatic reallocation can be turned off in the constructor.
 
-Obviously automatic reallocation is **dangerous** and should not be used in any kind of production code. But i thought it could be useful for quickly testing something or setting up a quick prototype, as the array can pretty much be treated like pseudo-code.
+Obviously this is **dangerous** and should not be used in any kind of production code. But i thought it could be useful for quickly testing something or setting up a quick prototype, as the array can be pretty much treated like pseudo-code.
 
 ---
 
 ### Constructor
-Default constructor with type `int`, initial capacity 10 and automatic reallocation turned on:
+Default constructor with type `std::string`, initial capacity 10 and automatic reallocation turned on:
 ```
-tf::array<int> array;
+tf::array<std::string> array;
 ```
 A custom initial capacity (in this case 100) and the reallocation behaviour can be set in the constructor:
 ```
-tf::array<int> array(100, false);
+tf::array<std::string> array(100, false);
 ```
-If the array is accessed out of bounds and automatic reallocation is set to false, the array throws a tf::exception.
-
 Copy constructor, copy assignment operator, move constructor and move assignment operator also exist.
 
 ---
@@ -47,9 +46,9 @@ Copy constructor, copy assignment operator, move constructor and move assignment
 
 *Exceptions:* Throws a tf::exception if a buffer overflow or bad_alloc occurs (Automatic reallocation turned off: throws a tf::exception if the index is out of bounds).
 
-Inserts the value 3 at index 1:
+Inserts the value "hello" at index 1:
 ```
-array.insert(1, 3);
+array.insert(1, "hello");
 ```
 
 ---
@@ -61,7 +60,7 @@ array.insert(1, 3);
 
 Returns a constant reference to the value at index 1:
 ```
-int value = array.get(1);
+std::string value = array.get(1);
 ```
 
 ---
@@ -73,8 +72,12 @@ int value = array.get(1);
 
 Returns a reference to the value at index 1:
 ```
-array[1] = 3;
+array[1] = "hello";
 int value = array[1];
+```
+Setting a value "out of bounds":
+```
+array[25] = "new";
 ```
 
 ---
@@ -82,9 +85,9 @@ int value = array[1];
 ### set_all(value)
 *Runtime:* **O(n)**
 
-Sets every entry to the value 0:
+Sets every entry to the value "blah":
 ```
-array.set_all(0);
+array.set_all("blah");
 ```
 
 ---
@@ -123,61 +126,90 @@ The content of the array gets copied into the new buffer. If new_capacity is sma
 ---
 ---
 
-## Stack
-A standard stack structure with put, peek and pop.
+## Vector
+A dynamic array similar to std::vector.
 
-Internally works as an array with a top index, which reallocates with twice its size when the top is reached. This allows for extremely high speed, but at the cost of a memory overhead.
-
-The default initial capacity is 10. The more the initial capacity approaches the maximum number of elements, the less reallocating has to be performed by the stack. If sparse memory is required, the use of [Linked List](#linked-list) is recommended.
+Unlike `tf::array`, the `tf::vector` does not automatically reallocate when accessed out of bounds. Instead, accessing out of bounds always throws an exception, add data is inserted to the back of the buffer with `add(...)`, doubling the buffer size when the capacity is reached.
 
 ---
 
 ### Constructor
-Default constructor with type `int` and initial capacity 10:
+Default constructor with type `std::string` and initial capacity 10:
 ```
-tf::stack<int> stack;
+tf::vector<std::string> vector;
 ```
 A custom initial capacity, in this case 100, can be set in the constructor:
 ```
-tf::stack<int> stack(100);
+tf::vector<std::string> vector(100);
 ```
 Copy constructor, copy assignment operator, move constructor and move assignment operator also exist.
 
 ---
 
-### put(value)
+### add(value)
 *Runtime:* **O(1)** / O(n) on reallocation
 
 *Exceptions:* Throws a tf::exception if a buffer overflow or bad_alloc occurs.
 
-Puts the value 3 on the stack:
+Adds the value "hello" to the vector:
 ```
-stack.put(3);
-```
-
----
-
-### peek()
-*Runtime:* **O(1)**
-
-*Exceptions:* Throws a tf::exception if the stack is empty.
-
-Returns a reference to the top value of the stack, which can be read of modified:
-```
-int top_value = stack.peek();
-stack.peek() = 4;
+vector.add("hello");
 ```
 
 ---
 
-### pop()
+### get(index)
 *Runtime:* **O(1)**
 
-*Exceptions:* Throws a tf::exception if the stack is empty.
+*Exceptions:* Throws a tf::exception if the index is larger than the size.
 
-Removes and returns the top value from the stack:
+Returns a constant reference to the element at index 1:
 ```
-int top_value = stack.pop();
+std::string value = vector.get(1);
+```
+
+---
+
+### [index]
+*Runtime:* **O(1)**
+
+*Exceptions:* Throws a tf::exception if the index is larger than the size.
+
+Returns a reference to the element at index 1:
+```
+std::string value = vector[1];
+```
+
+---
+
+### set_all(value)
+*Runtime:* **O(n)**
+
+Sets every element to the value "blah":
+```
+vector.set_all("blah");
+```
+
+---
+
+### remove(index)
+*Runtime:* **O(n)**
+
+*Exceptions:* Throws a tf::exception if the index is larger than the size.
+
+Removes and returns the element at index 1:
+```
+std::string value = vector.remove(1);
+```
+
+---
+
+### contains(value)
+*Runtime:* **O(n)**
+
+Returns `true` if the value "hello" is in the vector:
+```
+bool contains_value = vector.contains("hello");
 ```
 
 ---
@@ -185,9 +217,9 @@ int top_value = stack.pop();
 ### size()
 *Runtime:* **O(1)**
 
-Returns the number of elements on the stack:
+Returns the number of elements in the vector:
 ```
-size_t num_elements = stack.size();
+size_t num_elements = vector.size();
 ```
 
 ---
@@ -195,20 +227,19 @@ size_t num_elements = stack.size();
 ### current_capacity()
 *Runtime:* **O(1)**
 
-Returns the current size of the internal buffer.
+Returns the current size of the internal buffer:
 ```
-size_t buffer_size = stack.current_capacity();
+size_t capacity = vector.current_capacity();
 ```
-The buffer size is usually not of any importance. This method exists mostly for troubleshooting purposes.
 
 ---
 
 ### empty()
 *Runtime:* **O(1)**
 
-Returns `true` if the stack is empty:
+Returns `true` if the size of the vector is zero:
 ```
-bool stack_empty = stack.empty();
+bool vector_empty = vector.empty();
 ```
 
 ---
@@ -216,11 +247,11 @@ bool stack_empty = stack.empty();
 ### clear()
 *Runtime:* **O(1)**
 
-Removes all elements from the stack:
+Clear the vector:
 ```
-stack.clear();
+vector.clear();
 ```
-In reality, clear() just resets the internal top index, which means that no actual memory is deallocated and the stack is not reverted to its original capacity.
+In reality, clear() just resets the internal index, which means that no actual memory is deallocated and the vector is not reverted to its original capacity. Following calls to `add(...)` will overwrite the data in the buffer.
 
 ---
 ---
@@ -920,6 +951,95 @@ Deallocates all entries:
 ```
 tree.clear();
 ```
+
+---
+---
+
+## Stack
+This is just a wrapper for `tf::vector`.
+
+The insane speed comes at the cost of a memory overhead, as the vector always reallocates with twice its previous size. If sparse memory is required, the use of [Linked List](#linked-list) is recommended.
+
+---
+
+### Constructor
+Default constructor with type `std::string` and initial capacity 10:
+```
+tf::stack<std::string> stack;
+```
+A custom initial capacity, in this case 100, can be set in the constructor:
+```
+tf::stack<std::string> stack(100);
+```
+Copy constructor, copy assignment operator, move constructor and move assignment operator also exist.
+
+---
+
+### put(value)
+*Runtime:* **O(1)** / O(n) on reallocation
+
+*Exceptions:* Throws a tf::exception if a buffer overflow or bad_alloc occurs.
+
+Puts the value "hello" on the stack:
+```
+stack.put("hello");
+```
+
+---
+
+### peek()
+*Runtime:* **O(1)**
+
+*Exceptions:* Throws a tf::exception if the stack is empty.
+
+Returns a reference to the top value of the stack:
+```
+std::string top_value = stack.peek();
+stack.peek() = "world";
+```
+
+---
+
+### pop()
+*Runtime:* **O(1)**
+
+*Exceptions:* Throws a tf::exception if the stack is empty.
+
+Removes and returns the top value from the stack:
+```
+std::string top_value = stack.pop();
+```
+
+---
+
+### size()
+*Runtime:* **O(1)**
+
+Returns the number of elements on the stack:
+```
+size_t num_elements = stack.size();
+```
+
+---
+
+### empty()
+*Runtime:* **O(1)**
+
+Returns `true` if the stack is empty:
+```
+bool stack_empty = stack.empty();
+```
+
+---
+
+### clear()
+*Runtime:* **O(1)**
+
+Removes all elements from the stack:
+```
+stack.clear();
+```
+In reality, clear() just resets the internal top index, which means that no actual memory is deallocated and the stack is not reverted to its original capacity.
 
 ---
 ---

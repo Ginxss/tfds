@@ -1,6 +1,7 @@
 #ifndef TF_ARRAY_H
 #define TF_ARRAY_H
 
+#include <new> // std:bad_alloc
 #include <algorithm> // std::copy_n, std::swap, std::min
 #include "tf_exception.hpp"
 
@@ -57,7 +58,7 @@ public:
         auto_realloc(other.auto_realloc),
         buffer(new T[capacity_])
     {
-        std::copy_n(other.buffer, other.capacity_, buffer);
+        std::copy_n(other.buffer, capacity_, buffer);
     }
 
     // destructor
@@ -115,7 +116,7 @@ public:
 
     // O(n)
     void set_all(const T &value) {
-        for (int i = 0; i < capacity_; ++i) {
+        for (size_t i = 0; i < capacity_; ++i) {
             buffer[i] = value;
         }
     }
