@@ -66,6 +66,43 @@ void test_contains(const tf::hash_table<std::string, std::string> &h) {
 	assert(h.contains("hellos") == false);
 }
 
+void test_copying(const tf::hash_table<std::string, std::string> &h) {
+	assert(h.size() == 2);
+	assert(h.empty() == false);
+	assert(h.table_size() == 42);
+	assert(h.checks_duplicate_keys() == true);
+	assert(h.get("hello") == "world");
+	assert(h["key"] == "value");
+
+	const tf::hash_table<std::string, std::string> h2 = h;
+	assert(h2.size() == 2);
+	assert(h2.empty() == false);
+	assert(h2.table_size() == 42);
+	assert(h2.checks_duplicate_keys() == true);
+	assert(h2.get("hello") == "world");
+	assert(h2["key"] == "value");
+
+	tf::hash_table<std::string, std::string> h3;
+	h3 = h;
+	assert(h3.size() == 2);
+	assert(h3.empty() == false);
+	assert(h3.table_size() == 42);
+	assert(h3.checks_duplicate_keys() == true);
+	assert(h3.get("hello") == "world");
+	assert(h3["key"] == "value");
+
+	tf::hash_table<std::string, std::string> h4(std::move(h3));
+	assert(h4.size() == 2);
+	assert(h4.empty() == false);
+	assert(h4.table_size() == 42);
+	assert(h4.checks_duplicate_keys() == true);
+	assert(h4.get("hello") == "world");
+	assert(h4["key"] == "value");
+
+	assert(h3.size() == 0);
+	assert(h3.empty() == true);
+}
+
 void test_remove(tf::hash_table<std::string, std::string> &h) {
 	assert(h.size() == 2);
 	assert(h.empty() == false);
@@ -97,6 +134,7 @@ int main(int argc, char *argv[]) {
 		test_insert_and_get(result);
 		test_iterator(result);
 		test_contains(result);
+		test_copying(result);
 		test_remove(result);
 		test_clear(result);
 	}

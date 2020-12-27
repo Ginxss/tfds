@@ -557,11 +557,9 @@ table.clear();
 ## Search Tree
 An ordered map (iterative AVL Tree).
 
-The entries are sorted by the key. If only sorting by value is needed, the values should just have themselves as keys. If duplicate keys are expected, the use of [ Multi Search Tree](#multi-search-tree) is recommended.
+The entries are sorted by the key. If duplicate keys are expected, see [Multi Search Tree](#multi-search-tree).
 
 The keys for the search tree have to be comparable with `operator==`, `operator<` and `operator>`.
-
-Can also be used as a Priority Queue, although the use of the wrapper [Priority Queue](#priority-queue) is recommended because of its simpler interface.
 
 ---
 
@@ -587,9 +585,7 @@ for (auto it = tree.end(); it.condition(); --it) {
     std::cout << it.value() << std::endl;
 }
 ```
-The iterator is of the type `tf::search_tree<int, int>::iterator`, but for simplicity,  the use of `auto` is recommended.
-
-The value of the iterator can be accessed with either `*it` or the method `it.value()`. These two methods are identical and are interchangeable. The key of the iterator can be accessed with the method `it.key()`.
+The value of the iterator can be accessed with either `*it` or the method `it.value()` (both methods are identical and interchangeable). The key of the iterator can be accessed with the method `it.key()`.
 
 ---
 
@@ -638,6 +634,30 @@ Returns a reference to the value with key 1:
 ```
 int value = tree[1];
 tree[1] = 4;
+```
+
+---
+
+### min()
+*Runtime:* **O(log(n))**
+
+*Exceptions:* Throws a tf::exception if the tree is empty.
+
+Returns a reference to the value with the smallest key:
+```
+int min_value = tree.min();
+```
+
+---
+
+### max()
+*Runtime:* **O(log(n))**
+
+*Exceptions:* Throws a tf::exception if the tree is empty.
+
+Returns a reference to the value with the largest key:
+```
+int max_value = tree.max();
 ```
 
 ---

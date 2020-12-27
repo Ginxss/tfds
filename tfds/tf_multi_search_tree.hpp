@@ -449,7 +449,7 @@ public:
     }
 
     // O(log(n))
-    const V remove(const K &key) {
+    V remove(const K &key) {
         node *it = root;
         while (it) {
             if (key < it->key) {
@@ -459,7 +459,7 @@ public:
                 it = it->right;
             }
             else {
-                const V result = it->start_value->value;
+                V result = it->start_value->value;
                 remove_node(it);
                 return result;
             }
@@ -531,6 +531,24 @@ public:
 
     // O(log(n))
     V &operator[](const K &key) {
+        node *it = root;
+        while (it) {
+            if (key < it->key) {
+                it = it->left;
+            }
+            else if (key > it->key) {
+                it = it->right;
+            }
+            else {
+                return it->start_value->value;
+            }
+        }
+
+        throw exception("search tree: []: key not found");
+    }
+
+    // O(log(n))
+    const V &operator[](const K &key) const {
         node *it = root;
         while (it) {
             if (key < it->key) {

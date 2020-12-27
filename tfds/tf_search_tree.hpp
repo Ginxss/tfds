@@ -125,16 +125,49 @@ private:
 
 public:
     class iterator {
-    public:
+    private:
         search_tree *tree;
-        node *nd;
+        node *current_node;
+    
+    public:
+        iterator(search_tree *tree, const bool forward):
+            tree(tree)
+        {
+            if (forward)
+                current_node = tree->min_node(tree->root);
+            else
+                current_node = tree->max_node(tree->root);
+        }
 
-        V &operator*() { return nd->value; }
-        K &key() { return nd->key; }
-        V &value() { return nd->value; }
-        void operator++() { nd = tree->successor(nd); }
-        void operator--() { nd = tree->predecessor(nd); }
-        bool condition() { return nd != nullptr; }
+        const K &key() const { return current_node->key; }
+        V &operator*() { return current_node->value; }
+        V &value() { return current_node->value; }
+        void operator++() { current_node = tree->successor(current_node); }
+        void operator--() { current_node = tree->predecessor(current_node); }
+        bool condition() const { return current_node != nullptr; }
+    };
+
+    class const_iterator {
+    private:
+        const search_tree *tree;
+        node *current_node;
+    
+    public:
+        const_iterator(const search_tree *tree, const bool forward):
+            tree(tree)
+        {
+            if (forward)
+                current_node = tree->min_node(tree->root);
+            else
+                current_node = tree->max_node(tree->root);
+        }
+
+        const K &key() const { return current_node->key; }
+        const V &operator*() const { return current_node->value; }
+        const V &value() const { return current_node->value; }
+        void operator++() { current_node = tree->successor(current_node); }
+        void operator--() { current_node = tree->predecessor(current_node); }
+        bool condition() const { return current_node != nullptr; }
     };
 
 private:
@@ -142,9 +175,6 @@ private:
 
     size_t size_;
     node *root;
-
-    iterator start_it;
-    iterator end_it;
 
     // METHODS
 
@@ -271,8 +301,8 @@ private:
     }
 
     // uses one of the three methods above to remove a node and return its value.
-    const V remove_node(node *n) {
-        const V result = n->value;
+    V remove_node(node *n) {
+        V result = n->value;
         node *parent = n->parent;
 
         if (n->left && n->right)
@@ -296,20 +326,13 @@ public:
     // constructor
     search_tree():
         size_(0),
-        root(nullptr)
-    {
-        start_it.tree = this;
-        end_it.tree = this;
-    }
+        root(nullptr) {}
 
     // copy constructor
     search_tree(const search_tree &other):
         size_(0),
         root(nullptr)
     {
-        start_it.tree = this;
-        end_it.tree = this;
-
         // mimic iterator
         node *it = other.root;
         if (it) {
@@ -333,8 +356,6 @@ public:
         using std::swap;
         swap(first.size_, second.size_);
         swap(first.root, second.root);
-        swap(first.start_it, second.start_it);
-        swap(first.end_it, second.end_it);
     }
 
     // copy assignment operator
@@ -390,7 +411,7 @@ public:
     }
 
     // O(log(n))
-    const V remove(const K &key) {
+    V remove(const K &key) {
         node *it = root;
         while (it) {
             if (key < it->key) {
@@ -444,29 +465,73 @@ public:
     }
 
     // O(log(n))
-    iterator begin() {
+    const V &operator[](const K &key) const {
         node *it = root;
-        if (it) {
-            while (it->left) {
+        while (it) {
+            if (key < it->key) {
                 it = it->left;
+            }
+            else if (key > it->key) {
+                it = it->right;
+            }
+            else {
+                return it->value;
             }
         }
 
-        start_it.nd = it;
-        return start_it;
+        throw exception("search tree: []: key not found");
     }
 
     // O(log(n))
-    iterator end() {
+    V &min() {
+        if (empty())
+            throw exception("search tree: min: tree is empty");
+
         node *it = root;
-        if (it) {
-            while (it->right) {
-                it = it->right;
-            }
+        while (it->left) {
+            it = it->left;
         }
 
-        end_it.nd = it;
-        return end_it;
+        return it->value;
+    }
+
+    // O(log(n))
+    const V &min() const {
+        if (empty())
+            throw exception("search tree: min: tree is empty");
+
+        node *it = root;
+        while (it->left) {
+            it = it->left;
+        }
+
+        return it->value;
+    }
+
+    // O(log(n))
+    V &max() {
+        if (empty())
+            throw exception("search tree: max: tree is empty");
+
+        node *it = root;
+        while (it->right) {
+            it = it->right;
+        }
+
+        return it->value;
+    }
+
+    // O(log(n))
+    const V &max() const {
+        if (empty())
+            throw exception("search tree: max: tree is empty");
+
+        node *it = root;
+        while (it->right) {
+            it = it->right;
+        }
+
+        return it->value;
     }
 
     // O(log(n))
@@ -493,6 +558,26 @@ public:
         }
 
         return remove_node(it);
+    }
+
+    // O(log(n))
+    iterator begin() {
+        return iterator(this, true);
+    }
+
+    // O(log(n))
+    const_iterator begin() const {
+        return const_iterator(this, true);
+    }
+
+    // O(log(n))
+    iterator end() {
+        return iterator(this, false);
+    }
+
+    // O(log(n))
+    const_iterator end() const {
+        return const_iterator(this, false);
     }
 
     // O(log(n))

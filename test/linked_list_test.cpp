@@ -192,6 +192,35 @@ void test_contains(const tf::linked_list<std::string> &l) {
 	}
 }
 
+void test_copying(const tf::linked_list<std::string> &l) {
+	assert(l.length() == 3);
+	assert(l.empty() == false);
+	assert(l.front() == "two");
+	assert(l.back() == "three");
+
+	const tf::linked_list<std::string> l2 = l;
+	assert(l2.length() == 3);
+	assert(l2.empty() == false);
+	assert(l2.front() == "two");
+	assert(l2.back() == "three");
+
+	tf::linked_list<std::string> l3;
+	l3 = l;
+	assert(l3.length() == 3);
+	assert(l3.empty() == false);
+	assert(l3.front() == "two");
+	assert(l3.back() == "three");
+
+	tf::linked_list<std::string> l4(std::move(l3));
+	assert(l4.length() == 3);
+	assert(l4.empty() == false);
+	assert(l4.front() == "two");
+	assert(l4.back() == "three");
+
+	assert(l3.length() == 0);
+	assert(l3.empty() == true);
+}
+
 void test_clear(tf::linked_list<std::string> &l) {
 	assert(l.length() == 3);
 	assert(l.empty() == false);
@@ -213,6 +242,7 @@ int main(int argc, char *argv[]) {
 		test_pop_back(result);
 		test_pop_front(result);
 		test_contains(result);
+		test_copying(result);
 		test_clear(result);
 	}
 	catch (tf::exception &e) {

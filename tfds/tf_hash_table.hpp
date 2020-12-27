@@ -93,8 +93,7 @@ private:
 public:
     class iterator {
     private:
-        bucket **buckets;
-        size_t num_buckets;
+        hash_table *table;
         bucket *current_bucket;
         size_t current_index;
 
@@ -104,9 +103,9 @@ public:
                 return;
             }
 
-            while (++current_index < num_buckets) {
-                if (buckets[current_index]) {
-                    current_bucket = buckets[current_index];
+            while (++current_index < table->table_size_) {
+                if (table->buckets[current_index]) {
+                    current_bucket = table->buckets[current_index];
                     return;
                 }
             }
@@ -115,13 +114,13 @@ public:
         }
 
     public:
-        iterator(bucket **buckets, size_t num_buckets):
-            buckets(buckets), num_buckets(num_buckets)
+        iterator(hash_table *table):
+            table(table)
         {
             current_index = 0;
-            current_bucket = buckets[current_index];
-            while (!current_bucket && ++current_index < num_buckets) {
-                current_bucket = buckets[current_index];
+            current_bucket = table->buckets[current_index];
+            while (!current_bucket && ++current_index < table->table_size_) {
+                current_bucket = table->buckets[current_index];
             }
         }
 
@@ -134,8 +133,7 @@ public:
 
     class const_iterator {
     private:
-        bucket **buckets;
-        size_t num_buckets;
+        const hash_table *table;
         bucket *current_bucket;
         size_t current_index;
 
@@ -145,9 +143,9 @@ public:
                 return;
             }
 
-            while (++current_index < num_buckets) {
-                if (buckets[current_index]) {
-                    current_bucket = buckets[current_index];
+            while (++current_index < table->table_size_) {
+                if (table->buckets[current_index]) {
+                    current_bucket = table->buckets[current_index];
                     return;
                 }
             }
@@ -156,13 +154,13 @@ public:
         }
 
     public:
-        const_iterator(bucket **buckets, size_t num_buckets):
-            buckets(buckets), num_buckets(num_buckets)
+        const_iterator(const hash_table *table):
+            table(table)
         {
             current_index = 0;
-            current_bucket = buckets[current_index];
-            while (!current_bucket && ++current_index < num_buckets) {
-                current_bucket = buckets[current_index];
+            current_bucket = table->buckets[current_index];
+            while (!current_bucket && ++current_index < table->table_size_) {
+                current_bucket = table->buckets[current_index];
             }
         }
 
@@ -369,11 +367,11 @@ public:
     }
 
     iterator begin() {
-        return iterator(buckets, table_size_);
+        return iterator(this);
     }
 
     const_iterator begin() const {
-        return const_iterator(buckets, table_size_);
+        return const_iterator(this);
     }
 
     // O(1)

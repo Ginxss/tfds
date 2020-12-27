@@ -53,10 +53,10 @@ public:
 
     class const_iterator {
     private:
-        node *nd;
+        const node *nd;
 
     public:
-        const_iterator(node *nd):
+        const_iterator(const node *nd):
             nd(nd) {}
         
         const T &operator*() const { return nd->value; }
