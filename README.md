@@ -744,8 +744,6 @@ The entries are sorted by the key. Values with the same key are not ordered in a
 
 The keys for the multi search tree have to be comparable with `operator==`, `operator<` and `operator>`.
 
-Can also be used as a Multi Priority Queue, although the use of the wrapper [Multi Priority Queue](#multi-priority-queue) is recommended because of its simpler interface.
-
 ---
 
 ### Constructor
@@ -770,9 +768,7 @@ for (auto it = tree.end(); it.condition(); --it) {
     std::cout << it.value() << std::endl;
 }
 ```
-The iterator is of the type `tf::multi_search_tree<int, int>::iterator`, but for simplicity,  the use of `auto` is recommended.
-
-The value of the iterator can be accessed with either `*it` or the method `it.value()`. These two methods are identical and are interchangeable. The key of the iterator can be accessed with the method `it.key()`.
+The value of the iterator can be accessed with either `*it` or the method `it.value()` (both methods are identical and interchangeable). The key of the iterator can be accessed with the method `it.key()`.
 
 ---
 
@@ -1004,7 +1000,7 @@ queue.clear();
 ## Priority Queue
 This is just a wrapper for the [Search Tree](#search-tree), which provides only the functionality of a priority queue.
 
-The entries are sorted by the key. If only sorting by value is needed, the values should just have themselves as keys. If duplicate keys are expected, the use of [Multi Priority Queue](#multi-priority-queue) is recommended.
+The entries are sorted by the key. If duplicate keys are expected, see [Multi Priority Queue](#multi-priority-queue).
 
 ---
 
@@ -1097,7 +1093,7 @@ queue.clear();
 ## Multi Priority Queue
 This is just a wrapper for the [Multi Search Tree](#multi-search-tree), which provides only the functionality of a multi priority queue.
 
-The entries are sorted by the key. Values with the same key are not ordered in any particular order. If no duplicate keys are expected, the use of [Priority Queue](#priority-queue) is recommended because of its better performance.
+The entries are sorted by the key. Values with the same key are not ordered in any particular order. If no duplicate keys are expected, the use of [Priority Queue](#priority-queue) is recommended.
 
 ---
 
