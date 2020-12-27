@@ -65,8 +65,10 @@ private:
 
     node *min_node(node *n) const {
         node *it = n;
-        while (it->left) {
-            it = it->left;
+        if (it) {
+            while (it->left) {
+                it = it->left;
+            }
         }
 
         return it;
@@ -74,8 +76,10 @@ private:
 
     node *max_node(node *n) const {
         node *it = n;
-        while (it->right) {
-            it = it->right;
+        if (it) {
+            while (it->right) {
+                it = it->right;
+            }
         }
 
         return it;
@@ -333,17 +337,8 @@ public:
         size_(0),
         root(nullptr)
     {
-        // mimic iterator
-        node *it = other.root;
-        if (it) {
-            while (it->left) {
-                it = it->left;
-            }
-        }
-
-        while (it != nullptr) {
-            insert(it->key, it->value);
-            it = successor(it);
+        for (auto it = other.begin(); it.condition(); ++it) {
+            insert(it.key(), it.value());
         }
     }
     

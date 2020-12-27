@@ -791,7 +791,7 @@ tree.insert(1, 3);
 
 *Exceptions:* Throws a tf::exception if the key does not exist.
 
-Removes all entries with key 1 and returns a value:
+Removes one entry with key 1 and returns the value:
 ```
 int value = tree.remove(1);
 ```
@@ -803,11 +803,24 @@ int value = tree.remove(1);
 
 *Exceptions:* Throws a tf::exception if either the key or the value do not exist.
 
-Removes the entries with key 1 and value 1 and returns the removed value:
+Removes the entries with key 1 and value 3 and returns the removed value:
 ```
-int value = tree.remove(1, 1);
+int value = tree.remove(1, 3);
 ```
-While it is redundant to return the same value that was just removed, it works like that for reasons of symmetry and compatibility with the [Search Tree](#search-tree).
+Yes, it is redundant to return the same value that was just removed. It works like that anyway.
+
+---
+
+### remove_all(key)
+*Runtime:* **O(log(n))**
+
+*Exceptions:* Throws a tf::exception if the key does not exist.
+
+Removes all entries with key 1 returns a value:
+```
+int value = tree.remove(1);
+```
+Yes, it is redundant to return the same value that was just removed. It works like that anyway.
 
 ---
 

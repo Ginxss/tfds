@@ -137,6 +137,7 @@ int main(int argc, char *argv[]) {
 	}
 	catch (tf::exception &e) {
 		std::cout << e.what() << std::endl;
+		assert(false);
 	}
 
 	std::cout << "All tests successful." << std::endl;

@@ -99,8 +99,10 @@ private:
 
     node *min_node(node *n) const {
         node *it = n;
-        while (it->left) {
-            it = it->left;
+        if (it) {
+            while (it->left) {
+                it = it->left;
+            }
         }
 
         return it;
@@ -108,8 +110,10 @@ private:
 
     node *max_node(node *n) const {
         node *it = n;
-        while (it->right) {
-            it = it->right;
+        if (it) {
+            while (it->right) {
+                it = it->right;
+            }
         }
 
         return it;
@@ -157,43 +161,115 @@ private:
         return nullptr;
     }
 
-    value_node *next_value_node(value_node *vn, node **n) {
-        if (vn->next) {
-            return vn->next;
-        }
-
-        *n = successor(*n);
-        if (*n)
-            return (*n)->start_value;
-        
-        return nullptr;
-    }
-
-    value_node *prev_value_node(value_node *vn, node **n) {
-        if (vn->next) {
-            return vn->next;
-        }
-
-        *n = predecessor(*n);
-        if (*n)
-            return (*n)->start_value;
-        
-        return nullptr;
-    }
-
 public:
     class iterator {
-    public:
+    private:
         multi_search_tree *tree;
-        value_node *vn;
-        node *nd;
+        value_node *current_value_node;
+        node *current_node;
 
-        V &operator*() { return vn->value; }
-        K &key() { return nd->key; }
-        V &value() { return vn->value; }
-        void operator++() { vn = tree->next_value_node(vn, &nd); }
-        void operator--() { vn = tree->prev_value_node(vn, &nd); }
-        bool condition() { return nd != nullptr; }
+        void next_value_node() {
+            if (current_value_node->next) {
+                current_value_node = current_value_node->next;
+                return;
+            }
+
+            current_node = tree->successor(current_node);
+            if (current_node)
+                current_value_node = current_node->start_value;
+            else
+                current_value_node = nullptr;
+        }
+
+        void prev_value_node() {
+            if (current_value_node->next) {
+                current_value_node = current_value_node->next;
+                return;
+            }
+
+            current_node = tree->predecessor(current_node);
+            if (current_node)
+                current_value_node = current_node->start_value;
+            else
+                current_value_node = nullptr;
+        }
+
+    public:
+        iterator(multi_search_tree *tree, const bool forward):
+            tree(tree)
+        {
+            if (forward)
+                current_node = tree->min_node(tree->root);
+            else
+                current_node = tree->max_node(tree->root);
+
+            if (current_node)
+                current_value_node = current_node->start_value;
+            else
+                current_value_node = nullptr;
+        }
+
+        const K &key() const { return current_node->key; }
+        V &operator*() { return current_value_node->value; }
+        V &value() { return current_value_node->value; }
+        void operator++() { next_value_node(); }
+        void operator--() { prev_value_node(); }
+        bool condition() const { return current_value_node != nullptr; }
+    };
+
+    class const_iterator {
+    private:
+        const multi_search_tree *tree;
+        value_node *current_value_node;
+        node *current_node;
+
+        void next_value_node() {
+            if (current_value_node->next) {
+                current_value_node = current_value_node->next;
+                return;
+            }
+
+            current_node = tree->successor(current_node);
+            if (current_node)
+                current_value_node = current_node->start_value;
+            else
+                current_value_node = nullptr;
+        }
+
+        void prev_value_node() {
+            if (current_value_node->next) {
+                current_value_node = current_value_node->next;
+                return;
+            }
+
+            current_node = tree->predecessor(current_node);
+            if (current_node)
+                current_value_node = current_node->start_value;
+            else
+                current_value_node = nullptr;
+        }
+
+    public:
+        const_iterator(const multi_search_tree *tree, const bool forward):
+            tree(tree)
+        {
+            if (forward)
+                current_node = tree->min_node(tree->root);
+            else
+                current_node = tree->max_node(tree->root);
+
+            if (current_node)
+                current_value_node = current_node->start_value;
+            else
+                current_value_node = nullptr;
+        }
+
+        const K &key() const { return current_node->key; }
+        const V &operator*() const { return current_value_node->value; }
+        const V &value() const { return current_value_node->value; }
+        void operator++() { next_value_node(); }
+        void operator--() { prev_value_node(); }
+        bool condition() const { return current_value_node != nullptr; }
     };
 
 private:
@@ -201,9 +277,6 @@ private:
 
     size_t size_;
     node *root;
-
-    iterator start_it;
-    iterator end_it;
 
     // METHODS
 
@@ -353,32 +426,15 @@ public:
     // constructor
     multi_search_tree():
         size_(0),
-        root(nullptr)
-    {
-        start_it.tree = this;
-        end_it.tree = this;
-    }
+        root(nullptr) {}
 
     // copy constructor
     multi_search_tree(const multi_search_tree &other):
         size_(0),
         root(nullptr)
     {
-        start_it.tree = this;
-        end_it.tree = this;
-
-        // mimic iterator
-        node *it = other.root;
-        if (it) {
-            while (it->left) {
-                it = it->left;
-            }
-        }
-        value_node *vn = it->start_value;
-
-        while (it != nullptr) {
-            insert(it->key, vn->value);
-            vn = next_value_node(vn, &it);
+        for (auto it = other.begin(); it.condition(); ++it) {
+            insert(it.key(), it.value());
         }
     }
     
@@ -391,8 +447,6 @@ public:
         using std::swap;
         swap(first.size_, second.size_);
         swap(first.root, second.root);
-        swap(first.start_it, second.start_it);
-        swap(first.end_it, second.end_it);
     }
 
     // copy assignment operator
@@ -459,6 +513,33 @@ public:
                 it = it->right;
             }
             else {
+                value_node *to_delete = it->start_value;
+                V result = to_delete->value;
+
+                it->start_value = to_delete->next;
+                if (it->start_value == nullptr) {
+                    remove_node(it);
+                }
+
+                delete_value_node(to_delete);
+                return result;
+            }
+        }
+
+        throw exception("search tree: remove: key not found");
+    }
+
+    // O(log(n))
+    V remove_all(const K &key) {
+        node *it = root;
+        while (it) {
+            if (key < it->key) {
+                it = it->left;
+            }
+            else if (key > it->key) {
+                it = it->right;
+            }
+            else {
                 V result = it->start_value->value;
                 remove_node(it);
                 return result;
@@ -469,7 +550,7 @@ public:
     }
 
     // O(log(n) + #values with that key)
-    const V remove_value(const K &key, const V &value) {
+    V remove_value(const K &key, const V &value) {
         node *it = root;
         while (it) {
             if (key < it->key) {
@@ -483,7 +564,7 @@ public:
                 value_node *prev = nullptr;
                 while (value_it) {
                     if (compare<V>(value_it->value, value)) {
-                        const V result = value_it->value;
+                        V result = value_it->value;
 
                         if (prev) {
                             prev->next = value_it->next;
@@ -566,44 +647,13 @@ public:
     }
 
     // O(log(n))
-    iterator begin() {
-        node *it = root;
-        if (it) {
-            while (it->left) {
-                it = it->left;
-            }
-        }
-
-        start_it.nd = it;
-        start_it.vn = it->start_value;
-        return start_it;
-    }
-
-    // O(log(n))
-    iterator end() {
-        node *it = root;
-        if (it) {
-            while (it->right) {
-                it = it->right;
-            }
-        }
-
-        end_it.nd = it;
-        end_it.vn = it->start_value;
-        return end_it;
-    }
-
-    // O(log(n))
     V pop_min() {
         if (empty())
             throw exception("search tree: pop_min: tree is empty");
 
-        node *it = root;
-        while (it->left) {
-            it = it->left;
-        }
+        node *it = min_node(root);
 
-        const V result = it->start_value->value;
+        V result = it->start_value->value;
 
         value_node *to_delete = it->start_value;
         it->start_value = to_delete->next;
@@ -621,12 +671,9 @@ public:
         if (empty())
             throw exception("search tree: pop_max: tree is empty");
         
-        node *it = root;
-        while (it->right) {
-            it = it->right;
-        }
+        node *it = max_node(root);
 
-        const V result = it->start_value->value;
+        V result = it->start_value->value;
 
         value_node *to_delete = it->start_value;
         it->start_value = to_delete->next;
@@ -637,6 +684,26 @@ public:
         }
 
         return result;
+    }
+
+    // O(log(n))
+    iterator begin() {
+        return iterator(this, true);
+    }
+
+    // O(log(n))
+    const_iterator begin() const {
+        return const_iterator(this, true);
+    }
+
+    // O(log(n))
+    iterator end() {
+        return iterator(this, false);
+    }
+
+    // O(log(n))
+    const_iterator end() const {
+        return const_iterator(this, false);
     }
 
     // O(log(n))
