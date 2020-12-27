@@ -7,23 +7,23 @@
 namespace tf {
 
 template <typename T>
-inline bool compare(const T &key1, const T &key2) {
-    return key1 == key2;
+inline bool compare(const T &t1, const T &t2) {
+    return t1 == t2;
 }
 
 template <>
-inline bool compare<std::string>(const std::string &key1, const std::string &key2) {
-    return key1.compare(key2) == 0;
+inline bool compare<std::string>(const std::string &s1, const std::string &s2) {
+    return s1.compare(s2) == 0;
 }
 
 template <>
-inline bool compare<const char *>(const char * const &key1, const char * const &key2) {
-    return std::strcmp(key1, key2) == 0;
+inline bool compare<const char *>(const char * const &s1, const char * const &s2) {
+    return std::strcmp(s1, s2) == 0;
 }
 
 template <>
-inline bool compare<char *>(char * const &key1, char * const &key2) {
-    return std::strcmp(key1, key2) == 0;
+inline bool compare<char *>(char * const &s1, char * const &s2) {
+    return std::strcmp(s1, s2) == 0;
 }
 
 }

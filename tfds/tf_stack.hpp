@@ -65,14 +65,20 @@ public:
     void put(const T &value) {
         if (top_index >= capacity) {
             size_t new_capacity = capacity * 2;
-            if (new_capacity <= top_index)
-                throw exception("stack: put: capacity too large");
+            if (new_capacity <= top_index) {
+                throw exception("stack: put: stack too large, new capacity created buffer overflow");
+            }
 
-            T *new_buffer = new T[new_capacity];
-            std::copy_n(buffer, capacity, new_buffer);
-            capacity = new_capacity;
-            delete[] buffer;
-            buffer = new_buffer;
+            try {
+                T *new_buffer = new T[new_capacity];
+                std::copy_n(buffer, capacity, new_buffer);
+                capacity = new_capacity;
+                delete[] buffer;
+                buffer = new_buffer;
+            }
+            catch (std::bad_alloc &) {
+                throw exception("stack: put: bad_alloc caught, stack is probably too big");
+            }
         }
         
         buffer[top_index++] = value;

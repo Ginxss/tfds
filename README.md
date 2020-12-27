@@ -45,7 +45,7 @@ Copy constructor, copy assignment operator, move constructor and move assignment
 ### insert(index, value)
 *Runtime:* **O(1)** / O(n) on reallocation
 
-*Exceptions:* Automatic reallocation off: throws a tf::exception if index out of bounds; Automatic reallocation on: throws a tf::exception if buffer overflow occurs.
+*Exceptions:* Throws a tf::exception if a buffer overflow or bad_alloc occurs (Automatic reallocation turned off: throws a tf::exception if the index is out of bounds).
 
 Inserts the value 3 at index 1:
 ```
@@ -69,7 +69,7 @@ int value = array.get(1);
 ### [index]
 *Runtime:* **O(1)** / O(n) on reallocation
 
-*Exceptions:* Automatic reallocation off: throws a tf::exception if index out of bounds; Automatic reallocation on: throws a tf::exception if buffer overflow occurs.
+*Exceptions:* Throws a tf::exception if a buffer overflow or bad_alloc occurs (Automatic reallocation turned off: throws a tf::exception if the index is out of bounds).
 
 Returns a reference to the value at index 1:
 ```
@@ -112,11 +112,13 @@ bool array_is_reallocating = array.auto_reallocating();
 ### reallocate(new capacity)
 *Runtime:* **O(1)**
 
+*Exceptions:* throws a tf::exception if new_capacity is zero or if it is too big and causes a bad_alloc.
+
 Reallocates the array with the new capacity 20:
 ```
 array.reallocate(20);
 ```
-The content of the array does not get erased, it gets copied into the new buffer.
+The content of the array gets copied into the new buffer. If new_capacity is smaller than the old capacity, only the elements up to that point get copied, the rest gets deleted.
 
 ---
 ---
@@ -145,6 +147,8 @@ Copy constructor, copy assignment operator, move constructor and move assignment
 
 ### put(value)
 *Runtime:* **O(1)** / O(n) on reallocation
+
+*Exceptions:* Throws a tf::exception if a buffer overflow or bad_alloc occurs.
 
 Puts the value 3 on the stack:
 ```

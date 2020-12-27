@@ -13,6 +13,8 @@ namespace tf {
 template <typename T>
 class linked_list {
 private:
+    // NODE
+
     struct node {
         T value;
         node *prev;
@@ -22,18 +24,8 @@ private:
             value(value), prev(prev), next(next) {}
     };
 
-    node *new_node(const T &value, node *prev, node *next) {
-        node *n = new node(value, prev, next);
-        ++length_;
-        return n;
-    }
+    // ITERATORS
 
-    void delete_node(node *n) {
-        --length_;
-        delete n;
-    }
-
-public:
     class iterator {
     private:
         node *nd;
@@ -44,8 +36,8 @@ public:
         
         T &operator*() { return nd->value; }
         T &value() { return nd->value; }
-        T *next_value() { return (nd->next) ? &nd->next->value : nullptr; };
-        T *prev_value() { return (nd->prev) ? &nd->prev->value : nullptr; };
+        T *next_value() { return (nd->next) ? &nd->next->value : nullptr; }
+        T *prev_value() { return (nd->prev) ? &nd->prev->value : nullptr; }
         void operator++() { nd = nd->next; }
         void operator--() { nd = nd->prev; }
         bool condition() const { return nd != nullptr; }
@@ -61,46 +53,30 @@ public:
         
         const T &operator*() const { return nd->value; }
         const T &value() const { return nd->value; }
-        const T *next_value() const { return (nd->next) ? &nd->next->value : nullptr; };
-        const T *prev_value() const { return (nd->prev) ? &nd->prev->value : nullptr; };
+        const T *next_value() const { return (nd->next) ? &nd->next->value : nullptr; }
+        const T *prev_value() const { return (nd->prev) ? &nd->prev->value : nullptr; }
         void operator++() { nd = nd->next; }
         void operator--() { nd = nd->prev; }
         bool condition() const { return nd != nullptr; }
     };
 
-private:
     // VARIABLES
 
     size_t length_;
     node *start_node;
     node *end_node;
-    
+
     // METHODS
-    
-    void new_end_node(const T &value) {
-        end_node->next = new_node(value, end_node, nullptr);
-        end_node = end_node->next;
+
+    node *create_node(const T &value, node *prev, node *next) {
+        node *n = new node(value, prev, next);
+        ++length_;
+        return n;
     }
 
-    void new_start_node(const T &value) {
-        start_node->prev = new_node(value, nullptr, start_node);
-        start_node = start_node->prev;
-    }
-
-    void slide_start_node() {
-        start_node = start_node->next;
-        if (start_node)
-            start_node->prev = nullptr;
-        else
-            end_node = nullptr;
-    }
-
-    void slide_end_node() {
-        end_node = end_node->prev;
-        if (end_node)
-            end_node->next = nullptr;
-        else
-            start_node = nullptr;
+    void destroy_node(node *n) {
+        --length_;
+        delete n;
     }
 
 public:
@@ -116,7 +92,7 @@ public:
         start_node(nullptr),
         end_node(nullptr)
     {
-        node *it = other.start_node;
+        const node *it = other.start_node;
         while (it) {
             add_back(it->value);
             it = it->next;
@@ -154,18 +130,24 @@ public:
 
     // O(1)
     void add_back(const T &value) {
-        if (empty())
-            end_node = start_node = new_node(value, nullptr, nullptr);
-        else
-            new_end_node(value);
+        if (end_node) {
+            end_node->next = create_node(value, end_node, nullptr);
+            end_node = end_node->next;
+        }
+        else {
+            end_node = start_node = create_node(value, nullptr, nullptr);
+        }
     }
 
     // O(1)
     void add_front(const T &value) {
-        if (empty())
-            end_node = start_node = new_node(value, nullptr, nullptr);
-        else
-            new_start_node(value);
+        if (start_node) {
+            start_node->prev = create_node(value, nullptr, start_node);
+            start_node = start_node->prev;
+        }
+        else {
+            start_node = end_node = create_node(value, nullptr, nullptr);
+        }
     }
 
     // O(n)
@@ -173,14 +155,10 @@ public:
         node *it = start_node;
         while (it) {
             if (compare<T>(existing_value, it->value)) {
-                if (it == end_node) {
-                    new_end_node(new_value);
-                }
-                else {
-                    node *new_node_ = new_node(new_value, it, it->next);
-                    it->next->prev = new_node_;
-                    it->next = new_node_;
-                }
+                if (it == end_node)
+                    add_back(new_value);
+                else
+                    it->next = it->next->prev = create_node(new_value, it, it->next);
             
                 return;
             }
@@ -196,14 +174,10 @@ public:
         node *it = start_node;
         while (it) {
             if (compare<T>(existing_value, it->value)) {
-                if (it == start_node) {
-                    new_start_node(new_value);
-                }
-                else {
-                    node *new_node_ = new_node(new_value, it->prev, it);
-                    it->prev->next = new_node_;
-                    it->prev = new_node_;
-                }
+                if (it == start_node)
+                    add_front(new_value);
+                else
+                    it->prev = it->prev->next = create_node(new_value, it->prev, it);
             
                 return;
             }
@@ -217,21 +191,20 @@ public:
     // O(n)
     void remove(const T &value) {
         node *it = start_node;
-
         while (it) {
             if (compare<T>(value, it->value)) {
                 if (it == start_node) {
-                    slide_start_node();
+                    pop_front();
                 }
                 else if (it == end_node) {
-                    slide_end_node();
+                    pop_back();
                 }
                 else {
                     it->prev->next = it->next;
                     it->next->prev = it->prev;
+                    destroy_node(it);
                 }
                 
-                delete_node(it);
                 return;
             }
 
@@ -243,62 +216,76 @@ public:
 
     // O(1)
     T &back() {
-        if (empty())
+        if (end_node)
+            return end_node->value;
+        else
             throw exception("linked list: back: list is empty");
-        
-        return end_node->value;
     }
 
     // O(1)
     const T &back() const {
-        if (empty())
+        if (end_node)
+            return end_node->value;
+        else
             throw exception("linked list: back: list is empty");
-        
-        return end_node->value;
     }
 
     // O(1)
     T &front() {
-        if (empty())
+        if (start_node)
+            return start_node->value;
+        else
             throw exception("linked list: front: list is empty");
-        
-        return start_node->value;
     }
 
     // O(1)
     const T &front() const {
-        if (empty())
+        if (start_node)
+            return start_node->value;
+        else
             throw exception("linked list: front: list is empty");
-        
-        return start_node->value;
     }
 
     // O(1)
     T pop_back() {
-        if (empty())
-            throw exception("linked list: pop_back: list is empty");
-        
-        T result = end_node->value;
+        if (end_node) {
+            T result = end_node->value;
+            node *to_delete = end_node;
 
-        node *to_delete = end_node;
-        slide_end_node();
-        delete_node(to_delete);
+            if (end_node->prev) {
+                end_node = end_node->prev;
+                end_node->next = nullptr;
+            }
+            else {
+                end_node = start_node = nullptr;
+            }
+            
+            destroy_node(to_delete);
+            return result;
+        }
 
-        return result;
+        throw exception("linked list: pop_back: list is empty");        
     }
 
     // O(1)
     T pop_front() {
-        if (empty())
-            throw exception("linked list: pop_front: list is empty");
-        
-        T result = start_node->value;
+        if (start_node) {
+            T result = start_node->value;
+            node *to_delete = start_node;
 
-        node *to_delete = start_node;
-        slide_start_node();
-        delete_node(to_delete);
+            if (start_node->next) {
+                start_node = start_node->next;
+                start_node->prev = nullptr;
+            }
+            else {
+                start_node = end_node = nullptr;
+            }
 
-        return result;
+            destroy_node(to_delete);
+            return result;
+        }
+
+        throw exception("linked list: pop_front: list is empty");        
     }
 
     // O(1)
@@ -324,7 +311,6 @@ public:
     // O(n)
     bool contains(const T &value) const {
         node *it = start_node;
-
         while (it) {
             if (compare<T>(value, it->value)) {
                 return true;
@@ -349,11 +335,10 @@ public:
     // O(n)
     void clear() {
         node *it = start_node;
-
         while (it) {
             node *to_delete = it;
             it = it->next;
-            delete_node(to_delete);
+            destroy_node(to_delete);
         }
 
         start_node = nullptr;
