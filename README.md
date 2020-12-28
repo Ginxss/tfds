@@ -5,11 +5,9 @@
 * [Linked List](#linked-list)
 * [Hash Table](#hash-table)
 * [Search Tree](#search-tree)
-* [Multi Search Tree](#multi-search-tree)
 * [Stack](#stack)
 * [FIFO Queue](#fifo-queue)
 * [Priority Queue](#priority-queue)
-* [Multi Priority Queue](#multi-priority-queue)
 
 ---
 
@@ -592,16 +590,20 @@ table.clear();
 ## Search Tree
 An ordered map (iterative AVL Tree).
 
-The entries are sorted by the key. If duplicate keys are expected, see [Multi Search Tree](#multi-search-tree).
+The entries are sorted by the key. If duplicate keys are allowed, entries with the same key are not ordered in any particular order.
 
 The keys for the search tree have to be comparable with `operator==`, `operator<` and `operator>`.
 
 ---
 
 ### Constructor
-Constructor with `int` keys and `int` values:
+Constructor with `int` keys and `std::string` values:
 ```
-tf::search_tree<int, int> tree;
+tf::search_tree<int, std::string> tree;
+```
+Additionally, you can allow duplicate keys with:
+```
+tf::search_tree<int, std::string> tree(true);
 ```
 Copy constructor, copy assignment operator, move constructor and move assignment operator also exist.
 
@@ -627,11 +629,11 @@ The value of the iterator can be accessed with either `*it` or the method `it.va
 ### insert(key, value)
 *Runtime:* **O(log(n))**
 
-*Exceptions:* Throws a tf::exception if the key already exists.
+*Exceptions:* Duplicate keys not allowed (default behaviour): throws a tf::exception if the key already exists.
 
-Inserts the value 3 with key 1 into the search tree:
+Inserts the value "hello" with key 1 into the search tree:
 ```
-tree.insert(1, 3);
+tree.insert(1, "hello");
 ```
 
 ---
@@ -641,9 +643,33 @@ tree.insert(1, 3);
 
 *Exceptions:* Throws a tf::exception if the key does not exist.
 
-Removes the entry with key 1 and returns the value:
+Removes and returns one entry with key 1:
 ```
-int value = tree.remove(1);
+std::string value = tree.remove(1);
+```
+
+---
+
+### remove_all(key)
+*Runtime:* **O(log(n))**
+
+*Exceptions:* Throws a tf::exception if the key does not exist.
+
+Removes all entries with key 1 and returns one of them:
+```
+std::string value = tree.remove_all(1);
+```
+
+---
+
+### remove_value(key, value)
+*Runtime:* **O(log(n))**
+
+*Exceptions:* Throws a tf::exception if the key-value pair does not exist.
+
+Removes the entry with key 1 and value "hello" and return "hello" again:
+```
+std::string same_value = tree.remove_value(1, "hello");
 ```
 
 ---
@@ -653,9 +679,9 @@ int value = tree.remove(1);
 
 *Exceptions:* Throws a tf::exception if the key does not exist.
 
-Returns a constant reference to the value with key 1:
+Returns a constant reference to one value with key 1:
 ```
-int value = tree.get(1);
+std::string value = tree.get(1);
 ```
 
 ---
@@ -665,11 +691,12 @@ int value = tree.get(1);
 
 *Exceptions:* Throws a tf::exception if the key does not exist.
 
-Returns a reference to the value with key 1:
+Returns a reference to one value with key 1:
 ```
-int value = tree[1];
-tree[1] = 4;
+std::string value = tree[1];
+tree[1] = "world";
 ```
+Obviously this only makes sense if duplicate keys are not allowed, as you wouldn't otherwise know which entry you are currently editing. It's possible though.
 
 ---
 
@@ -678,7 +705,7 @@ tree[1] = 4;
 
 *Exceptions:* Throws a tf::exception if the tree is empty.
 
-Returns a reference to the value with the smallest key:
+Returns a reference to one value with the smallest key:
 ```
 int min_value = tree.min();
 ```
@@ -690,7 +717,7 @@ int min_value = tree.min();
 
 *Exceptions:* Throws a tf::exception if the tree is empty.
 
-Returns a reference to the value with the largest key:
+Returns a reference to one value with the largest key:
 ```
 int max_value = tree.max();
 ```
@@ -702,7 +729,7 @@ int max_value = tree.max();
 
 *Exceptions:* Throws a tf::exception if the tree is empty.
 
-Removes and returns the value with the smallest key:
+Removes and returns one value with the smallest key:
 ```
 int min_value = tree.pop_min();
 ```
@@ -714,7 +741,7 @@ int min_value = tree.pop_min();
 
 *Exceptions:* Throws a tf::exception if the search tree is empty.
 
-Removes and returns the value with the biggest key:
+Removes and returns one value with the biggest key:
 ```
 int max_value = tree.pop_max();
 ```
@@ -772,191 +799,8 @@ tree.clear();
 ---
 ---
 
-## Multi Search Tree
-Behaves just like the [Search Tree](#search-tree) while allowing duplicate keys.
-
-The entries are sorted by the key. Values with the same key are not ordered in any particular order. If no duplicate keys are expected, the use of [Search Tree](#search-tree) is recommended because of its better performance.
-
-The keys for the multi search tree have to be comparable with `operator==`, `operator<` and `operator>`.
-
----
-
-### Constructor
-Constructor with `int` keys and `int` values:
-```
-tf::multi_search_tree<int, int> tree;
-```
-Copy constructor, copy assignment operator, move constructor and move assignment operator also exist.
-
----
-
-### Iteration
-Iterate over every entry in the search tree in ascending order and print the values:
-```
-for (auto it = tree.begin(); it.condition(); ++it) {
-    std::cout << *it << std::endl;
-}
-```
-Iterate in descending order:
-```
-for (auto it = tree.end(); it.condition(); --it) {
-    std::cout << it.value() << std::endl;
-}
-```
-The value of the iterator can be accessed with either `*it` or the method `it.value()` (both methods are identical and interchangeable). The key of the iterator can be accessed with the method `it.key()`.
-
----
-
-### insert(key, value)
-*Runtime:* **O(log(n))**
-
-Inserts the value 3 with key 1 into the multi search tree:
-```
-tree.insert(1, 3);
-```
-
----
-
-### remove(key)
-*Runtime:* **O(log(n))**
-
-*Exceptions:* Throws a tf::exception if the key does not exist.
-
-Removes one entry with key 1 and returns the value:
-```
-int value = tree.remove(1);
-```
-
----
-
-### remove_value(key, value)
-*Runtime:* **O(log(n))**
-
-*Exceptions:* Throws a tf::exception if either the key or the value do not exist.
-
-Removes the entries with key 1 and value 3 and returns the removed value:
-```
-int value = tree.remove(1, 3);
-```
-Yes, it is redundant to return the same value that was just removed. It works like that anyway.
-
----
-
-### remove_all(key)
-*Runtime:* **O(log(n))**
-
-*Exceptions:* Throws a tf::exception if the key does not exist.
-
-Removes all entries with key 1 returns a value:
-```
-int value = tree.remove(1);
-```
-Yes, it is redundant to return the same value that was just removed. It works like that anyway.
-
----
-
-### get(key)
-*Runtime:* **O(log(n))**
-
-*Exceptions:* Throws a tf::exception if the key does not exist.
-
-Returns a constant reference to a value with key 1:
-```
-int value = tree.get(1);
-```
-
----
-
-### [key]
-*Runtime:* **O(log(n))**
-
-*Exceptions:* Throws a tf::exception if the key does not exist.
-
-Returns a reference to a value with key 1:
-```
-int value = tree[1];
-tree[1] = 4;
-```
-
----
-
-### pop_min()
-*Runtime:* **O(log(n))**
-
-*Exceptions:* Throws a tf::exception if the multi search tree is empty.
-
-Removes and returns a value with the smallest key:
-```
-int min_value = tree.pop_min();
-```
-
----
-
-### pop_max()
-*Runtime:* **O(log(n))**
-
-*Exceptions:* Throws a tf::exception if the multi search tree is empty.
-
-Removes and returns a value with the biggest key:
-```
-int max_value = tree.pop_max();
-```
-
----
-
-### contains(key)
-*Runtime:* **O(log(n))**
-
-Returns `true` if the multi search tree contains an entry with key 1:
-```
-bool key_present = tree.contains(1);
-```
-
----
-
-### height()
-*Runtime:* **O(1)**
-
-Returns the height of the multi search tree.
-```
-size_t tree_height = tree.height();
-```
-
----
-
-### size()
-*Runtime:* **O(1)**
-
-Returns the number of entries in the multi search tree:
-```
-size_t num_entries = tree.size();
-```
-
----
-
-### empty()
-*Runtime:* **O(log(n))**
-
-Returns `true` if the multi search tree has no entries:
-```
-bool tree_empty = tree.empty();
-```
-
----
-
-### clear()
-*Runtime:* **O(n)**
-
-Deallocates all entries:
-```
-tree.clear();
-```
-
----
----
-
 ## Stack
-This is just a wrapper for `tf::vector`.
+This is just a wrapper for `tf::vector` which only provides the functionality of a stack.
 
 The insane speed comes at the cost of a memory overhead, as the vector always reallocates with twice its previous size. If sparse memory is required, the use of [Linked List](#linked-list) is recommended.
 
@@ -1045,7 +889,7 @@ In reality, clear() just resets the internal top index, which means that no actu
 ---
 
 ## FIFO Queue
-This is just a wrapper for the [Linked List](#linked-list), which provides only the functionality of a FIFO queue.
+This is just a wrapper for the [Linked List](#linked-list) which provides only the functionality of a FIFO queue.
 
 ---
 
@@ -1122,16 +966,18 @@ queue.clear();
 ---
 
 ## Priority Queue
-This is just a wrapper for the [Search Tree](#search-tree), which provides only the functionality of a priority queue.
-
-The entries are sorted by the key. If duplicate keys are expected, see [Multi Priority Queue](#multi-priority-queue).
+This is just a wrapper for the [Search Tree](#search-tree) which provides only the functionality of a priority queue.
 
 ---
 
 ### Constructor
-Constructor with `int` keys and `int` values:
+Constructor with `int` keys and `std::string` values:
 ```
-tf::prio_queue<int, int> queue;
+tf::prio_queue<int, std::string> queue;
+```
+Additionally, you can allow duplicate keys in the constructor:
+```
+tf::prio_queue<int, std::string> queue(true);
 ```
 Copy constructor, copy assignment operator, move constructor and move assignment operator also exist.
 
@@ -1140,11 +986,11 @@ Copy constructor, copy assignment operator, move constructor and move assignment
 ### insert(key, value)
 *Runtime:* **O(log(n))**
 
-*Exceptions:* Throws a tf::exception if the key already exists.
+*Exceptions:* Duplicate keys not allowed (default behaviour): throws a tf::exception if the key already exists.
 
-Adds the value 3 with the key 1 to the priority queue:
+Adds the value "hello" with the key 1 to the priority queue:
 ```
-queue.insert(1, 3);
+queue.insert(1, "hello");
 ```
 
 ---
@@ -1154,9 +1000,9 @@ queue.insert(1, 3);
 
 *Exceptions:* Throws a tf::exception if the priority queue is empty.
 
-Removes and returns the value with the smallest key:
+Removes and returns one value with the smallest key:
 ```
-int min_value = queue.next_min();
+std::string min_value = queue.next_min();
 ```
 
 ---
@@ -1166,9 +1012,9 @@ int min_value = queue.next_min();
 
 *Exceptions:* Throws a tf::exception if the priority queue is empty.
 
-Removes and returns the value with the biggest key:
+Removes and returns one value with the biggest key:
 ```
-int max_value = queue.next_max();
+std::string max_value = queue.next_max();
 ```
 
 ---
@@ -1211,96 +1057,4 @@ Deallocates all entries:
 queue.clear();
 ```
 
----
----
-
-## Multi Priority Queue
-This is just a wrapper for the [Multi Search Tree](#multi-search-tree), which provides only the functionality of a multi priority queue.
-
-The entries are sorted by the key. Values with the same key are not ordered in any particular order. If no duplicate keys are expected, the use of [Priority Queue](#priority-queue) is recommended.
-
----
-
-### Constructor
-Constructor with `int` keys and `int` values:
-```
-tf::multi_prio_queue<int, int> queue;
-```
-Copy constructor, copy assignment operator, move constructor and move assignment operator also exist.
-
----
-
-### insert(key, value)
-*Runtime:* **O(log(n))**
-
-Adds the value 3 with the key 1 to the multi priority queue:
-```
-queue.insert(1, 3);
-```
-
----
-
-### next_min()
-*Runtime:* **O(log(n))**
-
-*Exceptions:* Throws a tf::exception if the multi priority queue is empty.
-
-Removes and returns a value with the smallest key:
-```
-int min_value = queue.next_min();
-```
-
----
-
-### next_max()
-*Runtime:* **O(log(n))**
-
-*Exceptions:* Throws a tf::exception if the multi priority queue is empty.
-
-Removes and returns a value with the biggest key:
-```
-int max_value = queue.next_max();
-```
-
----
-
-### contains(key)
-*Runtime:* **O(log(n))**
-
-Returns `true` if the multi priority queue contains a value with key 3:
-```
-bool contains_value = queue.contains(3);
-```
-
----
-
-### length()
-*Runtime:* **O(1)**
-
-Returns the number of elements in the multi priority queue.
-```
-size_t num_entries = queue.length();
-```
-
----
-
-### empty()
-*Runtime:* **O(1)**
-
-Returns `true` if the multi priority queue has no entries.
-```
-bool queue_empty = queue.empty();
-```
-
----
-
-### clear()
-*Runtime:* **O(n)**
-
-Deallocates all entries:
-```
-queue.clear();
-```
-
----
 ---

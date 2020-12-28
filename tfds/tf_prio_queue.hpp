@@ -15,7 +15,8 @@ private:
 
 public:
     // constructor
-    prio_queue() {}
+    prio_queue(const bool allow_duplicate_keys = false):
+        tree(search_tree<K, V>(allow_duplicate_keys)) {}
 
     // copy constructor
     prio_queue(const prio_queue &other):

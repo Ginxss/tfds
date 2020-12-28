@@ -3,6 +3,9 @@
 
 #include <algorithm> // std::swap
 #include "tf_exception.hpp"
+#include "tf_compare_functions.hpp"
+
+// #include "tf_vector.hpp"
 
 namespace tf {
 
@@ -12,26 +15,175 @@ namespace tf {
 template <typename K, typename V>
 class search_tree {
 private:
+    struct value_bucket {
+        V value;
+        value_bucket *next;
+
+        value_bucket(const V &value, value_bucket *next):
+            value(value), next(next) {}
+    };
+
     struct node {
         K key;
-        V value;
+        value_bucket *bucket;
         size_t height;
         node *parent;
         node *left;
         node *right;
 
-        node(const K &key, const V &value, const size_t height, node *parent, node *left, node *right):
-            key(key), value(value), height(height), parent(parent), left(left), right(right) {}
+        node(const K &key, value_bucket *bucket, const size_t height, node *parent, node *left, node *right):
+            key(key), bucket(bucket), height(height), parent(parent), left(left), right(right) {}
     };
 
-    node *new_node(const K &key, const V &value, node *parent) {
-        node *n = new node(key, value, 1, parent, nullptr, nullptr);
+    class iterator {
+    private:
+        search_tree *tree;
+        value_bucket *current_bucket;
+        node *current_node;
+
+        void next_bucket() {
+            if (current_bucket->next) {
+                current_bucket = current_bucket->next;
+                return;
+            }
+
+            current_node = tree->successor(current_node);
+            if (current_node)
+                current_bucket = current_node->bucket;
+            else
+                current_bucket = nullptr;
+        }
+
+        void prev_bucket() {
+            if (current_bucket->next) {
+                current_bucket = current_bucket->next;
+                return;
+            }
+
+            current_node = tree->predecessor(current_node);
+            if (current_node)
+                current_bucket = current_node->bucket;
+            else
+                current_bucket = nullptr;
+        }
+    
+    public:
+        iterator(search_tree *tree, const bool forward):
+            tree(tree)
+        {
+            if (forward)
+                current_node = tree->min_node(tree->root);
+            else
+                current_node = tree->max_node(tree->root);
+            
+            if (current_node)
+                current_bucket = current_node->bucket;
+            else
+                current_bucket = nullptr;
+        }
+
+        const K &key() const { return current_node->key; }
+        V &operator*() { return current_bucket->value; }
+        V &value() { return current_bucket->value; }
+        void operator++() { next_bucket(); }
+        void operator--() { prev_bucket(); }
+        bool condition() const { return current_bucket != nullptr; }
+    };
+
+    class const_iterator {
+    private:
+        const search_tree *tree;
+        value_bucket *current_bucket;
+        node *current_node;
+
+        void next_bucket() {
+            if (current_bucket->next) {
+                current_bucket = current_bucket->next;
+                return;
+            }
+
+            current_node = tree->successor(current_node);
+            if (current_node)
+                current_bucket = current_node->bucket;
+            else
+                current_bucket = nullptr;
+        }
+
+        void prev_bucket() {
+            if (current_bucket->next) {
+                current_bucket = current_bucket->next;
+                return;
+            }
+
+            current_node = tree->predecessor(current_node);
+            if (current_node)
+                current_bucket = current_node->bucket;
+            else
+                current_bucket = nullptr;
+        }
+    
+    public:
+        const_iterator(const search_tree *tree, const bool forward):
+            tree(tree)
+        {
+            if (forward)
+                current_node = tree->min_node(tree->root);
+            else
+                current_node = tree->max_node(tree->root);
+            
+            if (current_node)
+                current_bucket = current_node->bucket;
+            else
+                current_bucket = nullptr;
+        }
+
+        const K &key() const { return current_node->key; }
+        const V &operator*() const { return current_bucket->value; }
+        const V &value() const { return current_bucket->value; }
+        void operator++() { next_bucket(); }
+        void operator--() { prev_bucket(); }
+        bool condition() const { return current_bucket != nullptr; }
+    };
+
+
+    // VARIABLES
+
+    size_t size_;
+    bool allow_duplicate_keys;
+    node *root;
+
+    // METHODS
+
+    value_bucket *create_value_bucket(const V &value, value_bucket *next) {
+        value_bucket *b = new value_bucket(value, next);
+        ++size_;
+        return b;
+    }
+
+    void destroy_value_bucket(value_bucket *b) {
+        --size_;
+        delete b;
+    }
+
+    void destroy_all_value_buckets(value_bucket *b) {
+        while (b) {
+            value_bucket *to_delete = b;
+            b = b->next;
+            destroy_value_bucket(to_delete);
+        }
+    }
+
+    node *create_node(const K &key, const V &value, node *parent) {
+        node *n = new node(key, create_value_bucket(value, nullptr), 1, parent, nullptr, nullptr);
         ++size_;
         return n;
     }
 
-    void delete_node(node *n) {
-        --size_;
+    void destroy_node(node *n, const bool delete_values = true) {
+        if (delete_values) {
+            destroy_all_value_buckets(n->bucket);
+        }
+
         delete n;
     }
 
@@ -63,6 +215,88 @@ private:
         }
     }
 
+    bool is_left_child(node *child) const {
+        node *parent = child->parent;
+        if (parent->left && parent->left->key == child->key)
+            return true;
+
+        return false;
+    }
+
+    node *left_rotation(node *n) {
+        node *replacing = n->right;
+
+        if (n->parent) {
+            if (is_left_child(n))
+                set_left(n->parent, replacing);
+            else
+                set_right(n->parent, replacing);
+        }
+        else {
+            replacing->parent = nullptr;
+            root = replacing;
+        }
+
+        set_right(n, replacing->left);
+        set_left(replacing, n);
+
+        update_height(replacing->left);
+        update_height(replacing->right);
+        update_height(replacing);
+        return replacing;
+    }
+
+    node *right_rotation(node *n) {
+        node *replacing = n->left;
+
+        if (n->parent) {
+            if (is_left_child(n))
+                set_left(n->parent, replacing);
+            else
+                set_right(n->parent, replacing);
+        }
+        else {
+            replacing->parent = nullptr;
+            root = replacing;
+        }
+
+        set_left(n, replacing->right);
+        set_right(replacing, n);
+
+        update_height(replacing->left);
+        update_height(replacing->right);
+        update_height(replacing);
+        return replacing;
+    }
+
+    void rebalance_upward(node *n) {
+        node *it = n;
+        while (it) {
+            int balance = node_height(it->right) - node_height(it->left);
+            if (balance > 1) {
+                if (node_height(it->right->right) > node_height(it->right->left)) {
+                    it = left_rotation(it);
+                }
+                else {
+                    it->right = right_rotation(it->right);
+                    it = left_rotation(it);
+                }
+            }
+            else if (balance < -1) {
+                if (node_height(it->left->left) > node_height(it->left->right)) {
+                    it = right_rotation(it);
+                }
+                else {
+                    it->left = left_rotation(it->left);
+                    it = right_rotation(it);
+                }
+            }
+
+            update_height(it);
+            it = it->parent;
+        }
+    }
+
     node *min_node(node *n) const {
         node *it = n;
         if (it) {
@@ -83,16 +317,6 @@ private:
         }
 
         return it;
-    }
-
-    bool is_left_child(node *child) const {
-        if (child) {
-            node *parent = child->parent;
-            if (parent && parent->left && parent->left->key == child->key)
-                return true;
-        }
-
-        return false;
     }
 
     node *successor(node *n) const {
@@ -127,176 +351,46 @@ private:
         return nullptr;
     }
 
-public:
-    class iterator {
-    private:
-        search_tree *tree;
-        node *current_node;
-    
-    public:
-        iterator(search_tree *tree, const bool forward):
-            tree(tree)
-        {
-            if (forward)
-                current_node = tree->min_node(tree->root);
-            else
-                current_node = tree->max_node(tree->root);
-        }
-
-        const K &key() const { return current_node->key; }
-        V &operator*() { return current_node->value; }
-        V &value() { return current_node->value; }
-        void operator++() { current_node = tree->successor(current_node); }
-        void operator--() { current_node = tree->predecessor(current_node); }
-        bool condition() const { return current_node != nullptr; }
-    };
-
-    class const_iterator {
-    private:
-        const search_tree *tree;
-        node *current_node;
-    
-    public:
-        const_iterator(const search_tree *tree, const bool forward):
-            tree(tree)
-        {
-            if (forward)
-                current_node = tree->min_node(tree->root);
-            else
-                current_node = tree->max_node(tree->root);
-        }
-
-        const K &key() const { return current_node->key; }
-        const V &operator*() const { return current_node->value; }
-        const V &value() const { return current_node->value; }
-        void operator++() { current_node = tree->successor(current_node); }
-        void operator--() { current_node = tree->predecessor(current_node); }
-        bool condition() const { return current_node != nullptr; }
-    };
-
-private:
-    // VARIABLES
-
-    size_t size_;
-    node *root;
-
-    // METHODS
-
-    node *left_rotation(node *n) {
-        node *new_root = n->right;
-        if (n == root)
-            root = new_root;
-
-        if (n->parent) {
-            if (is_left_child(n))
-                set_left(n->parent, new_root);
-            else
-                set_right(n->parent, new_root);
-        }
-        else {
-            new_root->parent = nullptr;
-        }
-
-        set_right(n, new_root->left);
-        set_left(new_root, n);
-
-        update_height(new_root->left);
-        update_height(new_root->right);
-        update_height(new_root);
-        return new_root;
-    }
-
-    node *right_rotation(node *n) {
-        node *new_root = n->left;
-        if (n == root)
-            root = new_root;
-
-        if (n->parent) {
-            if (is_left_child(n))
-                set_left(n->parent, new_root);
-            else
-                set_right(n->parent, new_root);
-        }
-        else {
-            new_root->parent = nullptr;
-        }
-
-        set_left(n, new_root->right);
-        set_right(new_root, n);
-
-        update_height(new_root->left);
-        update_height(new_root->right);
-        update_height(new_root);
-        return new_root;
-    }
-
-    void rebalance_upward(node *n) {
-        node *it = n;
-        while (it) {
-            update_height(it);
-            int balance = node_height(it->right) - node_height(it->left);
-            if (balance > 1) {
-                if (node_height(it->right->right) > node_height(it->right->left)) {
-                    it = left_rotation(it);
-                    return;
-                }
-                else {
-                    it->right = right_rotation(it->right);
-                    it = left_rotation(it);
-                    return;
-                }
-            }
-            else if (balance < -1) {
-                if (node_height(it->left->left) > node_height(it->left->right)) {
-                    it = right_rotation(it);
-                    return;
-                }
-                else {
-                    it->left = left_rotation(it->left);
-                    it = right_rotation(it);
-                    return;
-                }
-            }
-
-            it = it->parent;
-        }
-    }
-
     void remove_leaf(node *to_delete) {
         if (to_delete->parent) {
             if (is_left_child(to_delete))
                 to_delete->parent->left = nullptr;
             else
                 to_delete->parent->right = nullptr;
+            
+            rebalance_upward(to_delete->parent);
         }
         else {
             root = nullptr;
+            rebalance_upward(root);
         }
 
-        delete_node(to_delete);
+        destroy_node(to_delete);
     }
 
     void remove_single_parent(node *to_delete) {
-        node *new_root = (to_delete->left) ? to_delete->left : to_delete->right;
+        node *replacing = (to_delete->left) ? to_delete->left : to_delete->right;
         if (to_delete->parent) {
             if (is_left_child(to_delete))
-                set_left(to_delete->parent, new_root);
+                set_left(to_delete->parent, replacing);
             else
-                set_right(to_delete->parent, new_root);
+                set_right(to_delete->parent, replacing);
         }
         else {
-            new_root->parent = nullptr;
-            root = new_root;
+            replacing->parent = nullptr;
+            root = replacing;
         }
 
-        delete_node(to_delete);
+        rebalance_upward(replacing);
+        destroy_node(to_delete);
     }
 
     void remove_double_parent(node *to_delete) {
         node *succ = successor(to_delete);
         
-        to_delete->key = succ->key;
-        to_delete->value = succ->value;
+        using std::swap;
+        swap(to_delete->key, succ->key);
+        swap(to_delete->bucket, succ->bucket);
 
         if (succ->right)
             remove_single_parent(succ);
@@ -304,9 +398,7 @@ private:
             remove_leaf(succ);
     }
 
-    // uses one of the three methods above to remove a node and return its value.
-    V remove_node(node *n) {
-        V result = n->value;
+    void remove_node(node *n) {
         node *parent = n->parent;
 
         if (n->left && n->right)
@@ -315,26 +407,19 @@ private:
             remove_single_parent(n);
         else
             remove_leaf(n);
-
-        if (!empty()) {
-            node *replacing = (parent) ? parent : root;
-            update_height(replacing->left);
-            update_height(replacing->right);
-            rebalance_upward(replacing);
-        }
-
-        return result;
     }
 
 public:
     // constructor
-    search_tree():
+    search_tree(const bool allow_duplicate_keys = false):
         size_(0),
+        allow_duplicate_keys(allow_duplicate_keys),
         root(nullptr) {}
 
     // copy constructor
     search_tree(const search_tree &other):
         size_(0),
+        allow_duplicate_keys(other.allow_duplicate_keys),
         root(nullptr)
     {
         for (auto it = other.begin(); it.condition(); ++it) {
@@ -350,6 +435,7 @@ public:
     friend void swap(search_tree &first, search_tree &second) noexcept {
         using std::swap;
         swap(first.size_, second.size_);
+        swap(first.allow_duplicate_keys, second.allow_duplicate_keys);
         swap(first.root, second.root);
     }
 
@@ -373,7 +459,7 @@ public:
     // O(log(n))
     void insert(const K &key, const V &value) {
         if (empty()) {
-            root = new_node(key, value, nullptr);
+            root = create_node(key, value, nullptr);
         }
         else {
             node *it = root;
@@ -383,7 +469,7 @@ public:
                         it = it->left;
                     }
                     else {
-                        it->left = new_node(key, value, it);
+                        it->left = create_node(key, value, it);
                         break;
                     }
                 }
@@ -392,12 +478,17 @@ public:
                         it = it->right;
                     }
                     else {
-                        it->right = new_node(key, value, it);
+                        it->right = create_node(key, value, it);
                         break;
                     }
                 }
                 else { // if (key == it->key)
-                    throw exception("search tree: insert: key already exists");
+                    if (!allow_duplicate_keys) {
+                        throw exception("search tree: insert: key already exists");
+                    }
+
+                    it->bucket = create_value_bucket(value, it->bucket);
+                    return;
                 }
             }
 
@@ -416,11 +507,87 @@ public:
                 it = it->right;
             }
             else {
-                return remove_node(it);
+                value_bucket *to_delete = it->bucket;
+                V result = to_delete->value;
+
+                if (to_delete->next) {
+                    it->bucket = to_delete->next;
+                    destroy_value_bucket(to_delete);
+                }
+                else {
+                    remove_node(it);
+                }
+
+                return result;
             }
         }
 
         throw exception("search tree: remove: key not found");
+    }
+
+    // O(log(n))
+    V remove_all(const K &key) {
+        node *it = root;
+        while (it) {
+            if (key < it->key) {
+                it = it->left;
+            }
+            else if (key > it->key) {
+                it = it->right;
+            }
+            else {
+                V result = it->bucket->value;
+                remove_node(it);
+                return result;
+            }
+        }
+
+        throw exception("search tree: remove: key not found");
+    }
+
+    // O(log(n) + #values with that key)
+    V remove_value(const K &key, const V &value) {
+        node *it = root;
+        while (it) {
+            if (key < it->key) {
+                it = it->left;
+            }
+            else if (key > it->key) {
+                it = it->right;
+            }
+            else {
+                value_bucket *bucket_it = it->bucket;
+                value_bucket *prev = nullptr;
+                while (bucket_it) {
+                    if (compare<V>(value, bucket_it->value)) {
+                        V result = bucket_it->value;
+
+                        if (prev) {
+                            prev->next = bucket_it->next;
+                            destroy_value_bucket(bucket_it);
+                        }
+                        else {
+                            if (bucket_it->next) {
+                                it->bucket = bucket_it->next;
+                                destroy_value_bucket(bucket_it);
+                            }
+                            else {
+                                remove_node(it);
+                            }
+                        }
+
+                        return result;
+                    }
+
+                    prev = bucket_it;
+                    bucket_it = bucket_it->next;
+                }
+
+                throw exception("search tree: remove_value: value not found");
+            }
+        }
+
+        throw exception("search tree: remove_value: key not found");
     }
 
     // O(log(n))
@@ -434,7 +601,7 @@ public:
                 it = it->right;
             }
             else {
-                return it->value;
+                return it->bucket->value;
             }
         }
 
@@ -452,7 +619,7 @@ public:
                 it = it->right;
             }
             else {
-                return it->value;
+                return it->bucket->value;
             }
         }
 
@@ -470,7 +637,7 @@ public:
                 it = it->right;
             }
             else {
-                return it->value;
+                return it->bucket->value;
             }
         }
 
@@ -482,12 +649,7 @@ public:
         if (empty())
             throw exception("search tree: min: tree is empty");
 
-        node *it = root;
-        while (it->left) {
-            it = it->left;
-        }
-
-        return it->value;
+        return min_node(root)->bucket->value;
     }
 
     // O(log(n))
@@ -495,12 +657,7 @@ public:
         if (empty())
             throw exception("search tree: min: tree is empty");
 
-        node *it = root;
-        while (it->left) {
-            it = it->left;
-        }
-
-        return it->value;
+        return min_node(root)->bucket->value;
     }
 
     // O(log(n))
@@ -508,12 +665,7 @@ public:
         if (empty())
             throw exception("search tree: max: tree is empty");
 
-        node *it = root;
-        while (it->right) {
-            it = it->right;
-        }
-
-        return it->value;
+        return max_node(root)->bucket->value;
     }
 
     // O(log(n))
@@ -521,12 +673,7 @@ public:
         if (empty())
             throw exception("search tree: max: tree is empty");
 
-        node *it = root;
-        while (it->right) {
-            it = it->right;
-        }
-
-        return it->value;
+        return max_node(root)->bucket->value;
     }
 
     // O(log(n))
@@ -534,12 +681,19 @@ public:
         if (empty())
             throw exception("search tree: pop_min: tree is empty");
 
-        node *it = root;
-        while (it->left) {
-            it = it->left;
+        node *n = min_node(root);
+        value_bucket *to_delete = n->bucket;
+        V result = to_delete->value;
+
+        if (to_delete->next) {
+            n->bucket = to_delete->next;
+            destroy_value_bucket(to_delete);
+        }
+        else {
+            remove_node(n);
         }
         
-        return remove_node(it);
+        return result;
     }
 
     // O(log(n))
@@ -547,12 +701,19 @@ public:
         if (empty())
             throw exception("search tree: pop_max: tree is empty");
         
-        node *it = root;
-        while (it->right) {
-            it = it->right;
-        }
+        node *n = max_node(root);
+        value_bucket *to_delete = n->bucket;
+        V result = to_delete->value;
 
-        return remove_node(it);
+        if (to_delete->next) {
+            n->bucket = to_delete->next;
+            destroy_value_bucket(to_delete);
+        }
+        else {
+            remove_node(n);
+        }
+        
+        return result;
     }
 
     // O(log(n))
@@ -632,10 +793,63 @@ public:
                     root = nullptr;
                 }
 
-                delete_node(to_delete);
+                destroy_node(to_delete);
             }
         }
     }
+
+    // DEBUG
+    /* void print() {
+        tf::vector<node*> level;
+        tf::vector<node*> next_level;
+
+        level.add(root);
+
+        while (true) {
+            std::cout << "|";
+
+            for (int i = 0; i < level.size(); ++i) {
+                node *it = level[i];
+                if (it) {
+                    value_bucket *b = it->bucket;
+                    std::cout << " (" << it->height << ") " << b->value;
+
+                    while (b->next) {
+                        std::cout << "," << b->next->value;
+                        b = b->next;
+                    }
+
+                    next_level.add(it->left);
+                    next_level.add(it->right);
+                }
+                else {
+                    std::cout << " -";
+                    next_level.add(nullptr);
+                    next_level.add(nullptr);
+                }
+
+                std::cout << " |";
+            }
+
+            std::cout << std::endl;
+
+            bool cancel = true;
+            for (int i = 0; i < next_level.size(); ++i) {
+                if (next_level[i] != nullptr) {
+                    cancel = false;
+                    break;
+                }
+            }
+            if (cancel) {
+                break;
+            }
+
+            level = next_level;
+            next_level.clear();
+        }
+
+        std::cout << std::endl;
+    } */
 };
 
 }

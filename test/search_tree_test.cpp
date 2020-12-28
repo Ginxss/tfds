@@ -188,8 +188,9 @@ void test_clear(tf::search_tree<int, std::string> &t) {
 	assert(t.empty() == true);
 }
 
+#include "../tfds/tf_prio_queue.hpp"
 int main(int argc, char *argv[]) {
-	try {
+	/* try {
 		tf::search_tree<int, std::string> result = test_construction();
 		test_insert_and_get(result);
 		test_iterator(result);
@@ -205,7 +206,41 @@ int main(int argc, char *argv[]) {
 		assert(false);
 	}
 
-	std::cout << "All tests successful." << std::endl;
+	std::cout << "All tests successful." << std::endl; */
+
+	tf::search_tree<int, std::string> t(true);
+	t.insert(2, "two");
+	t.insert(1, "one");
+	t.insert(3, "three");
+	t.insert(3, "threes");
+	t.insert(17, "seventeen");
+	t.insert(15, "fifteen");
+	t.insert(150, "onefifty");
+	t.insert(1000, "thousand");
+	t.insert(-10, "-ten");
+	t.insert(-100, "-hundred");
+	t.insert(-20, "-twenty");
+	t.insert(-2, "-2");
+	t.insert(10, "ten");
+
+	t.print();
+	for (auto it = t.begin(); it.condition(); ++it) {
+		std::cout << *it << std::endl;
+	}
+	std::cout << std::endl;
+
+	std::cout << "Removed: " << t.remove_value(3, "three") << std::endl << std::endl;
+	std::cout << "Removed: " << t.remove(3) << std::endl << std::endl;
+
+	t.print();
+	for (auto it = t.begin(); it.condition(); ++it) {
+		std::cout << *it << std::endl;
+	}
+	std::cout << std::endl;
+
+	tf::prio_queue<int, std::string> queue;
+	queue.insert(1, "hello");
+	std::cout << queue.next_max() << std::endl;
 
 	return 0;
 }
