@@ -2,137 +2,102 @@
 #include <iostream>
 #include "../tfds/tf_vector.hpp"
 
-tf::vector<std::string> test_construction() {
-	tf::vector<std::string> v1;
-	assert(v1.size() == 0);
-	assert(v1.empty() == true);
-	assert(v1.current_capacity() == 10);
+// For manual testing
+void print_vector_info(const tf::vector<std::string> &v, const std::string &message = "Array info") {
+	std::cout << message << ":" << std::endl << std::endl;
+	std::cout << "Size: " << v.size() << std::endl;
+	std::cout << "Empty: " << v.empty() << std::endl;
+	std::cout << "Capacity: " << v.current_capacity() << std::endl;
 
-	tf::vector<std::string> v2(4);
-	assert(v2.size() == 0);
-	assert(v2.empty() == true);
-	assert(v2.current_capacity() == 4);
-
-	return v2;
-}
-
-void test_add_and_get(tf::vector<std::string> &v) {
-	assert(v.size() == 0);
-	assert(v.empty() == true);
-	assert(v.current_capacity() == 4);
-
-	v.add("zero");
-	assert(v.get(0) == "zero");
-
-	v.add("one");
-	assert(v[1] == "one");
-
-	assert(v.size() == 2);
-	assert(v.empty() == false);
-	assert(v.current_capacity() == 4);
-}
-
-void test_reallocation(tf::vector<std::string> &v) {
-	assert(v.size() == 2);
-	assert(v.empty() == false);
-	assert(v.current_capacity() == 4);
-
-	v.add("two");
-	v.add("three");
-	assert(v.size() == 4);
-	assert(v.empty() == false);
-	assert(v.current_capacity() == 4);
-
-	v.add("four");
-	assert(v.size() == 5);
-	assert(v.current_capacity() == 8);
-}
-
-void test_remove(tf::vector<std::string> &v) {
-	assert(v.size() == 5);
-	assert(v.current_capacity() == 8);
-
-	assert(v.remove(2) == "two");
-	assert(v.size() == 4);
-	assert(v.current_capacity() == 8);
-
-	assert(v.get(2) == "three");
-	assert(v.get(3) == "four");
-}
-
-void test_contains(const tf::vector<std::string> &v) {
-	assert(v.size() == 4);
-	assert(v.current_capacity() == 8);
-
-	assert(v.contains("two") == false);
-	assert(v.contains("three") == true);
-}
-
-void test_copying(const tf::vector<std::string> &v) {
-	assert(v.size() == 4);
-	assert(v.empty() == false);
-	assert(v.current_capacity() == 8);
-	assert(v.get(1) == "one");
-
-	const tf::vector<std::string> v2 = v;
-	assert(v2.size() == 4);
-	assert(v2.empty() == false);
-	assert(v2.current_capacity() == 8);
-	assert(v2.get(1) == "one");
-
-	tf::vector<std::string> v3;
-	v3 = v;
-	assert(v3.size() == 4);
-	assert(v3.empty() == false);
-	assert(v3.current_capacity() == 8);
-	assert(v3.get(1) == "one");
-
-	const tf::vector<std::string> v4(std::move(v3));
-	assert(v4.size() == 4);
-	assert(v4.empty() == false);
-	assert(v4.current_capacity() == 8);
-	assert(v4.get(1) == "one");
-
-	assert(v3.size() == 0);
-	assert(v3.empty() == true);
-	assert(v3.current_capacity() == 1);
-}
-
-void test_set_all(tf::vector<std::string> &v) {
-	assert(v.size() == 4);
-	assert(v.empty() == false);
-	assert(v.current_capacity() == 8);
-	assert(v.get(1) == "one");
-
-	v.set_all("new");
-	assert(v.size() == 4);
-	assert(v.empty() == false);
-	assert(v.current_capacity() == 8);
-	assert(v.get(1) == "new");
-}
-
-void test_clear(tf::vector<std::string> &v) {
-	assert(v.size() == 4);
-	assert(v.empty() == false);
-	assert(v.current_capacity() == 8);
-	assert(v.get(2) == "new");
-
-	v.clear();
-	assert(v.size() == 0);
-	assert(v.empty() == true);
-	assert(v.current_capacity() == 8);
+	std::cout << "Content: ";
+	for (int i = 0; i < v.size(); ++i) {
+		std::cout << v.get(i) << " | ";
+	}
+	
+	std::cout << std::endl << std::endl << "----------------------------------------" << std::endl << std::endl;
 }
 
 int main(int argc, char *argv[]) {
 	try {
-		tf::vector<std::string> result = test_construction();
-		test_add_and_get(result);
-		test_reallocation(result);
-		test_remove(result);
-		test_contains(result);
-		test_copying(result);
-		test_set_all(result);
-		test_clear(result);
+		// construction
+		tf::vector<std::string> v;
+		tf::vector<std::string> v2(1000);
+		tf::vector<std::string> v3(0);
+
+		assert(v.size() == 0);
+		assert(v.empty() == true);
+		assert(v.current_capacity() == 10);
+		assert(v2.size() == 0);
+		assert(v2.empty() == true);
+		assert(v2.current_capacity() == 1000);
+		assert(v3.size() == 0);
+		assert(v3.empty() == true);
+		assert(v3.current_capacity() == 1);
+
+		// add and get
+		v.add("zero");
+		assert(v.size() == 1);
+		assert(v.empty() == false);
+		assert(v.get(0) == "zero" && v[0] == "zero");
+
+		v.add("one");
+		assert(v.get(0) == "zero" && v[0] == "zero");
+		assert(v.get(1) == "one" && v[1] == "one");
+
+		v.add("two");
+		assert(v.size() == 3);
+		assert(v.current_capacity() == 10);
+		assert(v.get(0) == "zero" && v[0] == "zero");
+		assert(v.get(1) == "one" && v[1] == "one");
+		assert(v.get(2) == "two" && v[2] == "two");
+		try {
+			v.get(3);
+			assert(false);
+		}
+		catch (tf::exception &) {
+			assert(true);
+		}
+
+		// reallocation
+		v.add("three");
+		v.add("four");
+		v.add("five");
+		v.add("six");
+		v.add("seven");
+		v.add("eight");
+		v.add("nine");
+		assert(v.size() == 10);
+		assert(v.current_capacity() == 10);
+
+		v.add("ten");
+		assert(v.size() == 11);
+		assert(v.current_capacity() == 20);
+		assert(v.get(0) == "zero" && v[0] == "zero");
+		assert(v.get(1) == "one" && v[1] == "one");
+		assert(v.get(2) == "two" && v[2] == "two");
+		assert(v.get(10) == "ten" && v[10] == "ten");
+
+		// contains and remove
+		assert(v.contains("two") == true);
+		assert(v.contains("twee") == false);
+		assert(v.remove(2) == "two");
+		assert(v.contains("two") == false);
+
+		// set all
+		v.set_all("blah");
+		for (int i = 0; i < v.size(); ++i) {
+			assert(v.get(i) == "blah" && v[i] == "blah");
+		}
+
+		// clear
+		assert(v.size() == 10);
+		assert(v.empty() == false);
+		assert(v.current_capacity() == 20);
+		
+		v.clear();
+		assert(v.size() == 0);
+		assert(v.empty() == true);
+		assert(v.current_capacity() == 20);
 	}
 	catch (tf::exception &e) {
 		std::cout << e.what() << std::endl;

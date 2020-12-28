@@ -5,8 +5,6 @@
 #include "tf_exception.hpp"
 #include "tf_compare_functions.hpp"
 
-// #include "tf_vector.hpp"
-
 namespace tf {
 
 /*
@@ -15,6 +13,8 @@ namespace tf {
 template <typename K, typename V>
 class search_tree {
 private:
+    // VALUE BUCKET
+
     struct value_bucket {
         V value;
         value_bucket *next;
@@ -22,6 +22,8 @@ private:
         value_bucket(const V &value, value_bucket *next):
             value(value), next(next) {}
     };
+
+    // NODE
 
     struct node {
         K key;
@@ -34,6 +36,8 @@ private:
         node(const K &key, value_bucket *bucket, const size_t height, node *parent, node *left, node *right):
             key(key), bucket(bucket), height(height), parent(parent), left(left), right(right) {}
     };
+
+    // ITERATORS
 
     class iterator {
     private:
@@ -175,7 +179,6 @@ private:
 
     node *create_node(const K &key, const V &value, node *parent) {
         node *n = new node(key, create_value_bucket(value, nullptr), 1, parent, nullptr, nullptr);
-        ++size_;
         return n;
     }
 
@@ -217,7 +220,7 @@ private:
 
     bool is_left_child(node *child) const {
         node *parent = child->parent;
-        if (parent->left && parent->left->key == child->key)
+        if (parent->left && equals<K>(parent->left->key, child->key))
             return true;
 
         return false;
@@ -464,7 +467,7 @@ public:
         else {
             node *it = root;
             while (true) {
-                if (key < it->key) {
+                if (less_than<K>(key, it->key)) {
                     if (it->left) {
                         it = it->left;
                     }
@@ -473,7 +476,7 @@ public:
                         break;
                     }
                 }
-                else if (key > it->key) {
+                else if (greater_than<K>(key, it->key)) {
                     if (it->right) {
                         it = it->right;
                     }
@@ -500,10 +503,10 @@ public:
     V remove(const K &key) {
         node *it = root;
         while (it) {
-            if (key < it->key) {
+            if (less_than<K>(key, it->key)) {
                 it = it->left;
             }
-            else if (key > it->key) {
+            else if (greater_than<K>(key, it->key)) {
                 it = it->right;
             }
             else {
@@ -529,10 +532,10 @@ public:
     V remove_all(const K &key) {
         node *it = root;
         while (it) {
-            if (key < it->key) {
+            if (less_than<K>(key, it->key)) {
                 it = it->left;
             }
-            else if (key > it->key) {
+            else if (greater_than<K>(key, it->key)) {
                 it = it->right;
             }
             else {
@@ -549,17 +552,17 @@ public:
     V remove_value(const K &key, const V &value) {
         node *it = root;
         while (it) {
-            if (key < it->key) {
+            if (less_than<K>(key, it->key)) {
                 it = it->left;
             }
-            else if (key > it->key) {
+            else if (greater_than<K>(key, it->key)) {
                 it = it->right;
             }
             else {
                 value_bucket *bucket_it = it->bucket;
                 value_bucket *prev = nullptr;
                 while (bucket_it) {
-                    if (compare<V>(value, bucket_it->value)) {
+                    if (equals<V>(value, bucket_it->value)) {
                         V result = bucket_it->value;
 
                         if (prev) {
@@ -594,10 +597,10 @@ public:
     const V &get(const K &key) const {
         node *it = root;
         while (it) {
-            if (key < it->key) {
+            if (less_than<K>(key, it->key)) {
                 it = it->left;
             }
-            else if (key > it->key) {
+            else if (greater_than<K>(key, it->key)) {
                 it = it->right;
             }
             else {
@@ -612,10 +615,10 @@ public:
     V &operator[](const K &key) {
         node *it = root;
         while (it) {
-            if (key < it->key) {
+            if (less_than<K>(key, it->key)) {
                 it = it->left;
             }
-            else if (key > it->key) {
+            else if (greater_than<K>(key, it->key)) {
                 it = it->right;
             }
             else {
@@ -630,10 +633,10 @@ public:
     const V &operator[](const K &key) const {
         node *it = root;
         while (it) {
-            if (key < it->key) {
+            if (less_than<K>(key, it->key)) {
                 it = it->left;
             }
-            else if (key > it->key) {
+            else if (greater_than<K>(key, it->key)) {
                 it = it->right;
             }
             else {
@@ -740,10 +743,10 @@ public:
     bool contains(const K &key) const {
         node *it = root;
         while (it) {
-            if (key < it->key) {
+            if (less_than<K>(key, it->key)) {
                 it = it->left;
             }
-            else if (key > it->key) {
+            else if (greater_than<K>(key, it->key)) {
                 it = it->right;
             }
             else {
@@ -767,6 +770,11 @@ public:
     // O(1)
     bool empty() const {
         return root == nullptr;
+    }
+
+    // O(1)
+    bool allows_duplicate_keys() const {
+        return allow_duplicate_keys;
     }
 
     // O(n)
@@ -799,7 +807,7 @@ public:
     }
 
     // DEBUG
-    /* void print() {
+    /* void print() const {
         tf::vector<node*> level;
         tf::vector<node*> next_level;
 

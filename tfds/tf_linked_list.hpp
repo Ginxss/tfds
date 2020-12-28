@@ -154,7 +154,7 @@ public:
     void add_after(const T &new_value, const T &existing_value) {
         node *it = start_node;
         while (it) {
-            if (compare<T>(existing_value, it->value)) {
+            if (equals<T>(existing_value, it->value)) {
                 if (it == end_node)
                     add_back(new_value);
                 else
@@ -173,7 +173,7 @@ public:
     void add_before(const T &new_value, const T &existing_value) {
         node *it = start_node;
         while (it) {
-            if (compare<T>(existing_value, it->value)) {
+            if (equals<T>(existing_value, it->value)) {
                 if (it == start_node)
                     add_front(new_value);
                 else
@@ -192,7 +192,7 @@ public:
     void remove(const T &value) {
         node *it = start_node;
         while (it) {
-            if (compare<T>(value, it->value)) {
+            if (equals<T>(value, it->value)) {
                 if (it == start_node) {
                     pop_front();
                 }
@@ -312,7 +312,7 @@ public:
     bool contains(const T &value) const {
         node *it = start_node;
         while (it) {
-            if (compare<T>(value, it->value)) {
+            if (equals<T>(value, it->value)) {
                 return true;
             }
 

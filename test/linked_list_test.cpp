@@ -2,6 +2,7 @@
 #include <iostream>
 #include "../tfds/tf_linked_list.hpp"
 
+// For manual testing
 void print_list_info(const tf::linked_list<std::string> &l, const std::string &message = "Linked List info") {
 	std::cout << message << ":" << std::endl << std::endl;
 	std::cout << "Length: " << l.length() << std::endl;
@@ -15,235 +16,120 @@ void print_list_info(const tf::linked_list<std::string> &l, const std::string &m
 	std::cout << std::endl << std::endl << "----------------------------------------" << std::endl << std::endl;
 }
 
-tf::linked_list<std::string> test_construction() {
-	tf::linked_list<std::string> l1;
-	assert(l1.length() == 0);
-	assert(l1.empty() == true);
-
-	return l1;
-}
-
-void test_add_back_and_back(tf::linked_list<std::string> &l) {
-	assert(l.length() == 0);
-	assert(l.empty() == true);
-
-	l.add_back("three");
-	assert(l.back() == "three");
-
-	l.add_back("four");
-	assert(l.back() == "four");
-}
-
-void test_add_front_and_front(tf::linked_list<std::string> &l) {
-	assert(l.length() == 2);
-	assert(l.empty() == false);
-
-	l.add_front("two");
-	assert(l.front() == "two");
-
-	l.add_front("one");
-	assert(l.front() == "one");
-}
-
-void test_add_after(tf::linked_list<std::string> &l) {
-	assert(l.length() == 4);
-	assert(l.empty() == false);
-
-	l.add_after("after_two", "two");
-	assert(l.length() == 5);
-
-	l.add_after("end", "four");
-	assert(l.length() == 6);
-	assert(l.back() == "end");
-}
-
-void test_add_before(tf::linked_list<std::string> &l) {
-	assert(l.length() == 6);
-	assert(l.empty() == false);
-
-	l.add_before("before_three", "three");
-	assert(l.length() == 7);
-
-	l.add_before("start", "one");
-	assert(l.length() == 8);
-	assert(l.front() == "start");
-}
-
-void test_iterator(const tf::linked_list<std::string> &l) {
-	assert(l.length() == 8);
-	assert(l.empty() == false);
-
-	int i = 0;
-	for (auto it = l.begin(); it.condition(); ++it) {
-		switch (i) {
-		case 0: assert(*it == "start"); break;
-		case 1: assert(*it == "one"); break;
-		case 2: assert(*it == "two"); break;
-		case 3: assert(*it == "after_two"); break;
-		case 4: assert(*it == "before_three"); break;
-		case 5: assert(*it == "three"); break;
-		case 6: assert(*it == "four"); break;
-		case 7: assert(*it == "end"); break;
-		default: assert(false);
-		}
-		i++;
-	}
-	assert(i == 8);
-
-	for (auto it = l.end(); it.condition(); --it) {
-		i--;
-		switch (i) {
-		case 0: assert(*it == "start"); break;
-		case 1: assert(*it == "one"); break;
-		case 2: assert(*it == "two"); break;
-		case 3: assert(*it == "after_two"); break;
-		case 4: assert(*it == "before_three"); break;
-		case 5: assert(*it == "three"); break;
-		case 6: assert(*it == "four"); break;
-		case 7: assert(*it == "end"); break;
-		default: assert(false);
-		}
-	}
-	assert(i == 0);
-}
-
-void test_remove(tf::linked_list<std::string> &l) {
-	assert(l.length() == 8);
-	assert(l.empty() == false);
-
-	l.remove("before_three");
-	assert(l.length() == 7);
-
-	l.remove("end");
-	assert(l.length() == 6);
-	assert(l.back() == "four");
-
-	l.remove("start");
-	assert(l.length() == 5);
-	assert(l.front() == "one");
-
-	int i = 0;
-	for (auto it = l.begin(); it.condition(); ++it) {
-		switch (i) {
-		case 0: assert(*it == "one"); break;
-		case 1: assert(*it == "two"); break;
-		case 2: assert(*it == "after_two"); break;
-		case 3: assert(*it == "three"); break;
-		case 4: assert(it.value() == "four"); break;
-		default: assert(false);
-		}
-		i++;
-	}
-}
-
-void test_pop_back(tf::linked_list<std::string> &l) {
-	assert(l.length() == 5);
-	assert(l.empty() == false);
-
-	assert(l.pop_back() == "four");
-	assert(l.length() == 4);
-
-	int i = 0;
-	for (auto it = l.begin(); it.condition(); ++it) {
-		switch (i) {
-		case 0: assert(*it == "one"); break;
-		case 1: assert(*it == "two"); break;
-		case 2: assert(*it == "after_two"); break;
-		case 3: assert(it.value() == "three"); break;
-		default: assert(false);
-		}
-		i++;
-	}
-}
-
-void test_pop_front(tf::linked_list<std::string> &l) {
-	assert(l.length() == 4);
-	assert(l.empty() == false);
-
-	assert(l.pop_front() == "one");
-	assert(l.length() == 3);
-
-	int i = 0;
-	for (auto it = l.begin(); it.condition(); ++it) {
-		switch (i) {
-		case 0: assert(*it == "two"); break;
-		case 1: assert(*it == "after_two"); break;
-		case 2: assert(it.value() == "three"); break;
-		default: assert(false);
-		}
-		i++;
-	}
-}
-
-void test_contains(const tf::linked_list<std::string> &l) {
-	assert(l.length() == 3);
-	assert(l.empty() == false);
-
-	assert(l.contains("one") == false);
-	assert(l.contains("two") == true);
-
-	for (int i = 0; i < l.length(); ++i) {
-		switch (i) {
-		case 0: assert(l.contains("two")); break;
-		case 1: assert(l.contains("after_two")); break;
-		case 2: assert(l.contains("three")); break;
-		default: assert(false);
-		}
-	}
-}
-
-void test_copying(const tf::linked_list<std::string> &l) {
-	assert(l.length() == 3);
-	assert(l.empty() == false);
-	assert(l.front() == "two");
-	assert(l.back() == "three");
-
-	const tf::linked_list<std::string> l2 = l;
-	assert(l2.length() == 3);
-	assert(l2.empty() == false);
-	assert(l2.front() == "two");
-	assert(l2.back() == "three");
-
-	tf::linked_list<std::string> l3;
-	l3 = l;
-	assert(l3.length() == 3);
-	assert(l3.empty() == false);
-	assert(l3.front() == "two");
-	assert(l3.back() == "three");
-
-	tf::linked_list<std::string> l4(std::move(l3));
-	assert(l4.length() == 3);
-	assert(l4.empty() == false);
-	assert(l4.front() == "two");
-	assert(l4.back() == "three");
-
-	assert(l3.length() == 0);
-	assert(l3.empty() == true);
-}
-
-void test_clear(tf::linked_list<std::string> &l) {
-	assert(l.length() == 3);
-	assert(l.empty() == false);
-
-	l.clear();
-	assert(l.length() == 0);
-	assert(l.empty() == true);
-}
-
 int main(int argc, char *argv[]) {
 	try {
-		tf::linked_list<std::string> result = test_construction();
-		test_add_back_and_back(result);
-		test_add_front_and_front(result);
-		test_add_after(result);
-		test_add_before(result);
-		test_iterator(result);
-		test_remove(result);
-		test_pop_back(result);
-		test_pop_front(result);
-		test_contains(result);
-		test_copying(result);
-		test_clear(result);
+		// construction
+		tf::linked_list<std::string> l;
+		assert(l.empty() == true);
+		assert(l.length() == 0);
+
+		// add, front and back
+		try {
+			l.front();
+			assert(false);
+			l.back();
+			assert(false);
+		}
+		catch (tf::exception &) {
+			assert(true);
+		}
+
+		l.add_back("four");
+		assert(l.length() == 1);
+		assert(l.empty() == false);
+
+		l.add_back("five");
+		l.add_front("one");
+		l.add_front("zero");
+		l.add_after("two", "one");
+		l.add_before("three", "four");
+		assert(l.length() == 6);
+		assert(l.front() == "zero");
+		assert(l.back() == "five");
+
+		// iteration
+		auto it = l.begin();
+		assert(it.condition() == true);
+		assert(*it == "zero");
+		++it;
+		assert(it.condition() == true);
+		assert(*it == "one");
+		++it;
+		assert(it.condition() == true);
+		assert(*it == "two");
+		++it;
+		assert(it.condition() == true);
+		assert(*it == "three");
+		++it;
+		assert(it.condition() == true);
+		assert(*it == "four");
+		++it;
+		assert(it.condition() == true);
+		assert(*it == "five");
+		++it;
+		assert(it.condition() == false);
+
+		auto it2 = l.end();
+		assert(it2.condition() == true);
+		assert(*it2 == "five");
+		--it2;
+		assert(it2.condition() == true);
+		assert(*it2 == "four");
+		--it2;
+		assert(it2.condition() == true);
+		assert(*it2 == "three");
+		--it2;
+		assert(it2.condition() == true);
+		assert(*it2 == "two");
+		--it2;
+		assert(it2.condition() == true);
+		assert(*it2 == "one");
+		--it2;
+		assert(it2.condition() == true);
+		assert(*it2 == "zero");
+		--it2;
+		assert(it2.condition() == false);
+
+		// contains and remove
+		assert(l.contains("two") == true);
+		assert(l.contains("twee") == false);
+
+		l.remove("two");
+		assert(l.contains("two") == false);
+
+		l.remove("zero");
+		assert(l.front() == "one");
+
+		l.remove("five");
+		assert(l.back() == "four");
+		assert(l.length() == 3);
+		assert(l.empty() == false);
+
+		auto it3 = l.begin();
+		assert(it3.condition() == true);
+		assert(*it3 == "one");
+		++it3;
+		assert(it3.condition() == true);
+		assert(*it3 == "three");
+		++it3;
+		assert(it3.condition() == true);
+		assert(*it3 == "four");
+		++it3;
+		assert(it3.condition() == false);
+
+		// pop, front and back
+		assert(l.pop_front() == "one");
+		assert(l.pop_back() == "four");
+		assert(l.front() == "three");
+		assert(l.back() == "three");
+
+		// clear
+		assert(l.length() == 1);
+		assert(l.empty() == false);
+
+		l.clear();
+		assert(l.length() == 0);
+		assert(l.empty() == true);
 	}
 	catch (tf::exception &e) {
 		std::cout << e.what() << std::endl;

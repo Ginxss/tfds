@@ -127,7 +127,7 @@ The content of the array gets copied into the new buffer. If new_capacity is sma
 ## Vector
 A dynamic array similar to std::vector.
 
-Unlike `tf::array`, the `tf::vector` does not automatically reallocate when accessed out of bounds. Instead, accessing out of bounds always throws an exception, add data is inserted to the back of the buffer with `add(...)`, doubling the buffer size when the capacity is reached.
+Unlike `tf::array`, the `tf::vector` does not automatically reallocate when accessed out of bounds. Instead, accessing out of bounds always throws an exception and new data is inserted to the back of the buffer with `add(...)`, doubling the buffer size when the capacity is reached.
 
 ---
 
@@ -176,6 +176,7 @@ std::string value = vector.get(1);
 Returns a reference to the element at index 1:
 ```
 std::string value = vector[1];
+vector[1] = "world";
 ```
 
 ---
@@ -259,14 +260,12 @@ A doubly linked list.
 
 Allows iteration both forwards and backwards.
 
-Can be used as a FIFO Queue, although the use of the wrapper [FIFO Queue](#fifo-queue) is recommended for that because of its simpler interface.
-
 ---
 
 ### Constructor
-Constructor with type `int`:
+Constructor with type `std::string`:
 ```
-tf::linked_list<int> list;
+tf::linked_list<std::string> list;
 ```
 Copy constructor, copy assignment operator, move constructor and move assignment operator also exist.
 
@@ -294,9 +293,9 @@ The methods `it.next_value()` and `it.prev_value()` return pointers to the follo
 ### add_back(value)
 *Runtime:* **O(1)**
 
-Adds the value 3 to the end of the list:
+Adds the value "hello" to the end of the list:
 ```
-list.add_back(3);
+list.add_back("hello");
 ```
 
 ---
@@ -304,9 +303,9 @@ list.add_back(3);
 ### add_front(value)
 *Runtime:* **O(1)**
 
-Adds the value 3 to the start of the list:
+Adds the value "hello" to the start of the list:
 ```
-list.add_front(3);
+list.add_front("hello");
 ```
 
 ---
@@ -316,9 +315,9 @@ list.add_front(3);
 
 *Exceptions:* Throws a tf::exception if the existing value does not exist.
 
-Adds the value 3 right after the value 4:
+Adds the value "world" right after the value "hello":
 ```
-list.add_after(3, 4);
+list.add_after("world", "hello");
 ```
 
 ---
@@ -328,9 +327,9 @@ list.add_after(3, 4);
 
 *Exceptions:* Throws a tf::exception if the existing value does not exist.
 
-Adds the value 3 in front of the value 4:
+Adds the value "hi" in front of the value "hello":
 ```
-list.add_before(3, 4);
+list.add_before("hi", "hello");
 ```
 
 ---
@@ -340,9 +339,9 @@ list.add_before(3, 4);
 
 *Exceptions:* Throws a tf::exception if the value does not exist.
 
-Removes the value 3 from the list:
+Removes the value "hello" from the list:
 ```
-list.remove(3);
+list.remove("hello");
 ```
 
 ---
@@ -354,7 +353,8 @@ list.remove(3);
 
 Returns a reference to the last value in the list:
 ```
-int last_value = list.back();
+std::string last_value = list.back();
+list.back() = "back";
 ```
 
 ---
@@ -366,7 +366,8 @@ int last_value = list.back();
 
 Returns a reference to the first value in the list:
 ```
-int first_value = list.front();
+std::string first_value = list.front();
+list.front() = "front";
 ```
 
 ---
@@ -378,7 +379,7 @@ int first_value = list.front();
 
 Removes and returns the last value from the list:
 ```
-int last_value = list.pop_back();
+std::string last_value = list.pop_back();
 ```
 
 ---
@@ -390,7 +391,7 @@ int last_value = list.pop_back();
 
 Removes and returns the first value from the list:
 ```
-int first_value = list.pop_front();
+std::string first_value = list.pop_front();
 ```
 
 ---
@@ -398,9 +399,9 @@ int first_value = list.pop_front();
 ### contains(value)
 *Runtime:* **O(n)**
 
-Returns `true` if the value 3 is found in the list:
+Returns `true` if the value "hello" is found in the list:
 ```
-bool contains_value = list.contains(3);
+bool contains_value = list.contains("hello");
 ```
 
 ---
@@ -447,15 +448,15 @@ The default table size is 100 (table size = number of buckets, bucket = linked l
 ---
 
 ### Constructor
-Default constructor with `int` keys and `int` values and table size 100 and checking for duplicate keys:
+Default constructor with `std::string` keys and `int` values and table size 100:
 ```
-tf::hash_table<int, int> table;
+tf::hash_table<std::string, int> table;
 ```
-You can set a custom table size and turn of checking for duplicate key in the constructor:
+You can set a custom table size and turn of checking for duplicate keys in the constructor:
 ```
-tf::hash_table<int, int> table(10, false);
+tf::hash_table<std::string, int> table(10, false);
 ```
-In this case, the hash table will not check the existing entries for duplicate keys when inserting to improve performance. Note that this flag is mainly supposed to speed up insertion time if you KNOW that there can never be identical keys. In this case, if there are duplicate keys inside the table, functions like get(...) and remove(...) will only find one of the inserted pairs.
+In this case, the hash table will not check the existing entries for duplicate keys when inserting to improve performance. Note that this flag is mainly supposed to speed up insertion time if you KNOW that there can never be identical keys. If there are duplicate keys inside the table, functions like get(...) and remove(...) will only find one of the inserted pairs.
 
 Copy constructor, copy assignment operator, move constructor and move assignment operator also exist.
 
@@ -481,11 +482,10 @@ The hash table is not a data structure made for efficient iteration. If consiste
 
 *Exceptions:* Checks duplicate keys: throws a tf::exception if the key already exists.
 
-Inserts the value 3 with key 1 into the hash table:
+Inserts the value 1 with key "hello" into the hash table:
 ```
-table.insert(1, 3);
+table.insert("hello", 1);
 ```
-Insertion is faster if keys are not checked for duplicates before inserting.
 
 ---
 
@@ -494,9 +494,9 @@ Insertion is faster if keys are not checked for duplicates before inserting.
 
 *Exceptions:* Throws a tf::exception if the key does not exist.
 
-Removes the entry with key 1 and returns the value:
+Removes the entry with key "hello" and returns the value:
 ```
-int value = table.remove(1);
+std::string value = table.remove("hello");
 ```
 
 ---
@@ -506,9 +506,9 @@ int value = table.remove(1);
 
 *Exceptions:* Throws a tf::exception if the key does not exist.
 
-Returns a constant reference to the value with key 1:
+Returns a constant reference to the value with key "hello":
 ```
-int value = table.get(1);
+std::string value = table.get("hello");
 ```
 
 ---
@@ -518,10 +518,10 @@ int value = table.get(1);
 
 *Exceptions:* Throws a tf::exception if the key does not exist.
 
-Returns a reference to the value with key 1:
+Returns a reference to the value with key "hello":
 ```
-int value = table[1];
-table[1] = 4;
+std::string value = table["hello"];
+table["hello"] = 2;
 ```
 
 ---
@@ -529,9 +529,9 @@ table[1] = 4;
 ### contains(key)
 *Runtime:* average case: **O(1)** / worst case: O(n)
 
-Returns `true` if an entry with key 1 is found in the hash table:
+Returns `true` if an entry with key "hello" is found in the hash table:
 ```
-bool contains_value = table.contains(1);
+bool contains_value = table.contains("hello");
 ```
 
 ---
@@ -667,7 +667,7 @@ std::string value = tree.remove_all(1);
 
 *Exceptions:* Throws a tf::exception if the key-value pair does not exist.
 
-Removes the entry with key 1 and value "hello" and return "hello" again:
+Removes the entry with key 1 and value "hello" and returns "hello" again:
 ```
 std::string same_value = tree.remove_value(1, "hello");
 ```
@@ -802,7 +802,7 @@ tree.clear();
 ## Stack
 This is just a wrapper for `tf::vector` which only provides the functionality of a stack.
 
-The insane speed comes at the cost of a memory overhead, as the vector always reallocates with twice its previous size. If sparse memory is required, the use of [Linked List](#linked-list) is recommended.
+The high performance comes at the cost of a memory overhead, as the vector always reallocates with twice its previous size. If sparse memory is required, the use of [Linked List](#linked-list) is recommended.
 
 ---
 
@@ -894,9 +894,9 @@ This is just a wrapper for the [Linked List](#linked-list) which provides only t
 ---
 
 ### Constructor
-Constructor with type `int`:
+Constructor with type `std::string`:
 ```
-tf::fifo_queue<int> queue;
+tf::fifo_queue<std::string> queue;
 ```
 Copy constructor, copy assignment operator, move constructor and move assignment operator also exist.
 
@@ -905,9 +905,9 @@ Copy constructor, copy assignment operator, move constructor and move assignment
 ### add(value)
 *Runtime:* **O(1)**
 
-Adds the value 3 to the FIFO queue:
+Adds the value "hello" to the FIFO queue:
 ```
-queue.add(3);
+queue.add("hello");
 ```
 
 ---
@@ -919,7 +919,7 @@ queue.add(3);
 
 Returns the next value in the FIFO queue:
 ```
-int next_value = queue.next();
+std::string next_value = queue.next();
 ```
 
 ---
@@ -927,9 +927,9 @@ int next_value = queue.next();
 ### contains(value)
 *Runtime:* **O(n)**
 
-Returns `true` if the FIFO queue contains the value 3:
+Returns `true` if the FIFO queue contains the value "hello":
 ```
-bool contains_value = queue.contains(3);
+bool contains_value = queue.contains("hello");
 ```
 
 ---
@@ -1056,5 +1056,3 @@ Deallocates all entries:
 ```
 queue.clear();
 ```
-
----

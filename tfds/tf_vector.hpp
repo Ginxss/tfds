@@ -138,7 +138,7 @@ public:
     // O(n)
     bool contains(const T &value) const {
         for (size_t i = 0; i < size_; ++i) {
-            if (compare<T>(value, buffer[i])) {
+            if (equals<T>(value, buffer[i])) {
                 return true;
             }
         }

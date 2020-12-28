@@ -62,6 +62,8 @@ inline unsigned long hash<char *>(char * const &key) {
 template <typename K, typename V>
 class hash_table {
 private:
+    // BUCKET 
+
     struct bucket {
         K key;
         V value;
@@ -71,31 +73,13 @@ private:
             key(key), value(value), next(next) {}
     };
 
-    bucket *new_bucket(const K &key, const V &value, bucket *next) {
-        bucket *b = new bucket(key, value, next);
-        ++size_;
-        return b;
-    }
+    // ITERATORS
 
-    void delete_bucket(bucket *b) {
-        --size_;
-        delete b;
-    }
-
-    void delete_buckets(bucket *b) {
-        while (b) {
-            bucket *to_delete = b;
-            b = b->next;
-            delete_bucket(to_delete);
-        }
-    }
-
-public:
     class iterator {
     private:
         hash_table *table;
-        bucket *current_bucket;
         size_t current_index;
+        bucket *current_bucket;
 
         void next_bucket() {
             if (current_bucket->next) {
@@ -115,10 +99,8 @@ public:
 
     public:
         iterator(hash_table *table):
-            table(table)
+            table(table), current_index(0), current_bucket(table->buckets[0])
         {
-            current_index = 0;
-            current_bucket = table->buckets[current_index];
             while (!current_bucket && ++current_index < table->table_size_) {
                 current_bucket = table->buckets[current_index];
             }
@@ -134,8 +116,8 @@ public:
     class const_iterator {
     private:
         const hash_table *table;
-        bucket *current_bucket;
         size_t current_index;
+        bucket *current_bucket;
 
         void next_bucket() {
             if (current_bucket->next) {
@@ -155,10 +137,8 @@ public:
 
     public:
         const_iterator(const hash_table *table):
-            table(table)
+            table(table), current_index(0), current_bucket(table->buckets[0])
         {
-            current_index = 0;
-            current_bucket = table->buckets[current_index];
             while (!current_bucket && ++current_index < table->table_size_) {
                 current_bucket = table->buckets[current_index];
             }
@@ -171,11 +151,33 @@ public:
         bool condition() const { return current_bucket != nullptr; }
     };
 
-private:
+    // VARIABLES
+
     size_t table_size_;
     size_t size_;
     bool check_duplicate_keys;
     bucket **buckets;
+
+    // METHODS
+
+    bucket *create_bucket(const K &key, const V &value, bucket *next) {
+        bucket *b = new bucket(key, value, next);
+        ++size_;
+        return b;
+    }
+
+    void destroy_bucket(bucket *b) {
+        --size_;
+        delete b;
+    }
+
+    void destroy_all_buckets(bucket *b) {
+        while (b) {
+            bucket *to_delete = b;
+            b = b->next;
+            destroy_bucket(to_delete);
+        }
+    }
 
 public:
     // constructor
@@ -202,7 +204,7 @@ public:
 
             bucket *b = other.buckets[i];
             while (b) {
-                buckets[i] = new_bucket(b->key, b->value, buckets[i]);
+                buckets[i] = create_bucket(b->key, b->value, buckets[i]);
                 b = b->next;
             }
         }
@@ -246,23 +248,19 @@ public:
         if (buckets[index]) {
             if (check_duplicate_keys) {
                 bucket *it = buckets[index];
-                if (compare<K>(key, it->key))
-                    throw exception("hash table: insert: key already exists");
-                
-                while (it->next) {
-                    it = it->next;
-                    if (compare<K>(key, it->key))
+                while (it) {
+                    if (equals<K>(key, it->key)) {
                         throw exception("hash table: insert: key already exists");
-                }
+                    }
 
-                it->next = new_bucket(key, value, nullptr);
+                    it = it->next;
+                }
             }
-            else {
-                buckets[index] = new_bucket(key, value, buckets[index]);
-            }
+
+            buckets[index] = create_bucket(key, value, buckets[index]);
         }
         else {
-            buckets[index] = new_bucket(key, value, nullptr);
+            buckets[index] = create_bucket(key, value, nullptr);
         }
     }
 
@@ -273,7 +271,7 @@ public:
         if (buckets[index]) {
             bucket *to_delete = nullptr;
 
-            if (compare<K>(key, buckets[index]->key)) {
+            if (equals<K>(key, buckets[index]->key)) {
                 to_delete = buckets[index];
                 buckets[index] = to_delete->next;
             }
@@ -281,7 +279,7 @@ public:
                 bucket *it = buckets[index]->next;
                 bucket *prev = buckets[index];
                 while (it) {
-                    if (compare<K>(key, it->key)) {
+                    if (equals<K>(key, it->key)) {
                         to_delete = it;
                         prev->next = it->next;
                         break;
@@ -294,7 +292,7 @@ public:
 
             if (to_delete) {
                 V result = to_delete->value;
-                delete_bucket(to_delete);
+                destroy_bucket(to_delete);
                 return result;
             }
         }
@@ -308,7 +306,7 @@ public:
 
         bucket *it = buckets[index];
         while (it) {
-            if (compare<K>(key, it->key)) {
+            if (equals<K>(key, it->key)) {
                 return it->value;
             }
 
@@ -324,7 +322,7 @@ public:
 
         bucket *it = buckets[index];
         while (it) {
-            if (compare<K>(key, it->key)) {
+            if (equals<K>(key, it->key)) {
                 return it->value;
             }
 
@@ -340,7 +338,7 @@ public:
 
         bucket *it = buckets[index];
         while (it) {
-            if (compare<K>(key, it->key)) {
+            if (equals<K>(key, it->key)) {
                 return it->value;
             }
 
@@ -356,7 +354,7 @@ public:
 
         bucket *it = buckets[index];
         while (it) {
-            if (compare<K>(key, it->key)) {
+            if (equals<K>(key, it->key)) {
                 return true;
             }
 
@@ -397,7 +395,7 @@ public:
     // O(n)
     void clear() {
         for (size_t i = 0; i < table_size_; ++i) {
-            delete_buckets(buckets[i]);
+            destroy_all_buckets(buckets[i]);
             buckets[i] = nullptr;
         }
     }
