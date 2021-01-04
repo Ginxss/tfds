@@ -190,7 +190,7 @@ private:
         delete n;
     }
 
-    int node_height(node *n) const {
+    size_t node_height(node *n) const {
         return (n) ? n->height : 0;
     }
 
@@ -275,7 +275,7 @@ private:
     void rebalance_upward(node *n) {
         node *it = n;
         while (it) {
-            int balance = node_height(it->right) - node_height(it->left);
+            ssize_t balance = node_height(it->right) - node_height(it->left);
             if (balance > 1) {
                 if (node_height(it->right->right) > node_height(it->right->left)) {
                     it = left_rotation(it);
