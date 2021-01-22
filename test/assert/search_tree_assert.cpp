@@ -1,6 +1,6 @@
 #include <cassert>
 #include <iostream>
-#include "../tfds/tf_search_tree.hpp"
+#include "../../tfds/tf_search_tree.hpp"
 
 void print_search_tree_info(const tf::search_tree<int, std::string> &t, const std::string &message = "Search Tree info") {
 	std::cout << message << ":" << std::endl << std::endl;

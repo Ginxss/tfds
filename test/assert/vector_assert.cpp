@@ -1,13 +1,13 @@
 #include <cassert>
 #include <iostream>
-#include "../tfds/tf_vector.hpp"
+#include "../../tfds/tf_vector.hpp"
 
 // For manual testing
 void print_vector_info(const tf::vector<std::string> &v, const std::string &message = "Array info") {
 	std::cout << message << ":" << std::endl << std::endl;
 	std::cout << "Size: " << v.size() << std::endl;
 	std::cout << "Empty: " << v.empty() << std::endl;
-	std::cout << "Capacity: " << v.current_capacity() << std::endl;
+	std::cout << "Capacity: " << v.capacity() << std::endl;
 
 	std::cout << "Content: ";
 	for (int i = 0; i < v.size(); ++i) {
@@ -26,13 +26,13 @@ int main(int argc, char *argv[]) {
 
 		assert(v.size() == 0);
 		assert(v.empty() == true);
-		assert(v.current_capacity() == 10);
+		assert(v.capacity() == 10);
 		assert(v2.size() == 0);
 		assert(v2.empty() == true);
-		assert(v2.current_capacity() == 1000);
+		assert(v2.capacity() == 1000);
 		assert(v3.size() == 0);
 		assert(v3.empty() == true);
-		assert(v3.current_capacity() == 1);
+		assert(v3.capacity() == 1);
 
 		// add and get
 		v.add("zero");
@@ -46,7 +46,7 @@ int main(int argc, char *argv[]) {
 
 		v.add("two");
 		assert(v.size() == 3);
-		assert(v.current_capacity() == 10);
+		assert(v.capacity() == 10);
 		assert(v.get(0) == "zero" && v[0] == "zero");
 		assert(v.get(1) == "one" && v[1] == "one");
 		assert(v.get(2) == "two" && v[2] == "two");
@@ -67,11 +67,27 @@ int main(int argc, char *argv[]) {
 		v.add("eight");
 		v.add("nine");
 		assert(v.size() == 10);
-		assert(v.current_capacity() == 10);
+		assert(v.capacity() == 10);
 
 		v.add("ten");
 		assert(v.size() == 11);
-		assert(v.current_capacity() == 20);
+		assert(v.capacity() == 20);
+		assert(v.get(0) == "zero" && v[0] == "zero");
+		assert(v.get(1) == "one" && v[1] == "one");
+		assert(v.get(2) == "two" && v[2] == "two");
+		assert(v.get(10) == "ten" && v[10] == "ten");
+
+		v.reallocate(10000);
+		assert(v.size() == 11);
+		assert(v.capacity() == 10000);
+		assert(v.get(0) == "zero" && v[0] == "zero");
+		assert(v.get(1) == "one" && v[1] == "one");
+		assert(v.get(2) == "two" && v[2] == "two");
+		assert(v.get(10) == "ten" && v[10] == "ten");
+
+		v.reallocate(20);
+		assert(v.size() == 11);
+		assert(v.capacity() == 20);
 		assert(v.get(0) == "zero" && v[0] == "zero");
 		assert(v.get(1) == "one" && v[1] == "one");
 		assert(v.get(2) == "two" && v[2] == "two");
@@ -92,12 +108,12 @@ int main(int argc, char *argv[]) {
 		// clear
 		assert(v.size() == 10);
 		assert(v.empty() == false);
-		assert(v.current_capacity() == 20);
+		assert(v.capacity() == 20);
 		
 		v.clear();
 		assert(v.size() == 0);
 		assert(v.empty() == true);
-		assert(v.current_capacity() == 20);
+		assert(v.capacity() == 20);
 	}
 	catch (tf::exception &e) {
 		std::cout << e.what() << std::endl;

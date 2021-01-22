@@ -1,0 +1,51 @@
+| META |
+
+runs each = 20
+number of elements each = 1000000
+type of elements each = std::string
+
+******************************
+
+| VECTOR |
+
+std::vector inserted 1000000 std::strings : 159 milliseconds
+tf::vector inserted 1000000 std::strings : 161 milliseconds
+
+std::vector inserted 1000000 std::strings (with reserved space) : 126 milliseconds
+tf::vector inserted 1000000 std::strings (with reserved space) : 122 milliseconds
+
+std::vector inserted and accessed 1000000 std::strings : 179 milliseconds
+tf::vector inserted and accessed 1000000 std::strings : 175 milliseconds
+
+******************************
+
+| LINKED LIST |
+
+std::list inserted 1000000 std::strings : 288 milliseconds
+tf::linked_list inserted 1000000 std::strings : 234 milliseconds
+
+std::list inserted and iterated over 1000000 std::strings : 327 milliseconds
+tf::linked_list inserted and iterated over 1000000 std::strings : 256 milliseconds
+
+std::list inserted and popped 1000000 std::strings : 321 milliseconds
+tf::linked_list inserted and popped 1000000 std::strings : 235 milliseconds
+
+******************************
+
+| HASH TABLE |
+
+std::unordered_map inserted 1000000 (std::string, int) pairs : 677 milliseconds
+tf::hash_table inserted 1000000 (std::string, int) pairs : 263 milliseconds
+
+std::unordered_map inserted and accessed 1000000 (std::string, int) pairs : 1100 milliseconds
+tf::hash_table inserted and accessed 1000000 (std::string, int) pairs : 430 milliseconds
+
+******************************
+
+| SEARCH TREE |
+
+std::map inserted 1000000 (int, std::string) pairs : 945 milliseconds
+tf::search_tree inserted 1000000 (int, std::string) pairs : 799 milliseconds
+
+std::map inserted and accessed 1000000 (int, std::string) pairs : 1348 milliseconds
+tf::search_tree inserted and accessed 1000000 (int, std::string) pairs : 950 milliseconds

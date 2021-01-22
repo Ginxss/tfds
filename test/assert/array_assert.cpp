@@ -1,6 +1,6 @@
 #include <cassert>
 #include <iostream>
-#include "../tfds/tf_array.hpp"
+#include "../../tfds/tf_array.hpp"
 
 // For manual testing
 void print_array_info(const tf::array<std::string> &a, const std::string &message = "Array info") {

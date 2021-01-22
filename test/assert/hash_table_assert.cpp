@@ -1,6 +1,6 @@
 #include <cassert>
 #include <iostream>
-#include "../tfds/tf_hash_table.hpp"
+#include "../../tfds/tf_hash_table.hpp"
 
 void print_hash_table_info(const tf::hash_table<std::string, int> &h, const std::string &message = "Hash Table info") {
 	std::cout << message << ":" << std::endl << std::endl;

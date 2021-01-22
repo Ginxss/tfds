@@ -11,8 +11,7 @@
 
 ---
 
-This is a collection of data structures in C++. In all of my tests **tfds** was (sometimes significantly) faster or equally as fast as their STL counterpart.
-That being said, i did not test very thoroughly for every scenario yet.
+This is a collection of data structures in C++. In my (admittedly suboptimal) testing the **tfds**-classes were always faster or equally as fast as their STL counterpart.
 
 Also, the `iterator`s that are used in **tfds**-classes behave differently than usual iterators, which is why you can't use range-based for loops (That's because these `iterator`s allow both forward and backward iteration with the same syntax).
 
@@ -111,7 +110,7 @@ bool array_is_reallocating = array.auto_reallocating();
 ---
 
 ### reallocate(new capacity)
-*Runtime:* **O(1)**
+*Runtime:* **O(n)**
 
 *Exceptions:* throws a tf::exception if new_capacity is zero or if it is too big and causes a bad_alloc.
 
@@ -203,6 +202,19 @@ std::string value = vector.remove(1);
 
 ---
 
+### reallocate(new capacity)
+*Runtime:* **O(n)**
+
+*Exceptions:* throws a tf::exception if new_capacity is zero or if it is too big and causes a bad_alloc.
+
+Reallocates the vector with the new capacity 20:
+```
+vector.reallocate(20);
+```
+The content of the array gets copied into the new buffer. If new_capacity is smaller than the old capacity, only the elements up to that point get copied, the rest gets deleted.
+
+---
+
 ### contains(value)
 *Runtime:* **O(n)**
 
@@ -223,12 +235,12 @@ size_t num_elements = vector.size();
 
 ---
 
-### current_capacity()
+### capacity()
 *Runtime:* **O(1)**
 
 Returns the current size of the internal buffer:
 ```
-size_t capacity = vector.current_capacity();
+size_t vector_capacity = vector.capacity();
 ```
 
 ---

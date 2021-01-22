@@ -16,22 +16,22 @@ class vector {
 private:
     // VARIABLES
 
-    size_t capacity;
+    size_t capacity_;
 	size_t size_;
     T *buffer;
 
 public:
     // constructor
     vector(const size_t initial_capacity = 10):
-        capacity((initial_capacity > 0) ? initial_capacity : 1),
+        capacity_((initial_capacity > 0) ? initial_capacity : 1),
 		size_(0),
-        buffer(new T[capacity]) {}
+        buffer(new T[capacity_]) {}
 
     // copy constructor
     vector(const vector &other):
-        capacity(other.capacity),
+        capacity_(other.capacity_),
 		size_(other.size_),
-        buffer(new T[capacity])
+        buffer(new T[capacity_])
     {
         std::copy_n(other.buffer, size_, buffer);
     }
@@ -43,7 +43,7 @@ public:
 
     friend void swap(vector &first, vector &second) noexcept {
         using std::swap;
-        swap(first.capacity, second.capacity);
+        swap(first.capacity_, second.capacity_);
         swap(first.size_, second.size_);
         swap(first.buffer, second.buffer);
     }
@@ -67,22 +67,13 @@ public:
 
 	// O(1) / O(n) on reallocation
 	void add(const T &value) {
-		if (size_ >= capacity) {
-			size_t new_capacity = capacity * 2;
+		if (size_ >= capacity_) {
+			size_t new_capacity = capacity_ * 2;
 			if (new_capacity <= size_) {
 				throw exception("vector: add: too large, new capacity created buffer overflow");
 			}
 
-			try {
-				T *new_buffer = new T[new_capacity];
-				std::copy_n(buffer, size_, new_buffer);
-				capacity = new_capacity;
-				delete[] buffer;
-				buffer = new_buffer;
-			}
-			catch (std::bad_alloc &) {
-				throw exception("vector: add: bad_alloc caught, vector is probably too big");
-			}
+            reallocate(new_capacity);
         }
 
 		buffer[size_++] = value;
@@ -120,7 +111,7 @@ public:
     }
 
 	// O(n)
-	T remove(const size_t &index) {
+	T remove(const size_t index) {
 		if (index < size_) {
 			T result = buffer[index];
 
@@ -134,6 +125,23 @@ public:
 
 		throw exception("vector: remove: index larger than size");
 	}
+
+    // O(n)
+    void reallocate(const size_t new_capacity) {
+        if (new_capacity == 0)
+            throw exception("vector: reallocate: new_capacity must be > 0");
+        
+        try {
+            T *new_buffer = new T[new_capacity];
+            std::copy_n(buffer, std::min(capacity_, new_capacity), new_buffer);
+            capacity_ = new_capacity;
+            delete[] buffer;
+            buffer = new_buffer;
+        }
+        catch (std::bad_alloc &) {
+            throw exception("vector: reallocate: bad_alloc caught, vector is probably too big");
+        }
+    }
 
     // O(n)
     bool contains(const T &value) const {
@@ -152,8 +160,8 @@ public:
     }
 
     // O(1)
-    size_t current_capacity() const {
-        return capacity;
+    size_t capacity() const {
+        return capacity_;
     }
 
 	// O(1)
