@@ -16,7 +16,9 @@ void print_list_info(const tf::linked_list<std::string> &l, const std::string &m
 	std::cout << std::endl << std::endl << "----------------------------------------" << std::endl << std::endl;
 }
 
-int main(int argc, char *argv[]) {
+void print_list_assert() {
+	std::cout << "| LINKED LIST |" << std::endl << std::endl;
+
 	try {
 		// construction
 		tf::linked_list<std::string> l;
@@ -137,6 +139,10 @@ int main(int argc, char *argv[]) {
 	}
 
 	std::cout << "All tests successful." << std::endl;
+}
+
+/* int main(int argc, char *argv[]) {
+	print_list_assert();
 
 	return 0;
-}
+} */

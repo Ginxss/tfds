@@ -14,19 +14,15 @@ int main(int argc, char *argv[]) {
 	std::cout << "type of elements each = std::string" << std::endl << std::endl;
 	std::cout << "******************************" << std::endl << std::endl;
 
-	std::cout << "| VECTOR |" << std::endl << std::endl;
 	print_vector_performance(num_elements, runs);
 	std::cout << "******************************" << std::endl << std::endl;
 
-	std::cout << "| LINKED LIST |" << std::endl << std::endl;
 	print_list_performance(num_elements, runs);
 	std::cout << "******************************" << std::endl << std::endl;
 
-	std::cout << "| HASH TABLE |" << std::endl << std::endl;
 	print_table_performance(num_elements, runs);
 	std::cout << "******************************" << std::endl << std::endl;
 
-	std::cout << "| SEARCH TREE |" << std::endl << std::endl;
 	print_tree_performance(num_elements, runs);
 
 	return 0;

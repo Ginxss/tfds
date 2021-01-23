@@ -56,6 +56,8 @@ void tf_vector_insert_get(int num_elements) {
 }
 
 void print_vector_performance(int num_elements, int runs) {
+	std::cout << "| VECTOR |" << std::endl << std::endl;
+	
 	std::cout << "std::vector inserted " << num_elements << " std::strings : " <<
 		measure(std_vector_insert, num_elements, runs) << " milliseconds" << std::endl;
 	std::cout << "tf::vector inserted " << num_elements << " std::strings : " <<

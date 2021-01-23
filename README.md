@@ -464,7 +464,7 @@ Default constructor with `std::string` keys and `int` values and table size 100:
 ```
 tf::hash_table<std::string, int> table;
 ```
-You can set a custom table size and turn of checking for duplicate keys in the constructor:
+You can set a custom table size and turn off checking for duplicate keys in the constructor:
 ```
 tf::hash_table<std::string, int> table(10, false);
 ```
@@ -604,7 +604,7 @@ An ordered map (iterative AVL Tree).
 
 The entries are sorted by the key. If duplicate keys are allowed, entries with the same key are not ordered in any particular order.
 
-The keys for the search tree have to be comparable with `operator==`, `operator<` and `operator>`.
+The keys have to be comparable with either `operator==`, `operator<` and `operator>` or compare functions in the `tf`-namespace like in *tf_compare_functions.hpp*.
 
 ---
 

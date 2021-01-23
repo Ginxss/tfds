@@ -16,7 +16,9 @@ void print_array_info(const tf::array<std::string> &a, const std::string &messag
 	std::cout << std::endl << std::endl << "----------------------------------------" << std::endl << std::endl;
 }
 
-int main(int argc, char *argv[]) {
+void print_array_assert() {
+	std::cout << "| ARRAY |" << std::endl << std::endl;
+
 	try {
 		// construction
 		tf::array<std::string> a;
@@ -84,6 +86,10 @@ int main(int argc, char *argv[]) {
 	}
 
 	std::cout << "All tests successful." << std::endl;
+}
+
+/* int main(int argc, char *argv[]) {
+	print_array_assert();
 
 	return 0;
-}
+} */

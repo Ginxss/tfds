@@ -3,7 +3,7 @@
 
 #include <new> // std:bad_alloc
 #include <algorithm> // std::copy_n, std::swap, std::min
-#include "tf_exception.hpp"
+#include "utils/tf_exception.hpp"
 
 namespace tf {
 

@@ -2,7 +2,7 @@
 #include <iostream>
 #include "../../tfds/tf_hash_table.hpp"
 
-void print_hash_table_info(const tf::hash_table<std::string, int> &h, const std::string &message = "Hash Table info") {
+void print_table_info(const tf::hash_table<std::string, int> &h, const std::string &message = "Hash Table info") {
 	std::cout << message << ":" << std::endl << std::endl;
 	std::cout << "Size: " << h.size() << std::endl;
 	std::cout << "Empty: " << h.empty() << std::endl;
@@ -18,7 +18,9 @@ void print_hash_table_info(const tf::hash_table<std::string, int> &h, const std:
 	std::cout << std::endl << std::endl << "----------------------------------------" << std::endl << std::endl;
 }
 
-int main(int argc, char *argv[]) {
+void print_table_assert() {
+	std::cout << "| HASH TABLE |" << std::endl << std::endl;
+
 	try {
 		// construction
 		tf::hash_table<std::string, int> h;
@@ -130,6 +132,10 @@ int main(int argc, char *argv[]) {
 	}
 
 	std::cout << "All tests successful." << std::endl;
+}
+
+/* int main(int argc, char *argv[]) {
+	print_table_assert();
 
 	return 0;
-}
+} */

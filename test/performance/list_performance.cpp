@@ -64,6 +64,8 @@ void tf_list_insert_pop(int num_elements) {
 }
 
 void print_list_performance(int num_elements, int runs) {
+	std::cout << "| LINKED LIST |" << std::endl << std::endl;
+	
 	std::cout << "std::list inserted " << num_elements << " std::strings : " <<
 		measure(std_list_insert, num_elements, runs) << " milliseconds" << std::endl;
 	std::cout << "tf::linked_list inserted " << num_elements << " std::strings : " <<

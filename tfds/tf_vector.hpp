@@ -3,8 +3,8 @@
 
 #include <new> // std:bad_alloc
 #include <algorithm> // std::copy_n, std::swap
-#include "tf_exception.hpp"
-#include "tf_compare_functions.hpp"
+#include "utils/tf_exception.hpp"
+#include "utils/tf_compare_functions.hpp"
 
 namespace tf {
 

@@ -43,6 +43,8 @@ void tf_table_insert_get(int num_elements) {
 }
 
 void print_table_performance(int num_elements, int runs) {
+	std::cout << "| HASH TABLE |" << std::endl << std::endl;
+	
 	std::cout << "std::unordered_map inserted " << num_elements << " (std::string, int) pairs : " <<
 		measure(std_unordered_map_insert, num_elements, runs) << " milliseconds" << std::endl;
 	std::cout << "tf::hash_table inserted " << num_elements << " (std::string, int) pairs : " <<

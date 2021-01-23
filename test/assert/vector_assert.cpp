@@ -17,7 +17,9 @@ void print_vector_info(const tf::vector<std::string> &v, const std::string &mess
 	std::cout << std::endl << std::endl << "----------------------------------------" << std::endl << std::endl;
 }
 
-int main(int argc, char *argv[]) {
+void print_vector_assert() {
+	std::cout << "| VECTOR |" << std::endl << std::endl;
+
 	try {
 		// construction
 		tf::vector<std::string> v;
@@ -121,6 +123,10 @@ int main(int argc, char *argv[]) {
 	}
 
 	std::cout << "All tests successful." << std::endl;
+}
+
+/* int main(int argc, char *argv[]) {
+	print_vector_assert();
 
 	return 0;
-}
+} */

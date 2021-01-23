@@ -2,7 +2,7 @@
 #include <iostream>
 #include "../../tfds/tf_search_tree.hpp"
 
-void print_search_tree_info(const tf::search_tree<int, std::string> &t, const std::string &message = "Search Tree info") {
+void print_tree_info(const tf::search_tree<int, std::string> &t, const std::string &message = "Search Tree info") {
 	std::cout << message << ":" << std::endl << std::endl;
 	std::cout << "Size: " << t.size() << std::endl;
 	std::cout << "Height: " << t.height() << std::endl;
@@ -15,7 +15,7 @@ void print_search_tree_info(const tf::search_tree<int, std::string> &t, const st
 	std::cout << std::endl << "----------------------------------------" << std::endl << std::endl;
 }
 
-int main(int argc, char *argv[]) {
+void print_tree_assert() {
 	try {
 		// construction
 		tf::search_tree<int, std::string> t;
@@ -197,6 +197,10 @@ int main(int argc, char *argv[]) {
 	}
 
 	std::cout << "All tests successful." << std::endl;
+}
+
+/* int main(int argc, char *argv[]) {
+	print_tree_assert();
 
 	return 0;
-}
+} */

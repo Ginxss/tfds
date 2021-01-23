@@ -41,6 +41,8 @@ void tf_tree_insert_get(int num_elements) {
 }
 
 void print_tree_performance(int num_elements, int runs) {
+	std::cout << "| SEARCH TREE |" << std::endl << std::endl;
+	
 	std::cout << "std::map inserted " << num_elements << " (int, std::string) pairs : " <<
 		measure(std_map_insert, num_elements, runs) << " milliseconds" << std::endl;
 	std::cout << "tf::search_tree inserted " << num_elements << " (int, std::string) pairs : " <<
