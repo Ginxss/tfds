@@ -402,8 +402,6 @@ private:
     }
 
     void remove_node(node *n) {
-        node *parent = n->parent;
-
         if (n->left && n->right)
             remove_double_parent(n);
         else if (n->left || n->right)
