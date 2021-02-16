@@ -149,6 +149,9 @@ void print_tree_assert() {
 		assert(it2.condition() == false);
 
 		// contains and remove
+		assert(t2.contains_value(0, "zero3"));
+		assert(t2.contains_value(0, "zero4") == false);
+
 		assert(t.contains(2) == true);
 		assert(t.contains(12) == false);
 		

@@ -5,6 +5,8 @@
 #include "utils/tf_exception.hpp"
 #include "utils/tf_compare_functions.hpp"
 
+#include <iostream>
+
 namespace tf {
 
 /*
@@ -749,6 +751,33 @@ public:
             }
             else {
                 return true;
+            }
+        }
+
+        return false;
+    }
+
+    // O(log(n))
+    bool contains_value(const K &key, const V &value) const {
+        node *it = root;
+        while (it) {
+            if (less_than<K>(key, it->key)) {
+                it = it->left;
+            }
+            else if (greater_than<K>(key, it->key)) {
+                it = it->right;
+            }
+            else {
+                value_bucket *bucket_it = it->bucket;
+                while (bucket_it) {
+                    if (equals<V>(value, bucket_it->value)) {
+                        return true;
+                    }
+
+                    bucket_it = bucket_it->next;
+                }
+
+                return false;
             }
         }
 

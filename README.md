@@ -719,7 +719,7 @@ Obviously this only makes sense if duplicate keys are not allowed, as you wouldn
 
 Returns a reference to one value with the smallest key:
 ```
-int min_value = tree.min();
+std::string min_value = tree.min();
 ```
 
 ---
@@ -731,7 +731,7 @@ int min_value = tree.min();
 
 Returns a reference to one value with the largest key:
 ```
-int max_value = tree.max();
+std::string max_value = tree.max();
 ```
 
 ---
@@ -743,7 +743,7 @@ int max_value = tree.max();
 
 Removes and returns one value with the smallest key:
 ```
-int min_value = tree.pop_min();
+std::string min_value = tree.pop_min();
 ```
 
 ---
@@ -755,7 +755,7 @@ int min_value = tree.pop_min();
 
 Removes and returns one value with the biggest key:
 ```
-int max_value = tree.pop_max();
+std::string max_value = tree.pop_max();
 ```
 
 ---
@@ -766,6 +766,16 @@ int max_value = tree.pop_max();
 Returns `true` if the tree contains an entry with key 1:
 ```
 bool key_present = tree.contains(1);
+```
+
+---
+
+### contains_value(key, value)
+*Runtime:* **O(log(n))**
+
+Returns `true` if the tree contains an entry with key 1 and value "one":
+```
+bool key_value_present = tree.contains(1, "one");
 ```
 
 ---
