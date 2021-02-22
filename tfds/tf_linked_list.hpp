@@ -188,6 +188,13 @@ public:
         throw exception("linked list: add_before: existing_value not found");
     }
 
+    // O(other.n)
+    void add_back_all(const linked_list &other) {
+        for (auto it = other.begin(); it.condition(); ++it) {
+            add_back(*it);
+        }
+    }
+
     // O(n)
     void remove(const T &value) {
         node *it = start_node;

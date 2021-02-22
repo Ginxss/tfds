@@ -346,6 +346,17 @@ list.add_before("hi", "hello");
 
 ---
 
+### add_back_all(other list)
+*Runtime:* **O(other.n)**
+
+Adds all values from `list2` to the back of `list`.
+```
+list.add_back_all(list2);
+```
+`list2` is traversed front to back. Both lists have to share the same template type.
+
+---
+
 ### remove(value)
 *Runtime:* **O(n)**
 

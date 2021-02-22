@@ -49,6 +49,15 @@ void print_list_assert() {
 		assert(l.front() == "zero");
 		assert(l.back() == "five");
 
+		tf::linked_list<std::string> l2;
+		l2.add_back("added1");
+		l2.add_back("added2");
+		l.add_back_all(l2);
+		assert(l.length() == 8);
+		assert(l.pop_back() == "added2");
+		assert(l.pop_back() == "added1");
+		assert(l.length() == 6);
+
 		// iteration
 		auto it = l.begin();
 		assert(it.condition() == true);
