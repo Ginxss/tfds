@@ -34,14 +34,14 @@ A custom initial capacity (in this case 100) and the reallocation behaviour can 
 ```
 tf::array<std::string> array(100, false);
 ```
-Copy constructor, copy assignment operator, move constructor and move assignment operator also exist.
+Copy constructor, move constructor and copy assignment operator (copy and swap) also exist.
 
 ---
 
 ### insert(index, value)
 *Runtime:* **O(1)** / O(n) on reallocation
 
-*Exceptions:* Throws a tf::exception if a buffer overflow or bad_alloc occurs (Automatic reallocation turned off: throws a tf::exception if the index is out of bounds).
+*Exceptions:* Throws a tf::exception if a buffer overflow or bad_alloc occurs (If automatic reallocation turned off: throws a tf::exception if the index is out of bounds).
 
 Inserts the value "hello" at index 1:
 ```
@@ -65,12 +65,12 @@ std::string value = array.get(1);
 ### [index]
 *Runtime:* **O(1)** / O(n) on reallocation
 
-*Exceptions:* Throws a tf::exception if a buffer overflow or bad_alloc occurs (Automatic reallocation turned off: throws a tf::exception if the index is out of bounds).
+*Exceptions:* Throws a tf::exception if a buffer overflow or bad_alloc occurs (If automatic reallocation turned off: throws a tf::exception if the index is out of bounds).
 
 Returns a reference to the value at index 1:
 ```
 array[1] = "hello";
-int value = array[1];
+std::string value = array[1];
 ```
 Setting a value "out of bounds":
 ```
@@ -82,29 +82,9 @@ array[25] = "new";
 ### set_all(value)
 *Runtime:* **O(n)**
 
-Sets every entry to the value "blah":
+Sets every entry to the value "hello":
 ```
-array.set_all("blah");
-```
-
----
-
-### capacity()
-*Runtime:* **O(1)**
-
-Returns the current capacity of the array:
-```
-size_t array_capacity = array.capacity();
-```
-
----
-
-### auto_reallocating()
-*Runtime:* **O(1)**
-
-Returns `true` if the array automatically reallocates when accessed out of bounds.
-```
-bool array_is_reallocating = array.auto_reallocating();
+array.set_all("hello");
 ```
 
 ---
@@ -119,6 +99,26 @@ Reallocates the array with the new capacity 20:
 array.reallocate(20);
 ```
 The content of the array gets copied into the new buffer. If new_capacity is smaller than the old capacity, only the elements up to that point get copied, the rest gets deleted.
+
+---
+
+### capacity()
+*Runtime:* **O(1)**
+
+Returns the current current size of the internal buffer:
+```
+size_t array_capacity = array.capacity();
+```
+
+---
+
+### auto_reallocating()
+*Runtime:* **O(1)**
+
+Returns `true` if the array automatically reallocates when accessed out of bounds.
+```
+bool array_is_reallocating = array.auto_reallocating();
+```
 
 ---
 ---
@@ -139,7 +139,7 @@ A custom initial capacity, in this case 100, can be set in the constructor:
 ```
 tf::vector<std::string> vector(100);
 ```
-Copy constructor, copy assignment operator, move constructor and move assignment operator also exist.
+Copy constructor, move constructor and copy assignment operator (copy and swap) also exist.
 
 ---
 
@@ -158,7 +158,7 @@ vector.add("hello");
 ### get(index)
 *Runtime:* **O(1)**
 
-*Exceptions:* Throws a tf::exception if the index is larger than the size.
+*Exceptions:* Throws a tf::exception if the index is larger or equal to the size.
 
 Returns a constant reference to the element at index 1:
 ```
@@ -170,7 +170,7 @@ std::string value = vector.get(1);
 ### [index]
 *Runtime:* **O(1)**
 
-*Exceptions:* Throws a tf::exception if the index is larger than the size.
+*Exceptions:* Throws a tf::exception if the index is larger or equal to the size.
 
 Returns a reference to the element at index 1:
 ```
@@ -183,9 +183,9 @@ vector[1] = "world";
 ### set_all(value)
 *Runtime:* **O(n)**
 
-Sets every element to the value "blah":
+Sets every element to the value "hello":
 ```
-vector.set_all("blah");
+vector.set_all("hello");
 ```
 
 ---
@@ -193,11 +193,21 @@ vector.set_all("blah");
 ### remove(index)
 *Runtime:* **O(n)**
 
-*Exceptions:* Throws a tf::exception if the index is larger than the size.
+*Exceptions:* Throws a tf::exception if the index is larger or equal to the size.
 
 Removes and returns the element at index 1:
 ```
 std::string value = vector.remove(1);
+```
+
+---
+
+### contains(value)
+*Runtime:* **O(n)**
+
+Returns `true` if the value "hello" is in the vector:
+```
+bool contains_value = vector.contains("hello");
 ```
 
 ---
@@ -211,17 +221,18 @@ Reallocates the vector with the new capacity 20:
 ```
 vector.reallocate(20);
 ```
-The content of the array gets copied into the new buffer. If new_capacity is smaller than the old capacity, only the elements up to that point get copied, the rest gets deleted.
+The content of the vector gets copied into the new buffer. If new_capacity is smaller than the old capacity, only the elements up to that point get copied, the rest gets deleted.
 
 ---
 
-### contains(value)
-*Runtime:* **O(n)**
+### clear()
+*Runtime:* **O(1)**
 
-Returns `true` if the value "hello" is in the vector:
+Clear the vector:
 ```
-bool contains_value = vector.contains("hello");
+vector.clear();
 ```
+In reality, clear() just resets the internal index, which means that no actual memory is deallocated and the vector is not reverted to its original capacity. Following calls to `add(...)` will overwrite the data in the buffer.
 
 ---
 
@@ -252,17 +263,6 @@ Returns `true` if the size of the vector is zero:
 ```
 bool vector_empty = vector.empty();
 ```
-
----
-
-### clear()
-*Runtime:* **O(1)**
-
-Clear the vector:
-```
-vector.clear();
-```
-In reality, clear() just resets the internal index, which means that no actual memory is deallocated and the vector is not reverted to its original capacity. Following calls to `add(...)` will overwrite the data in the buffer.
 
 ---
 ---

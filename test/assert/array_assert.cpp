@@ -22,8 +22,6 @@ void test_array_reallocate();
 } */
 
 void test_array() {
-	std::cout << "| ARRAY |" << std::endl;
-
 	test_array_default_constructor();
 	test_array_insert();
 	test_array_get();
@@ -35,7 +33,7 @@ void test_array() {
 	test_array_set_all();
 	test_array_reallocate();
 
-	std::cout << "All tests successful." << std::endl;
+	std::cout << "ARRAY tests successful." << std::endl;
 }
 
 // prec: -
@@ -171,7 +169,7 @@ void test_array_move_constructor() {
 	assert(a2.get(10) == "Ten");
 }
 
-// prec: copy_constructor
+// prec: insert
 void test_array_brackets_operator() {
 	tf::array<std::string> a;
 	a.insert(1, "One");
@@ -188,6 +186,13 @@ void test_array_brackets_operator() {
 	assert(a[1] == "Two");
 	assert(a[10] == "Ten");
 	assert(a[20] == "Twenty");
+
+	try {
+		tf::array<std::string> a2(10, false);
+
+		a2[10] = "Ten";
+		assert(false);
+	} catch (tf::exception &) {}
 }
 
 // prec: brackets_operator
