@@ -14,48 +14,48 @@ namespace tf {
 template <typename T>
 class vector {
 private:
-    size_t capacity_;
+	size_t capacity_;
 	size_t size_;
-    T *buffer;
+	T *buffer;
 
 public:
-    // constructor
-    vector(const size_t initial_capacity = 10):
-        capacity_((initial_capacity > 0) ? initial_capacity : 1),
+	// constructor
+	vector(const size_t initial_capacity = 10):
+		capacity_((initial_capacity > 0) ? initial_capacity : 1),
 		size_(0),
-        buffer(new T[capacity_]) {}
+		buffer(new T[capacity_]) {}
 
-    // copy constructor
-    vector(const vector &other):
-        capacity_(other.capacity_),
+	// copy constructor
+	vector(const vector &other):
+		capacity_(other.capacity_),
 		size_(other.size_),
-        buffer(new T[capacity_])
-    {
-        std::copy_n(other.buffer, size_, buffer);
-    }
+		buffer(new T[capacity_])
+	{
+		std::copy_n(other.buffer, size_, buffer);
+	}
 
-    // destructor
-    ~vector() {
-        delete[] buffer;
-    }
+	// destructor
+	~vector() {
+		delete[] buffer;
+	}
 
-    friend void swap(vector &first, vector &second) noexcept {
-        using std::swap;
-        swap(first.capacity_, second.capacity_);
-        swap(first.size_, second.size_);
-        swap(first.buffer, second.buffer);
-    }
+	friend void swap(vector &first, vector &second) noexcept {
+		using std::swap;
+		swap(first.capacity_, second.capacity_);
+		swap(first.size_, second.size_);
+		swap(first.buffer, second.buffer);
+	}
 
-    // move constructor
-    vector(vector &&other) noexcept : vector(1) {
-        swap(*this, other);
-    }
+	// move constructor
+	vector(vector &&other) noexcept : vector(1) {
+		swap(*this, other);
+	}
 
-    // copy assignment operator
-    vector &operator=(vector other) {
-        swap(*this, other);
-        return *this;
-    }
+	// copy assignment operator
+	vector &operator=(vector other) {
+		swap(*this, other);
+		return *this;
+	}
 
 	// O(1) / O(n) on reallocation
 	void add(const T &value) {
@@ -65,42 +65,42 @@ public:
 				throw exception("vector: add: vector too large, new capacity created buffer overflow");
 			}
 
-            reallocate(new_capacity);
-        }
+			reallocate(new_capacity);
+		}
 
 		buffer[size_++] = value;
 	}
 
-    // O(1)
-    const T &get(const size_t index) const {
+	// O(1)
+	const T &get(const size_t index) const {
 		if (index < size_)
-        	return buffer[index];
+			return buffer[index];
 		else
 			throw exception("vector: get: index larger or equal to size");
-    }
+	}
 
-    // O(1)
-    T &operator[](const size_t index) {
+	// O(1)
+	T &operator[](const size_t index) {
 		if (index < size_)
-        	return buffer[index];
+			return buffer[index];
 		else
 			throw exception("vector: []: index larger or equal to size");
-    }
+	}
 
-    // O(1)
-    const T &operator[](const size_t index) const {
-        if (index < size_)
-        	return buffer[index];
+	// O(1)
+	const T &operator[](const size_t index) const {
+		if (index < size_)
+			return buffer[index];
 		else
 			throw exception("vector: []: index larger or equal to size");
-    }
+	}
 
-    // O(n)
-    void set_all(const T &value) {
-        for (size_t i = 0; i < size_; ++i) {
-            buffer[i] = value;
-        }
-    }
+	// O(n)
+	void set_all(const T &value) {
+		for (size_t i = 0; i < size_; ++i) {
+			buffer[i] = value;
+		}
+	}
 
 	// O(n)
 	T remove(const size_t index) {
@@ -118,49 +118,49 @@ public:
 		throw exception("vector: remove: index larger or equal to size");
 	}
 
-    // O(n)
-    bool contains(const T &value) const {
-        for (size_t i = 0; i < size_; ++i) {
-            if (equals<T>(value, buffer[i])) {
-                return true;
-            }
-        }
+	// O(n)
+	bool contains(const T &value) const {
+		for (size_t i = 0; i < size_; ++i) {
+			if (equals<T>(value, buffer[i])) {
+				return true;
+			}
+		}
 
-        return false;
-    }
+		return false;
+	}
 
-    // O(n)
-    void reallocate(const size_t new_capacity) {
-        if (new_capacity == 0)
-            throw exception("vector: reallocate: new_capacity is 0");
-        
-        try {
-            T *new_buffer = new T[new_capacity];
-            std::copy_n(buffer, std::min(capacity_, new_capacity), new_buffer);
-            delete[] buffer;
-            buffer = new_buffer;
-            capacity_ = new_capacity;
-            size_ = std::min(size_, capacity_);
-        }
-        catch (std::bad_alloc &) {
-            throw exception("vector: reallocate: bad_alloc caught, vector is probably too big");
-        }
-    }
+	// O(n)
+	void reallocate(const size_t new_capacity) {
+		if (new_capacity == 0)
+			throw exception("vector: reallocate: new_capacity is 0");
+		
+		try {
+			T *new_buffer = new T[new_capacity];
+			std::copy_n(buffer, std::min(capacity_, new_capacity), new_buffer);
+			delete[] buffer;
+			buffer = new_buffer;
+			capacity_ = new_capacity;
+			size_ = std::min(size_, capacity_);
+		}
+		catch (std::bad_alloc &) {
+			throw exception("vector: reallocate: bad_alloc caught, vector is probably too big");
+		}
+	}
 
-    // O(1)
+	// O(1)
 	void clear() {
 		size_ = 0;
 	}
 
 	// O(1)
-    size_t size() const {
-        return size_;
-    }
+	size_t size() const {
+		return size_;
+	}
 
-    // O(1)
-    size_t capacity() const {
-        return capacity_;
-    }
+	// O(1)
+	size_t capacity() const {
+		return capacity_;
+	}
 
 	// O(1)
 	bool empty() const {
