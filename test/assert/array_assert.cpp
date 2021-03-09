@@ -2,94 +2,237 @@
 #include <iostream>
 #include "../../tfds/tf_array.hpp"
 
-// For manual testing
-void print_array_info(const tf::array<std::string> &a, const std::string &message = "Array info") {
-	std::cout << message << ":" << std::endl << std::endl;
-	std::cout << "Capacity: " << a.capacity() << std::endl;
-	std::cout << "Auto-Reallocating: " << a.auto_reallocating() << std::endl;
+void test_array();
+void test_array_default_constructor();
+void test_array_insert();
+void test_array_get();
+void test_array_copy_constructor();
+void test_array_swap();
+void test_array_copy_assignment();
+void test_array_move_constructor();
+void test_array_brackets_operator();
+void test_array_set_all();
+void test_array_reallocate();
 
-	std::cout << "Content: ";
-	for (int i = 0; i < a.capacity(); ++i) {
-		std::cout << a.get(i) << " | ";
-	}
-	
-	std::cout << std::endl << std::endl << "----------------------------------------" << std::endl << std::endl;
-}
 
-void print_array_assert() {
-	std::cout << "| ARRAY |" << std::endl << std::endl;
+/* int main(int argc, char *argv[]) {
+	test_array();
 
-	try {
-		// construction
-		tf::array<std::string> a;
-		tf::array<std::string> a2(1000);
-		tf::array<std::string> a3(10000, false);
-		tf::array<std::string> a4(0, false);
+	return 0;
+} */
 
-		assert(a.capacity() == 10);
-		assert(a.auto_reallocating() == true);
-		assert(a2.capacity() == 1000);
-		assert(a2.auto_reallocating() == true);
-		assert(a3.capacity() == 10000);
-		assert(a3.auto_reallocating() == false);
-		assert(a4.capacity() == 1);
-		assert(a4.auto_reallocating() == false);
+void test_array() {
+	std::cout << "| ARRAY |" << std::endl;
 
-		// insert, get and automatic reallocation
-		a.insert(0, "zero");
-		assert(a.capacity() == 10);
-		assert(a.get(0) == "zero" && a[0] == "zero");
-
-		a.insert(1001, "thousandone");
-		assert(a.capacity() == 1010);
-		assert(a.get(1001) == "thousandone" && a[1001] == "thousandone");
-
-		a[10] = "ten";
-		assert(a.capacity() == 1010);
-		assert(a.get(10) == "ten" && a[10] == "ten");
-
-		a[1999] = "ninenine";
-		assert(a.capacity() == 2020);
-		assert(a.get(1999) == "ninenine" && a[1999] == "ninenine");
-
-		// reallocate
-		a.reallocate(10000);
-		assert(a.capacity() == 10000);
-		assert(a.get(0) == "zero" && a[0] == "zero");
-		assert(a.get(10) == "ten" && a[10] == "ten");
-		assert(a.get(1001) == "thousandone" && a[1001] == "thousandone");
-		assert(a.get(1999) == "ninenine" && a[1999] == "ninenine");
-
-		a.reallocate(100);
-		assert(a.capacity() == 100);
-		assert(a.get(0) == "zero" && a[0] == "zero");
-		assert(a.get(10) == "ten" && a[10] == "ten");
-		try {
-			a.get(1001);
-			assert(false);
-			a.get(1999);
-			assert(false);
-		}
-		catch (tf::exception &) {
-			assert(true);
-		}
-
-		// set all
-		a.set_all("blah");
-		for (int i = 0; i < a.capacity(); ++i) {
-			assert(a.get(i) == "blah" && a[i] == "blah");
-		}
-	}
-	catch (tf::exception &e) {
-		std::cout << e.what() << std::endl;
-		assert(false);
-	}
+	test_array_default_constructor();
+	test_array_insert();
+	test_array_get();
+	test_array_copy_constructor();
+	test_array_swap();
+	test_array_copy_assignment();
+	test_array_move_constructor();
+	test_array_brackets_operator();
+	test_array_set_all();
+	test_array_reallocate();
 
 	std::cout << "All tests successful." << std::endl;
 }
 
-/* int main(int argc, char *argv[]) {
-	print_array_assert();
+// prec: -
+void test_array_default_constructor() {
+	tf::array<std::string> a;
+	assert(a.capacity() == 10);
+	assert(a.auto_reallocating() == true);
 
-	return 0;
-} */
+	tf::array<std::string> a2(1000);
+	assert(a2.capacity() == 1000);
+	assert(a2.auto_reallocating() == true);
+
+	tf::array<std::string> a3(0, false);
+	assert(a3.capacity() == 1);
+	assert(a3.auto_reallocating() == false);
+}
+
+// prec: default_constructor
+void test_array_insert() {
+	tf::array<std::string> a;
+
+	// -- //
+
+	a.insert(1, "One");
+	assert(a.capacity() == 10);
+
+	a.insert(10, "Ten");
+	assert(a.capacity() == 20);
+
+	a.insert(10000, "Tenthousand");
+	assert(a.capacity() == 10020);
+
+	try {
+		tf::array<std::string> a2(10, false);
+
+		a2.insert(10, "Ten");
+		assert(false);
+	} catch (tf::exception &) {}
+}
+
+// prec: insert
+void test_array_get() {
+	tf::array<std::string> a;
+
+	// -- //
+
+	a.insert(1, "One");
+	assert(a.get(1) == "One");
+
+	a.insert(10, "Ten");
+	assert(a.get(1) == "One");
+	assert(a.get(10) == "Ten");
+
+	try {
+		a.get(0);
+		a.get(20);
+		assert(false);
+	} catch (tf::exception &) {}
+}
+
+// prec: get
+void test_array_copy_constructor() {
+	tf::array<std::string> a;
+	a.insert(1, "One");
+	a.insert(10, "Ten");
+
+	// -- //
+
+	tf::array<std::string> a2(a);
+	assert(a2.capacity() == 20);
+	assert(a2.auto_reallocating() == true);
+	assert(a2.get(1) == "One");
+	assert(a2.get(10) == "Ten");
+
+	a.insert(30, "Thirty");
+	assert(a2.capacity() == 20);
+}
+
+// prec: get
+void test_array_swap() {
+	tf::array<std::string> a;
+	a.insert(1, "One");
+	a.insert(10, "Ten");
+
+	tf::array<std::string> a2(8, false);
+	a2.insert(0, "Zero");
+	a2.insert(7, "Seven");
+
+	// -- //
+
+	swap(a, a2);
+	
+	assert(a.capacity() == 8);
+	assert(a.auto_reallocating() == false);
+	assert(a.get(0) == "Zero");
+	assert(a.get(7) == "Seven");
+
+	assert(a2.capacity() == 20);
+	assert(a2.auto_reallocating() == true);
+	assert(a2.get(1) == "One");
+	assert(a2.get(10) == "Ten");
+}
+
+// prec: get
+void test_array_copy_assignment() {
+	tf::array<std::string> a;
+	a.insert(1, "One");
+	a.insert(10, "Ten");
+
+	// -- //
+
+	tf::array<std::string> a2(5, false);
+	a2 = a;
+
+	assert(a2.capacity() == 20);
+	assert(a2.auto_reallocating() == true);
+	assert(a2.get(1) == "One");
+	assert(a2.get(10) == "Ten");
+}
+
+// prec: get
+void test_array_move_constructor() {
+	tf::array<std::string> a;
+	a.insert(1, "One");
+	a.insert(10, "Ten");
+
+	// -- //
+
+	tf::array<std::string> a2(std::move(a));
+	assert(a2.capacity() == 20);
+	assert(a2.auto_reallocating() == true);
+	assert(a2.get(1) == "One");
+	assert(a2.get(10) == "Ten");
+}
+
+// prec: copy_constructor
+void test_array_brackets_operator() {
+	tf::array<std::string> a;
+	a.insert(1, "One");
+	a.insert(10, "Ten");
+
+	// -- //
+
+	assert(a[1] == "One");
+	assert(a[10] == "Ten");
+
+	a[1] = "Two";
+	a[20] = "Twenty";
+	assert(a.capacity() == 40);
+	assert(a[1] == "Two");
+	assert(a[10] == "Ten");
+	assert(a[20] == "Twenty");
+}
+
+// prec: brackets_operator
+void test_array_set_all() {
+	tf::array<std::string> a;
+	a.insert(1, "One");
+	a.insert(9, "Nine");
+	assert(a.capacity() == 10);
+
+	// -- //
+
+	a.set_all("All");
+
+	for (int i = 0; i < 10; ++i) {
+		assert(a[i] == "All");
+	}
+}
+
+// prec: backets_operator
+void test_array_reallocate() {
+	tf::array<std::string> a(10, false);
+	a[1] = "One";
+	a[3] = "Three";
+	a[9] = "Nine";
+
+	// -- //
+
+	a.reallocate(5);
+	assert(a.capacity() == 5);
+	assert(a[1] == "One");
+	assert(a[3] == "Three");
+
+	try {
+		a[9];
+		assert(false);
+	} catch (tf::exception &) {}
+	
+	a.reallocate(50);
+	assert(a.capacity() == 50);
+	assert(a[1] == "One");
+	assert(a[3] == "Three");
+
+	try {
+		a[49];
+		a[50];
+		assert(false);
+	} catch (tf::exception &) {}
+}

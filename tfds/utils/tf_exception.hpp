@@ -20,7 +20,7 @@ public:
     exception(const std::string &msg):
         msg(msg) {}
 
-    virtual ~exception() throw() {}
+    virtual ~exception() noexcept {}
 
     virtual const char *what() const throw() {
         return msg.c_str();

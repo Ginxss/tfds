@@ -13,37 +13,9 @@ namespace tf {
 template <typename T>
 class array {
 private:
-    // VARIABLES
-
     size_t capacity_;
     bool auto_realloc;
     T *buffer;
-
-    // METHODS
-
-    // reallocation size is the smallest multiple of the current capacity that can hold the index.
-    void check_index_realloc_if_on(const size_t index) {
-        if (index >= capacity_) {
-            if (auto_realloc) {
-                size_t new_capacity = capacity_ * ((index / capacity_) + 1);
-                if (new_capacity > index) {
-                    reallocate(new_capacity);
-                }
-                else {
-                    throw exception("array: index too large, new capacity created buffer overflow");
-                }
-            }
-            else {
-                throw exception("array: index larger than capacity");
-            }
-        }
-    }
-
-    void check_index_always_except(const size_t index) const {
-        if (index >= capacity_) {
-            throw exception("array: index larger than capacity");
-        }
-    }
 
 public:
     // constructor
@@ -73,19 +45,13 @@ public:
         swap(first.buffer, second.buffer);
     }
 
-    // copy assignment operator
-    array &operator=(array other) {
-        swap(*this, other);
-        return *this;
-    }
-
     // move constructor
     array(array &&other) noexcept : array(1) {
         swap(*this, other);
     }
 
-    // move assignment operator
-    array &operator=(array &&other) {
+    // copy assignment operator
+    array &operator=(array other) {
         swap(*this, other);
         return *this;
     }
@@ -145,6 +111,31 @@ public:
         }
         catch (std::bad_alloc &) {
             throw exception("array: reallocate: bad_alloc caught, new_capacity is probably too big");
+        }
+    }
+
+private:
+    // reallocation size is the smallest multiple of the current capacity that can hold the index.
+    void check_index_realloc_if_on(const size_t index) {
+        if (index >= capacity_) {
+            if (auto_realloc) {
+                size_t new_capacity = capacity_ * ((index / capacity_) + 1);
+                if (new_capacity > index) {
+                    reallocate(new_capacity);
+                }
+                else {
+                    throw exception("array: index too large, new capacity created buffer overflow");
+                }
+            }
+            else {
+                throw exception("array: index larger than capacity");
+            }
+        }
+    }
+
+    void check_index_always_except(const size_t index) const {
+        if (index >= capacity_) {
+            throw exception("array: index larger than capacity");
         }
     }
 };
