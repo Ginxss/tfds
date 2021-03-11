@@ -24,6 +24,24 @@ private:
             value(value), prev(prev), next(next) {}
     };
 
+    node *create_node(const T &value, node *prev, node *next) {
+        node *n = new node(value, prev, next);
+        ++length_;
+        return n;
+    }
+
+    void destroy_node(node *n) {
+        --length_;
+        delete n;
+    }
+
+    // VARIABLES
+
+    size_t length_;
+    node *start_node;
+    node *end_node;
+
+public:
     // ITERATORS
 
     class iterator {
@@ -60,26 +78,8 @@ private:
         bool condition() const { return nd != nullptr; }
     };
 
-    // VARIABLES
+    // CLASS
 
-    size_t length_;
-    node *start_node;
-    node *end_node;
-
-    // METHODS
-
-    node *create_node(const T &value, node *prev, node *next) {
-        node *n = new node(value, prev, next);
-        ++length_;
-        return n;
-    }
-
-    void destroy_node(node *n) {
-        --length_;
-        delete n;
-    }
-
-public:
     // constructor
     linked_list():
         length_(0),
@@ -111,19 +111,13 @@ public:
         swap(first.end_node, second.end_node);
     }
 
-    // copy assignment operator
-    linked_list &operator=(linked_list other) {
-        swap(*this, other);
-        return *this;
-    }
-
     // move constructor
     linked_list(linked_list &&other) noexcept : linked_list() {
         swap(*this, other);
     }
 
-    // move assignment operator
-    linked_list &operator=(linked_list &&other) {
+    // copy assignment operator
+    linked_list &operator=(linked_list other) {
         swap(*this, other);
         return *this;
     }
@@ -255,44 +249,42 @@ public:
 
     // O(1)
     T pop_back() {
-        if (end_node) {
-            T result = end_node->value;
-            node *to_delete = end_node;
+        if (!end_node)
+            throw exception("linked list: pop_back: list is empty");
 
-            if (end_node->prev) {
-                end_node = end_node->prev;
-                end_node->next = nullptr;
-            }
-            else {
-                end_node = start_node = nullptr;
-            }
-            
-            destroy_node(to_delete);
-            return result;
+        T result = end_node->value;
+        node *to_delete = end_node;
+
+        if (end_node->prev) {
+            end_node = end_node->prev;
+            end_node->next = nullptr;
         }
-
-        throw exception("linked list: pop_back: list is empty");        
+        else {
+            end_node = start_node = nullptr;
+        }
+        
+        destroy_node(to_delete);
+        return result;
     }
 
     // O(1)
     T pop_front() {
-        if (start_node) {
-            T result = start_node->value;
-            node *to_delete = start_node;
+        if (!start_node)
+            throw exception("linked list: pop_front: list is empty");        
 
-            if (start_node->next) {
-                start_node = start_node->next;
-                start_node->prev = nullptr;
-            }
-            else {
-                start_node = end_node = nullptr;
-            }
+        T result = start_node->value;
+        node *to_delete = start_node;
 
-            destroy_node(to_delete);
-            return result;
+        if (start_node->next) {
+            start_node = start_node->next;
+            start_node->prev = nullptr;
+        }
+        else {
+            start_node = end_node = nullptr;
         }
 
-        throw exception("linked list: pop_front: list is empty");        
+        destroy_node(to_delete);
+        return result;
     }
 
     // O(1)

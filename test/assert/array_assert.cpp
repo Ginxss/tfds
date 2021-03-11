@@ -8,8 +8,8 @@ void test_array_insert();
 void test_array_get();
 void test_array_copy_constructor();
 void test_array_swap();
-void test_array_copy_assignment();
 void test_array_move_constructor();
+void test_array_copy_assignment();
 void test_array_brackets_operator();
 void test_array_set_all();
 void test_array_reallocate();
@@ -27,8 +27,8 @@ void test_array() {
 	test_array_get();
 	test_array_copy_constructor();
 	test_array_swap();
-	test_array_copy_assignment();
 	test_array_move_constructor();
+	test_array_copy_assignment();
 	test_array_brackets_operator();
 	test_array_set_all();
 	test_array_reallocate();
@@ -138,6 +138,21 @@ void test_array_swap() {
 }
 
 // prec: get
+void test_array_move_constructor() {
+	tf::array<std::string> a;
+	a.insert(1, "One");
+	a.insert(10, "Ten");
+
+	// -- //
+
+	tf::array<std::string> a2(std::move(a));
+	assert(a2.capacity() == 20);
+	assert(a2.auto_reallocating() == true);
+	assert(a2.get(1) == "One");
+	assert(a2.get(10) == "Ten");
+}
+
+// prec: get
 void test_array_copy_assignment() {
 	tf::array<std::string> a;
 	a.insert(1, "One");
@@ -148,21 +163,6 @@ void test_array_copy_assignment() {
 	tf::array<std::string> a2(5, false);
 	a2 = a;
 
-	assert(a2.capacity() == 20);
-	assert(a2.auto_reallocating() == true);
-	assert(a2.get(1) == "One");
-	assert(a2.get(10) == "Ten");
-}
-
-// prec: get
-void test_array_move_constructor() {
-	tf::array<std::string> a;
-	a.insert(1, "One");
-	a.insert(10, "Ten");
-
-	// -- //
-
-	tf::array<std::string> a2(std::move(a));
 	assert(a2.capacity() == 20);
 	assert(a2.auto_reallocating() == true);
 	assert(a2.get(1) == "One");

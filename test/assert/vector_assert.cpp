@@ -8,8 +8,8 @@ void test_vector_add();
 void test_vector_get();
 void test_vector_copy_constructor();
 void test_vector_swap();
-void test_vector_copy_assignment();
 void test_vector_move_constructor();
+void test_vector_copy_assignment();
 void test_vector_brackets_operator();
 void test_vector_set_all();
 void test_vector_contains();
@@ -31,8 +31,8 @@ void test_vector() {
 	test_vector_get();
 	test_vector_copy_constructor();
 	test_vector_swap();
-	test_vector_copy_assignment();
 	test_vector_move_constructor();
+	test_vector_copy_assignment();
 	test_vector_brackets_operator();
 	test_vector_set_all();
 	test_vector_contains();
@@ -146,6 +146,21 @@ void test_vector_swap() {
 }
 
 // prec: get
+void test_vector_move_constructor() {
+	tf::vector<std::string> v(9);
+	v.add("Zero");
+	v.add("One");
+
+	// -- //
+
+	tf::vector<std::string> v2(std::move(v));
+	assert(v2.size() == 2);
+	assert(v2.capacity() == 9);
+	assert(v2.get(0) == "Zero");
+	assert(v2.get(1) == "One");
+}
+
+// prec: get
 void test_vector_copy_assignment() {
 	tf::vector<std::string> v(1);
 	v.add("Zero");
@@ -158,21 +173,6 @@ void test_vector_copy_assignment() {
 
 	assert(v2.size() == 2);
 	assert(v2.capacity() == 2);
-	assert(v2.get(0) == "Zero");
-	assert(v2.get(1) == "One");
-}
-
-// prec: get
-void test_vector_move_constructor() {
-	tf::vector<std::string> v(9);
-	v.add("Zero");
-	v.add("One");
-
-	// -- //
-
-	tf::vector<std::string> v2(std::move(v));
-	assert(v2.size() == 2);
-	assert(v2.capacity() == 9);
 	assert(v2.get(0) == "Zero");
 	assert(v2.get(1) == "One");
 }
