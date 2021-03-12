@@ -224,19 +224,13 @@ public:
         swap(first.buckets, second.buckets);
     }
 
-    // copy assignment operator
-    hash_table &operator=(hash_table other) {
-        swap(*this, other);
-        return *this;
-    }
-
     // move constructor
     hash_table(hash_table &&other) noexcept : hash_table(1) {
         swap(*this, other);
     }
 
-    // move assignment operator
-    hash_table &operator=(hash_table &&other) {
+    // copy assignment operator
+    hash_table &operator=(hash_table other) {
         swap(*this, other);
         return *this;
     }

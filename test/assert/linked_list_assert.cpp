@@ -20,6 +20,7 @@ void test_list_pop_front();
 void test_list_contains();
 void test_list_remove();
 void test_list_iteration();
+void test_list_empty();
 void test_list_clear();
 
 
@@ -47,6 +48,7 @@ void test_list() {
 	test_list_contains();
 	test_list_remove();
 	test_list_iteration();
+	test_list_empty();
 	test_list_clear();
 
 	std::cout << "LINKED LIST tests successful." << std::endl;
