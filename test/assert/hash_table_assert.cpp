@@ -18,11 +18,11 @@ void test_table_empty();
 void test_table_clear();
 
 
-int main(int argc, char *argv[]) {
+/* int main(int argc, char *argv[]) {
 	test_table();
 
 	return 0;
-}
+} */
 
 void test_table() {
 	test_table_default_constructor();
@@ -38,6 +38,8 @@ void test_table() {
 	test_table_iteration();
 	test_table_empty();
 	test_table_clear();
+
+	std::cout << "HASH TABLE tests successful." << std::endl;
 }
 
 // prec: -

@@ -73,6 +73,33 @@ private:
             key(key), value(value), next(next) {}
     };
 
+    bucket *create_bucket(const K &key, const V &value, bucket *next) {
+        bucket *b = new bucket(key, value, next);
+        ++size_;
+        return b;
+    }
+
+    void destroy_bucket(bucket *b) {
+        --size_;
+        delete b;
+    }
+
+    void destroy_all_buckets(bucket *b) {
+        while (b) {
+            bucket *to_delete = b;
+            b = b->next;
+            destroy_bucket(to_delete);
+        }
+    }
+
+    // VARIABLES
+
+    size_t table_size_;
+    size_t size_;
+    bool check_duplicate_keys;
+    bucket **buckets;
+
+public:
     // ITERATORS
 
     class iterator {
@@ -151,35 +178,8 @@ private:
         bool condition() const { return current_bucket != nullptr; }
     };
 
-    // VARIABLES
+    // CLASS
 
-    size_t table_size_;
-    size_t size_;
-    bool check_duplicate_keys;
-    bucket **buckets;
-
-    // METHODS
-
-    bucket *create_bucket(const K &key, const V &value, bucket *next) {
-        bucket *b = new bucket(key, value, next);
-        ++size_;
-        return b;
-    }
-
-    void destroy_bucket(bucket *b) {
-        --size_;
-        delete b;
-    }
-
-    void destroy_all_buckets(bucket *b) {
-        while (b) {
-            bucket *to_delete = b;
-            b = b->next;
-            destroy_bucket(to_delete);
-        }
-    }
-
-public:
     // constructor
     hash_table(const size_t table_size = 100, const bool check_duplicate_keys = true):
         table_size_((table_size > 0) ? table_size : 1),
@@ -358,12 +358,12 @@ public:
         return false;
     }
 
-    iterator begin() {
-        return iterator(this);
-    }
-
-    const_iterator begin() const {
-        return const_iterator(this);
+    // O(n)
+    void clear() {
+        for (size_t i = 0; i < table_size_; ++i) {
+            destroy_all_buckets(buckets[i]);
+            buckets[i] = nullptr;
+        }
     }
 
     // O(1)
@@ -386,12 +386,12 @@ public:
         return size_ == 0;
     }
 
-    // O(n)
-    void clear() {
-        for (size_t i = 0; i < table_size_; ++i) {
-            destroy_all_buckets(buckets[i]);
-            buckets[i] = nullptr;
-        }
+    iterator begin() {
+        return iterator(this);
+    }
+
+    const_iterator begin() const {
+        return const_iterator(this);
     }
 };
 

@@ -287,24 +287,17 @@ public:
         return result;
     }
 
-    // O(1)
-    iterator begin() {
-        return iterator(start_node);
-    }
+    // O(n)
+    void clear() {
+        node *it = start_node;
+        while (it) {
+            node *to_delete = it;
+            it = it->next;
+            destroy_node(to_delete);
+        }
 
-    // O(1)
-    const_iterator begin() const {
-        return const_iterator(start_node);
-    }
-
-    // O(1)
-    iterator end() {
-        return iterator(end_node);
-    }
-
-    // O(1)
-    const_iterator end() const {
-        return const_iterator(end_node);
+        start_node = nullptr;
+        end_node = nullptr;
     }
 
     // O(n)
@@ -331,17 +324,24 @@ public:
         return start_node == nullptr;
     }
 
-    // O(n)
-    void clear() {
-        node *it = start_node;
-        while (it) {
-            node *to_delete = it;
-            it = it->next;
-            destroy_node(to_delete);
-        }
+    // O(1)
+    iterator begin() {
+        return iterator(start_node);
+    }
 
-        start_node = nullptr;
-        end_node = nullptr;
+    // O(1)
+    const_iterator begin() const {
+        return const_iterator(start_node);
+    }
+
+    // O(1)
+    iterator end() {
+        return iterator(end_node);
+    }
+
+    // O(1)
+    const_iterator end() const {
+        return const_iterator(end_node);
     }
 };
 
