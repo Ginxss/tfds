@@ -5,8 +5,6 @@
 #include "utils/tf_exception.hpp"
 #include "utils/tf_compare_functions.hpp"
 
-#include <iostream>
-
 namespace tf {
 
 /*
@@ -24,141 +22,6 @@ private:
         value_bucket(const V &value, value_bucket *next):
             value(value), next(next) {}
     };
-
-    // NODE
-
-    struct node {
-        K key;
-        value_bucket *bucket;
-        size_t height;
-        node *parent;
-        node *left;
-        node *right;
-
-        node(const K &key, value_bucket *bucket, const size_t height, node *parent, node *left, node *right):
-            key(key), bucket(bucket), height(height), parent(parent), left(left), right(right) {}
-    };
-
-    // ITERATORS
-
-    class iterator {
-    private:
-        search_tree *tree;
-        value_bucket *current_bucket;
-        node *current_node;
-
-        void next_bucket() {
-            if (current_bucket->next) {
-                current_bucket = current_bucket->next;
-                return;
-            }
-
-            current_node = tree->successor(current_node);
-            if (current_node)
-                current_bucket = current_node->bucket;
-            else
-                current_bucket = nullptr;
-        }
-
-        void prev_bucket() {
-            if (current_bucket->next) {
-                current_bucket = current_bucket->next;
-                return;
-            }
-
-            current_node = tree->predecessor(current_node);
-            if (current_node)
-                current_bucket = current_node->bucket;
-            else
-                current_bucket = nullptr;
-        }
-    
-    public:
-        iterator(search_tree *tree, const bool forward):
-            tree(tree)
-        {
-            if (forward)
-                current_node = tree->min_node(tree->root);
-            else
-                current_node = tree->max_node(tree->root);
-            
-            if (current_node)
-                current_bucket = current_node->bucket;
-            else
-                current_bucket = nullptr;
-        }
-
-        const K &key() const { return current_node->key; }
-        V &operator*() { return current_bucket->value; }
-        V &value() { return current_bucket->value; }
-        void operator++() { next_bucket(); }
-        void operator--() { prev_bucket(); }
-        bool condition() const { return current_bucket != nullptr; }
-    };
-
-    class const_iterator {
-    private:
-        const search_tree *tree;
-        value_bucket *current_bucket;
-        node *current_node;
-
-        void next_bucket() {
-            if (current_bucket->next) {
-                current_bucket = current_bucket->next;
-                return;
-            }
-
-            current_node = tree->successor(current_node);
-            if (current_node)
-                current_bucket = current_node->bucket;
-            else
-                current_bucket = nullptr;
-        }
-
-        void prev_bucket() {
-            if (current_bucket->next) {
-                current_bucket = current_bucket->next;
-                return;
-            }
-
-            current_node = tree->predecessor(current_node);
-            if (current_node)
-                current_bucket = current_node->bucket;
-            else
-                current_bucket = nullptr;
-        }
-    
-    public:
-        const_iterator(const search_tree *tree, const bool forward):
-            tree(tree)
-        {
-            if (forward)
-                current_node = tree->min_node(tree->root);
-            else
-                current_node = tree->max_node(tree->root);
-            
-            if (current_node)
-                current_bucket = current_node->bucket;
-            else
-                current_bucket = nullptr;
-        }
-
-        const K &key() const { return current_node->key; }
-        const V &operator*() const { return current_bucket->value; }
-        const V &value() const { return current_bucket->value; }
-        void operator++() { next_bucket(); }
-        void operator--() { prev_bucket(); }
-        bool condition() const { return current_bucket != nullptr; }
-    };
-
-
-    // VARIABLES
-
-    size_t size_;
-    bool allow_duplicate_keys;
-    node *root;
-
-    // METHODS
 
     value_bucket *create_value_bucket(const V &value, value_bucket *next) {
         value_bucket *b = new value_bucket(value, next);
@@ -178,6 +41,20 @@ private:
             destroy_value_bucket(to_delete);
         }
     }
+
+    // NODE
+
+    struct node {
+        K key;
+        value_bucket *bucket;
+        size_t height;
+        node *parent;
+        node *left;
+        node *right;
+
+        node(const K &key, value_bucket *bucket, const size_t height, node *parent, node *left, node *right):
+            key(key), bucket(bucket), height(height), parent(parent), left(left), right(right) {}
+    };
 
     node *create_node(const K &key, const V &value, node *parent) {
         node *n = new node(key, create_value_bucket(value, nullptr), 1, parent, nullptr, nullptr);
@@ -367,7 +244,6 @@ private:
         }
         else {
             root = nullptr;
-            rebalance_upward(root);
         }
 
         destroy_node(to_delete);
@@ -412,7 +288,127 @@ private:
             remove_leaf(n);
     }
 
+    // VARIABLES
+
+    size_t size_;
+    bool allow_duplicate_keys;
+    node *root;   
+
 public:
+    // ITERATORS
+
+    class iterator {
+    private:
+        search_tree *tree;
+        value_bucket *current_bucket;
+        node *current_node;
+
+        void next_bucket() {
+            if (current_bucket->next) {
+                current_bucket = current_bucket->next;
+                return;
+            }
+
+            current_node = tree->successor(current_node);
+            if (current_node)
+                current_bucket = current_node->bucket;
+            else
+                current_bucket = nullptr;
+        }
+
+        void prev_bucket() {
+            if (current_bucket->next) {
+                current_bucket = current_bucket->next;
+                return;
+            }
+
+            current_node = tree->predecessor(current_node);
+            if (current_node)
+                current_bucket = current_node->bucket;
+            else
+                current_bucket = nullptr;
+        }
+    
+    public:
+        iterator(search_tree *tree, const bool forward):
+            tree(tree)
+        {
+            if (forward)
+                current_node = tree->min_node(tree->root);
+            else
+                current_node = tree->max_node(tree->root);
+            
+            if (current_node)
+                current_bucket = current_node->bucket;
+            else
+                current_bucket = nullptr;
+        }
+
+        const K &key() const { return current_node->key; }
+        V &operator*() { return current_bucket->value; }
+        V &value() { return current_bucket->value; }
+        void operator++() { next_bucket(); }
+        void operator--() { prev_bucket(); }
+        bool condition() const { return current_bucket != nullptr; }
+    };
+
+    class const_iterator {
+    private:
+        const search_tree *tree;
+        value_bucket *current_bucket;
+        node *current_node;
+
+        void next_bucket() {
+            if (current_bucket->next) {
+                current_bucket = current_bucket->next;
+                return;
+            }
+
+            current_node = tree->successor(current_node);
+            if (current_node)
+                current_bucket = current_node->bucket;
+            else
+                current_bucket = nullptr;
+        }
+
+        void prev_bucket() {
+            if (current_bucket->next) {
+                current_bucket = current_bucket->next;
+                return;
+            }
+
+            current_node = tree->predecessor(current_node);
+            if (current_node)
+                current_bucket = current_node->bucket;
+            else
+                current_bucket = nullptr;
+        }
+    
+    public:
+        const_iterator(const search_tree *tree, const bool forward):
+            tree(tree)
+        {
+            if (forward)
+                current_node = tree->min_node(tree->root);
+            else
+                current_node = tree->max_node(tree->root);
+            
+            if (current_node)
+                current_bucket = current_node->bucket;
+            else
+                current_bucket = nullptr;
+        }
+
+        const K &key() const { return current_node->key; }
+        const V &operator*() const { return current_bucket->value; }
+        const V &value() const { return current_bucket->value; }
+        void operator++() { next_bucket(); }
+        void operator--() { prev_bucket(); }
+        bool condition() const { return current_bucket != nullptr; }
+    };
+
+    // CLASS
+
     // constructor
     search_tree(const bool allow_duplicate_keys = false):
         size_(0),
@@ -442,19 +438,13 @@ public:
         swap(first.root, second.root);
     }
 
-    // copy assignment operator
-    search_tree &operator=(search_tree other) {
-        swap(*this, other);
-        return *this;
-    }
-
     // move constructor
     search_tree(search_tree &&other) noexcept : search_tree() {
         swap(*this, other);
     }
 
-    // move assignment operator
-    search_tree &operator=(search_tree &&other) {
+    // copy assignment operator
+    search_tree &operator=(search_tree other) {
         swap(*this, other);
         return *this;
     }
@@ -720,26 +710,6 @@ public:
     }
 
     // O(log(n))
-    iterator begin() {
-        return iterator(this, true);
-    }
-
-    // O(log(n))
-    const_iterator begin() const {
-        return const_iterator(this, true);
-    }
-
-    // O(log(n))
-    iterator end() {
-        return iterator(this, false);
-    }
-
-    // O(log(n))
-    const_iterator end() const {
-        return const_iterator(this, false);
-    }
-
-    // O(log(n))
     bool contains(const K &key) const {
         node *it = root;
         while (it) {
@@ -784,26 +754,6 @@ public:
         return false;
     }
 
-    // O(1)
-    size_t height() const {
-        return node_height(root);
-    }
-
-    // O(1)
-    size_t size() const {
-        return size_;
-    }
-
-    // O(1)
-    bool empty() const {
-        return root == nullptr;
-    }
-
-    // O(1)
-    bool allows_duplicate_keys() const {
-        return allow_duplicate_keys;
-    }
-
     // O(n)
     void clear() {
         node *it = root;
@@ -833,58 +783,45 @@ public:
         }
     }
 
-    // DEBUG
-    /* void print() const {
-        tf::vector<node*> level;
-        tf::vector<node*> next_level;
+    // O(1)
+    size_t size() const {
+        return size_;
+    }
 
-        level.add(root);
+    // O(1)
+    size_t height() const {
+        return node_height(root);
+    }
+    
+    // O(1)
+    bool empty() const {
+        return root == nullptr;
+    }
 
-        while (true) {
-            std::cout << "|";
+    // O(1)
+    bool allows_duplicate_keys() const {
+        return allow_duplicate_keys;
+    }
 
-            for (int i = 0; i < level.size(); ++i) {
-                node *it = level[i];
-                if (it) {
-                    value_bucket *b = it->bucket;
-                    std::cout << " (" << it->height << ") " << b->value;
+    // O(log(n))
+    iterator begin() {
+        return iterator(this, true);
+    }
 
-                    while (b->next) {
-                        std::cout << "," << b->next->value;
-                        b = b->next;
-                    }
+    // O(log(n))
+    const_iterator begin() const {
+        return const_iterator(this, true);
+    }
 
-                    next_level.add(it->left);
-                    next_level.add(it->right);
-                }
-                else {
-                    std::cout << " -";
-                    next_level.add(nullptr);
-                    next_level.add(nullptr);
-                }
+    // O(log(n))
+    iterator end() {
+        return iterator(this, false);
+    }
 
-                std::cout << " |";
-            }
-
-            std::cout << std::endl;
-
-            bool cancel = true;
-            for (int i = 0; i < next_level.size(); ++i) {
-                if (next_level[i] != nullptr) {
-                    cancel = false;
-                    break;
-                }
-            }
-            if (cancel) {
-                break;
-            }
-
-            level = next_level;
-            next_level.clear();
-        }
-
-        std::cout << std::endl;
-    } */
+    // O(log(n))
+    const_iterator end() const {
+        return const_iterator(this, false);
+    }
 };
 
 }

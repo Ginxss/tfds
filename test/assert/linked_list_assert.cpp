@@ -424,15 +424,15 @@ void test_list_iteration() {
 	assert(i == 3);
 
 	for (auto it = l.end(); it.condition(); --it) {
+		--i;
 		switch (i) {
-		case 3: assert(it.value() == "Two"); break;
-		case 2: assert(it.value() == "One"); break;
-		case 1:
+		case 2: assert(it.value() == "Two"); break;
+		case 1: assert(it.value() == "One"); break;
+		case 0:
 			assert(it.value() == "Zero");
 			it.value() = "New Zero";
 			break;
 		}
-		--i;
 	}
 	assert(i == 0);
 
@@ -455,15 +455,15 @@ void test_list_iteration() {
 	assert(i == 3);
 
 	for (auto it = l2.end(); it.condition(); --it) {
+		--i;
 		switch (i) {
-		case 3: assert(*it == "Two"); break;
-		case 2: assert(*it == "One"); break;
-		case 1:
+		case 2: assert(*it == "Two"); break;
+		case 1: assert(*it == "One"); break;
+		case 0:
 			assert(*it == "Zero");
 			// it.value() = "New Zero";
 			break;
 		}
-		--i;
 	}
 	assert(i == 0);
 

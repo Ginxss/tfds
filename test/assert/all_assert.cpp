@@ -1,23 +1,15 @@
 #include "array_assert.cpp"
 #include "vector_assert.cpp"
-#include "list_assert.cpp"
-#include "table_assert.cpp"
-#include "tree_assert.cpp"
+#include "linked_list_assert.cpp"
+#include "hash_table_assert.cpp"
+#include "search_tree_assert.cpp"
 
 int main(int argc, char *argv[]) {
-	print_array_assert();
-	std::cout << std::endl << "******************************" << std::endl << std::endl;
-
-	print_vector_assert();
-	std::cout << std::endl << "******************************" << std::endl << std::endl;
-
-	print_list_assert();
-	std::cout << std::endl << "******************************" << std::endl << std::endl;
-
-	print_table_assert();
-	std::cout << std::endl << "******************************" << std::endl << std::endl;
-
-	print_tree_assert();
+	test_array();
+	test_vector();
+	test_list();
+	test_table();
+	test_tree();
 
 	return 0;
 }
