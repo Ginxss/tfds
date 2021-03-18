@@ -74,6 +74,12 @@ void test_table_insert() {
 	h.insert("Two", 2);
 	assert(h.size() == 2);
 
+	h.insert("Three", 3);
+	assert(h.size() == 3);
+
+	h.insert("Four", 4);
+	assert(h.size() == 4);
+
 	try {
 		h.insert("Two", 22);
 		assert(false);
@@ -89,14 +95,18 @@ void test_table_get() {
 	tf::hash_table<std::string, int> h;
 	h.insert("One", 1);
 	h.insert("Two", 2);
+	h.insert("Three", 3);
+	h.insert("Four", 4);
 
 	// -- //
 
 	assert(h.get("One") == 1);
 	assert(h.get("Two") == 2);
+	assert(h.get("Three") == 3);
+	assert(h.get("Four") == 4);
 
 	try {
-		h.get("Three");
+		h.get("Five");
 		assert(false);
 	} catch (tf::exception &) {}
 }
@@ -106,18 +116,22 @@ void test_table_copy_constructor() {
 	tf::hash_table<std::string, int> h(10, false);
 	h.insert("One", 1);
 	h.insert("Two", 2);
+	h.insert("Three", 3);
+	h.insert("Four", 4);
 
 	// -- //
 
 	tf::hash_table<std::string, int> h2(h);
-	assert(h2.size() == 2);
+	assert(h2.size() == 4);
 	assert(h2.table_size() == 10);
 	assert(h2.checks_duplicate_keys() == false);
 	assert(h2.get("One") == 1);
 	assert(h2.get("Two") == 2);
+	assert(h2.get("Three") == 3);
+	assert(h2.get("Four") == 4);
 
-	h2.insert("Three", 3);
-	assert(h.size() == 2);
+	h2.insert("Five", 5);
+	assert(h.size() == 4);
 }
 
 // prec: get
@@ -154,15 +168,19 @@ void test_table_move_constructor() {
 	tf::hash_table<std::string, int> h(10);
 	h.insert("One", 1);
 	h.insert("Two", 2);
+	h.insert("Three", 3);
+	h.insert("Four", 4);
 
 	// -- //
 
 	tf::hash_table<std::string, int> h2(std::move(h));
-	assert(h2.size() == 2);
+	assert(h2.size() == 4);
 	assert(h2.table_size() == 10);
 	assert(h2.checks_duplicate_keys() == true);
 	assert(h2.get("One") == 1);
 	assert(h2.get("Two") == 2);
+	assert(h2.get("Three") == 3);
+	assert(h2.get("Four") == 4);
 }
 
 // prec: get
@@ -170,17 +188,21 @@ void test_table_copy_assignment() {
 	tf::hash_table<std::string, int> h(10);
 	h.insert("One", 1);
 	h.insert("Two", 2);
+	h.insert("Three", 3);
+	h.insert("Four", 4);
 
 	// -- //
 
 	tf::hash_table<std::string, int> h2;
 	h2 = h;
 
-	assert(h2.size() == 2);
+	assert(h2.size() == 4);
 	assert(h2.table_size() == 10);
 	assert(h2.checks_duplicate_keys() == true);
 	assert(h2.get("One") == 1);
 	assert(h2.get("Two") == 2);
+	assert(h2.get("Three") == 3);
+	assert(h2.get("Four") == 4);
 }
 
 // prec: insert
@@ -194,9 +216,15 @@ void test_table_contains() {
 	assert(h.contains("One") == true);
 
 	assert(h.contains("Two") == false);
-	h.insert("Two", 1);
+	h.insert("Two", 2);
 	assert(h.contains("One") == true);
 	assert(h.contains("Two") == true);
+
+	assert(h.contains("Three") == false);
+	h.insert("Three", 3);
+	assert(h.contains("One") == true);
+	assert(h.contains("Two") == true);
+	assert(h.contains("Three") == true);
 }
 
 // prec: contains
@@ -204,19 +232,34 @@ void test_table_remove() {
 	tf::hash_table<std::string, int> h;
 	h.insert("One", 1);
 	h.insert("Two", 2);
+	h.insert("Three", 3);
+	h.insert("Four", 4);
 
 	// -- //
 
+	try {
+		h.remove("Five");
+		assert(false);
+	} catch (tf::exception &) {}
+
 	assert(h.remove("One") == 1);
-	assert(h.size() == 1);
+	assert(h.size() == 3);
 	assert(h.contains("One") == false);
+
+	assert(h.remove("Three") == 3);
+	assert(h.size() == 2);
+	assert(h.contains("Three") == false);
+
+	assert(h.remove("Four") == 4);
+	assert(h.size() == 1);
+	assert(h.contains("Four") == false);
 
 	assert(h.remove("Two") == 2);
 	assert(h.size() == 0);
 	assert(h.contains("Two") == false);
 
 	try {
-		h.remove("Three");
+		h.remove("One");
 		assert(false);
 	} catch (tf::exception &) {}
 }
@@ -226,14 +269,18 @@ void test_table_brackets_operator() {
 	tf::hash_table<std::string, int> h;
 	h.insert("One", 1);
 	h.insert("Two", 2);
+	h.insert("Three", 3);
+	h.insert("Four", 4);
 
 	// -- //
 
 	assert(h["One"] == 1);
 	assert(h["Two"] == 2);
+	assert(h["Three"] == 3);
+	assert(h["Four"] == 4);
 
 	try {
-		h["Three"];
+		h["Five"];
 		assert(false);
 	} catch (tf::exception &) {}
 }
@@ -244,15 +291,16 @@ void test_table_iteration() {
 	h.insert("One", 1);
 	h.insert("Two", 2);
 	h.insert("Three", 3);
+	h.insert("Four", 4);
 
 	// -- //
 
 	int i = 0;
 	for (auto it = h.begin(); it.condition(); ++it) {
-		assert(*it == 1 || *it == 2 || *it == 3);
+		assert(*it == 1 || *it == 2 || *it == 3 || *it == 4);
 		++i;
 	}
-	assert(i == 3);
+	assert(i == 4);
 }
 
 // prec: remove
@@ -276,7 +324,7 @@ void test_table_empty() {
 
 // prec: empty
 void test_table_clear() {
-	tf::hash_table<std::string, int> h;
+	tf::hash_table<std::string, int> h(10);
 	h.insert("One", 1);
 	h.insert("Two", 2);
 	h.insert("Three", 3);
@@ -285,7 +333,7 @@ void test_table_clear() {
 
 	h.clear();
 	assert(h.size() == 0);
-	assert(h.table_size() == 100);
+	assert(h.table_size() == 10);
 	assert(h.empty() == true);
 	assert(h.checks_duplicate_keys() == true);
 

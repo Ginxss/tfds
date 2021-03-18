@@ -49,17 +49,14 @@ void test_vector_default_constuctor() {
 	tf::vector<std::string> v;
 	assert(v.size() == 0);
 	assert(v.capacity() == 10);
-	assert(v.empty() == true);
 
 	tf::vector<std::string> v2(1000);
 	assert(v2.size() == 0);
 	assert(v2.capacity() == 1000);
-	assert(v2.empty() == true);
 
 	tf::vector<std::string> v3(0);
 	assert(v3.size() == 0);
 	assert(v3.capacity() == 1);
-	assert(v3.empty() == true);
 }
 
 // prec: default_constructor
@@ -69,6 +66,9 @@ void test_vector_add() {
 	// -- //
 
 	v.add("Zero");
+	assert(v.size() == 1);
+	assert(v.capacity() == 2);
+
 	v.add("One");
 	assert(v.size() == 2);
 	assert(v.capacity() == 2);
@@ -76,6 +76,14 @@ void test_vector_add() {
 	v.add("Two");
 	assert(v.size() == 3);
 	assert(v.capacity() == 4);
+
+	v.add("Three");
+	assert(v.size() == 4);
+	assert(v.capacity() == 4);
+
+	v.add("Four");
+	assert(v.size() == 5);
+	assert(v.capacity() == 8);
 }
 
 // prec: add
@@ -104,7 +112,7 @@ void test_vector_get() {
 
 // prec: get
 void test_vector_copy_constructor() {
-	tf::vector<std::string> v(1);
+	tf::vector<std::string> v(9);
 	v.add("Zero");
 	v.add("One");
 
@@ -112,7 +120,7 @@ void test_vector_copy_constructor() {
 
 	tf::vector<std::string> v2(v);
 	assert(v.size() == 2);
-	assert(v.capacity() == 2);
+	assert(v.capacity() == 9);
 	assert(v.get(0) == "Zero");
 	assert(v.get(1) == "One");
 
@@ -162,7 +170,7 @@ void test_vector_move_constructor() {
 
 // prec: get
 void test_vector_copy_assignment() {
-	tf::vector<std::string> v(1);
+	tf::vector<std::string> v(9);
 	v.add("Zero");
 	v.add("One");
 
@@ -172,7 +180,7 @@ void test_vector_copy_assignment() {
 	v2 = v;
 
 	assert(v2.size() == 2);
-	assert(v2.capacity() == 2);
+	assert(v2.capacity() == 9);
 	assert(v2.get(0) == "Zero");
 	assert(v2.get(1) == "One");
 }
@@ -194,7 +202,7 @@ void test_vector_brackets_operator() {
 	} catch (tf::exception &) {}
 }
 
-// prec: add
+// prec: brackets_operator
 void test_vector_set_all() {
 	tf::vector<std::string> v;
 	v.add("Zero");
@@ -224,6 +232,12 @@ void test_vector_contains() {
 	v.add("One");
 	assert(v.contains("Zero") == true);
 	assert(v.contains("One") == true);
+
+	assert(v.contains("Two") == false);
+	v.add("Two");
+	assert(v.contains("Zero") == true);
+	assert(v.contains("One") == true);
+	assert(v.contains("Two") == true);
 }
 
 // prec: contains, brackets_operator
@@ -235,7 +249,7 @@ void test_vector_remove() {
 
 	// -- //
 
-	v.remove(1);
+	assert(v.remove(1) == "One");
 	assert(v.size() == 2);
 	assert(v.capacity() == 10);
 	assert(v.contains("One") == false);
@@ -247,9 +261,9 @@ void test_vector_remove() {
 		assert(false);
 	} catch (tf::exception &) {}
 
-	v.remove(1);
+	assert(v.remove(1) == "Two");
 	assert(v.size() == 1);
-	v.remove(0);
+	assert(v.remove(0) == "Zero");
 	assert(v.size() == 0);
 
 	try {
@@ -311,7 +325,7 @@ void test_vector_empty() {
 
 // prec: empty
 void test_vector_clear() {
-	tf::vector<std::string> v;
+	tf::vector<std::string> v(9);
 	v.add("Zero");
 	v.add("One");
 	v.add("Two");
@@ -321,7 +335,7 @@ void test_vector_clear() {
 	v.clear();
 	assert(v.size() == 0);
 	assert(v.empty() == true);
-	assert(v.capacity() == 10);
+	assert(v.capacity() == 9);
 	
 	try {
 		v[0];

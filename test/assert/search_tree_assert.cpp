@@ -25,11 +25,11 @@ void test_tree_empty();
 void test_tree_clear();
 
 
-int main(int argc, char *argv[]) {
+/* int main(int argc, char *argv[]) {
 	test_tree();
 
 	return 0;
-}
+} */
 
 void test_tree() {
 	test_tree_default_constructor();
@@ -99,6 +99,8 @@ void test_tree_insert() {
 
 	t2.insert(1, "One");
 	t2.insert(1, "One2");
+	assert(t2.size() == 2);
+	assert(t2.height() == 1);
 }
 
 // prec: insert
@@ -114,6 +116,17 @@ void test_tree_get() {
 	assert(t.get(2) == "Two");
 	assert(t.get(6) == "Six");
 
+	t.insert(-6, "nSix");
+	assert(t.get(2) == "Two");
+	assert(t.get(6) == "Six");
+	assert(t.get(-6) == "nSix");
+
+	t.insert(-2, "nTwo");
+	assert(t.get(2) == "Two");
+	assert(t.get(6) == "Six");
+	assert(t.get(-6) == "nSix");
+	assert(t.get(-2) == "nTwo");
+
 	try {
 		t.get(1);
 		assert(false);
@@ -123,20 +136,24 @@ void test_tree_get() {
 // prec: get
 void test_tree_copy_constructor() {
 	tf::search_tree<int, std::string> t(true);
-	t.insert(2, "Two");
+	t.insert(-2, "nTwo");
 	t.insert(6, "Six");
+	t.insert(5, "Five");
+	t.insert(7, "Seven");
 
 	// -- //
 
 	tf::search_tree<int, std::string> t2(t);
-	assert(t2.size() == 2);
-	assert(t2.height() == 2);
+	assert(t2.size() == 4);
+	assert(t2.height() == 3);
 	assert(t2.allows_duplicate_keys() == true);
-	assert(t2.get(2) == "Two");
+	assert(t2.get(-2) == "nTwo");
 	assert(t2.get(6) == "Six");
+	assert(t2.get(5) == "Five");
+	assert(t2.get(7) == "Seven");
 
 	t2.insert(2, "Two2");
-	assert(t.size() == 2);
+	assert(t.size() == 4);
 }
 
 // prec: get
@@ -149,17 +166,19 @@ void test_tree_swap() {
 	t2.insert(1, "One");
 	t2.insert(2, "Two");
 	t2.insert(-2, "nTwo");
+	t2.insert(5, "Five");
 
 	// -- //
 
 	swap(t, t2);
 
-	assert(t.size() == 3);
-	assert(t.height() == 2);
+	assert(t.size() == 4);
+	assert(t.height() == 3);
 	assert(t.allows_duplicate_keys() == true);
 	assert(t.get(1) == "One");
 	assert(t.get(2) == "Two");
 	assert(t.get(-2) == "nTwo");
+	assert(t.get(5) == "Five");
 
 	assert(t2.size() == 2);
 	assert(t2.height() == 2);
@@ -171,50 +190,62 @@ void test_tree_swap() {
 // prec: get
 void test_tree_move_constructor() {
 	tf::search_tree<int, std::string> t(true);
+	t.insert(1, "One");
 	t.insert(2, "Two");
-	t.insert(6, "Six");
+	t.insert(-2, "nTwo");
+	t.insert(5, "Five");
 
 	// -- //
 
 	tf::search_tree<int, std::string> t2(std::move(t));
-	assert(t2.size() == 2);
-	assert(t2.height() == 2);
+	assert(t2.size() == 4);
+	assert(t2.height() == 3);
 	assert(t2.allows_duplicate_keys() == true);
+	assert(t2.get(1) == "One");
 	assert(t2.get(2) == "Two");
-	assert(t2.get(6) == "Six");
+	assert(t2.get(-2) == "nTwo");
+	assert(t2.get(5) == "Five");
 }
 
 // prec: get
 void test_tree_copy_assignment() {
 	tf::search_tree<int, std::string> t(true);
+	t.insert(1, "One");
 	t.insert(2, "Two");
-	t.insert(6, "Six");
+	t.insert(-2, "nTwo");
+	t.insert(5, "Five");
 
 	// -- //
 
 	tf::search_tree<int, std::string> t2;
 	t2 = t;
 
-	assert(t2.size() == 2);
-	assert(t2.height() == 2);
+	assert(t2.size() == 4);
+	assert(t2.height() == 3);
 	assert(t2.allows_duplicate_keys() == true);
+	assert(t2.get(1) == "One");
 	assert(t2.get(2) == "Two");
-	assert(t2.get(6) == "Six");
+	assert(t2.get(-2) == "nTwo");
+	assert(t2.get(5) == "Five");
 }
 
 // prec: insert
 void test_tree_brackets_operator() {
 	tf::search_tree<int, std::string> t;
+	t.insert(1, "One");
 	t.insert(2, "Two");
-	t.insert(6, "Six");
+	t.insert(-2, "nTwo");
+	t.insert(5, "Five");
 
 	// -- //
 
+	assert(t[1] == "One");
 	assert(t[2] == "Two");
-	assert(t[6] == "Six");
+	assert(t[-2] == "nTwo");
+	assert(t[5] == "Five");
 
 	try {
-		t[1];
+		t[6];
 		assert(false);
 	} catch (tf::exception &) {}
 }
@@ -233,6 +264,12 @@ void test_tree_min() {
 
 	t.insert(10, "Ten");
 	assert(t.min() == "nOne");
+
+	t.insert(100, "Hundred");
+	assert(t.min() == "nOne");
+
+	t.insert(-10, "nTen");
+	assert(t.min() == "nTen");
 }
 
 // prec: insert
@@ -249,6 +286,12 @@ void test_tree_max() {
 
 	t.insert(10, "Ten");
 	assert(t.max() == "Ten");
+
+	t.insert(100, "Hundred");
+	assert(t.max() == "Hundred");
+
+	t.insert(-10, "nTen");
+	assert(t.max() == "Hundred");
 }
 
 // prec: insert
@@ -491,6 +534,8 @@ void test_tree_iteration() {
 	t.insert(-100, "nHundred");
 	t.insert(7, "Seven");
 
+	const tf::search_tree<int, std::string> t2(t);
+
 	// -- //
 
 	int i = 0;
@@ -530,6 +575,45 @@ void test_tree_iteration() {
 	}
 
 	for (auto it = t.end(); it.condition(); ++it) {
+		assert(*it == "Sixty");
+	}
+
+	for (auto it = t2.begin(); it.condition(); ++it) {
+		switch (i) {
+		case 0: assert(*it == "nHundred"); break;
+		case 1: assert(*it == "nOne"); break;
+		case 2: assert(*it == "One"); break;
+		case 3: assert(*it == "Seven"); break;
+		case 4: assert(*it == "Ten" || *it == "Ten2"); break;
+		case 5: assert(*it == "Ten" || *it == "Ten2"); break;
+		case 6: assert(*it == "Sixty"); break;
+		}
+		++i;
+	}
+	assert(i == 7);
+
+	for (auto it = t2.end(); it.condition(); --it) {
+		--i;
+		switch (i) {
+		case 6: assert(*it == "Sixty"); break;
+		case 5: assert(*it == "Ten" || *it == "Ten2"); break;
+		case 4: assert(*it == "Ten" || *it == "Ten2"); break;
+		case 3: assert(*it == "Seven"); break;
+		case 2: assert(*it == "One"); break;
+		case 1: assert(*it == "nOne"); break;
+		case 0:
+			assert(it.value() == "nHundred");
+			// it.value() = "New nHundred";
+			break;
+		}
+	}
+	assert(i == 0);
+
+	for (auto it = t2.begin(); it.condition(); --it) {
+		assert(*it == "nHundred");
+	}
+
+	for (auto it = t2.end(); it.condition(); ++it) {
 		assert(*it == "Sixty");
 	}
 }

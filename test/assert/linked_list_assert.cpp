@@ -74,6 +74,9 @@ void test_list_add_back() {
 
 	l.add_back("Three");
 	assert(l.length() == 3);
+
+	l.add_back("Four");
+	assert(l.length() == 4);
 }
 
 // prec: add_back
@@ -82,9 +85,15 @@ void test_list_pop_back() {
 	l.add_back("One");
 	l.add_back("Two");
 	l.add_back("Three");
+	l.add_back("Four");
+	l.add_back("Five");
 
 	// -- //
 
+	assert(l.pop_back() == "Five");
+	assert(l.length() == 4);
+	assert(l.pop_back() == "Four");
+	assert(l.length() == 3);
 	assert(l.pop_back() == "Three");
 	assert(l.length() == 2);
 	assert(l.pop_back() == "Two");
@@ -103,16 +112,22 @@ void test_list_copy_constructor() {
 	tf::linked_list<std::string> l;
 	l.add_back("One");
 	l.add_back("Two");
+	l.add_back("Three");
+	l.add_back("Four");
+	l.add_back("Five");
 
 	// -- //
 
 	tf::linked_list<std::string> l2(l);
-	assert(l2.length() == 2);
+	assert(l2.length() == 5);
+	assert(l2.pop_back() == "Five");
+	assert(l2.pop_back() == "Four");
+	assert(l2.pop_back() == "Three");
 	assert(l2.pop_back() == "Two");
 	assert(l2.pop_back() == "One");
 
-	l2.add_back("Three");
-	assert(l.length() == 2);
+	assert(l2.length() == 0);
+	assert(l.length() == 5);
 }
 
 // prec: pop_back
@@ -120,18 +135,24 @@ void test_list_swap() {
 	tf::linked_list<std::string> l;
 	l.add_back("One");
 	l.add_back("Two");
+	l.add_back("Three");
+	l.add_back("Four");
 
 	tf::linked_list<std::string> l2;
-	l2.add_back("Three");
+	l2.add_back("Five");
+	l2.add_back("Six");
 
 	// -- //
 
 	swap(l, l2);
 
-	assert(l.length() == 1);
-	assert(l.pop_back() == "Three");
+	assert(l.length() == 2);
+	assert(l.pop_back() == "Six");
+	assert(l.pop_back() == "Five");
 
-	assert(l2.length() == 2);
+	assert(l2.length() == 4);
+	assert(l2.pop_back() == "Four");
+	assert(l2.pop_back() == "Three");
 	assert(l2.pop_back() == "Two");
 	assert(l2.pop_back() == "One");
 }
@@ -141,11 +162,15 @@ void test_list_move_constructor() {
 	tf::linked_list<std::string> l;
 	l.add_back("One");
 	l.add_back("Two");
+	l.add_back("Three");
+	l.add_back("Four");
 
 	// -- //
 
 	tf::linked_list<std::string> l2(std::move(l));
-	assert(l2.length() == 2);
+	assert(l2.length() == 4);
+	assert(l2.pop_back() == "Four");
+	assert(l2.pop_back() == "Three");
 	assert(l2.pop_back() == "Two");
 	assert(l2.pop_back() == "One");
 }
@@ -155,13 +180,17 @@ void test_list_copy_assignment() {
 	tf::linked_list<std::string> l;
 	l.add_back("One");
 	l.add_back("Two");
+	l.add_back("Three");
+	l.add_back("Four");
 
 	// -- //
 
 	tf::linked_list<std::string> l2;
 	l2 = l;
 
-	assert(l2.length() == 2);
+	assert(l2.length() == 4);
+	assert(l2.pop_back() == "Four");
+	assert(l2.pop_back() == "Three");
 	assert(l2.pop_back() == "Two");
 	assert(l2.pop_back() == "One");
 }
@@ -181,9 +210,13 @@ void test_list_add_front() {
 	l.add_front("Three");
 	assert(l.length() == 3);
 
+	l.add_front("Four");
+	assert(l.length() == 4);
+
 	assert(l.pop_back() == "One");
 	assert(l.pop_back() == "Two");
 	assert(l.pop_back() == "Three");
+	assert(l.pop_back() == "Four");
 }
 
 // prec: pop_back
@@ -305,11 +338,14 @@ void test_list_back() {
 	l.add_back("One");
 	assert(l.back() == "One");
 
+	l.add_front("Zero");
+	assert(l.back() == "One");
+
 	l.add_back("Two");
 	assert(l.back() == "Two");
 
-	l.add_front("Zero");
-	assert(l.back() == "Two");
+	l.add_back("Three");
+	assert(l.back() == "Three");
 }
 
 // prec: add_back(), add_front()
@@ -326,11 +362,14 @@ void test_list_front() {
 	l.add_front("One");
 	assert(l.front() == "One");
 
+	l.add_back("Zero");
+	assert(l.front() == "One");
+
 	l.add_front("Two");
 	assert(l.front() == "Two");
 
-	l.add_back("Zero");
-	assert(l.front() == "Two");
+	l.add_front("Three");
+	assert(l.front() == "Three");
 }
 
 // prec: add_back
@@ -339,14 +378,20 @@ void test_list_pop_front() {
 	l.add_back("One");
 	l.add_back("Two");
 	l.add_back("Three");
+	l.add_back("Four");
+	l.add_back("Five");
 
 	// -- //
 
 	assert(l.pop_front() == "One");
-	assert(l.length() == 2);
+	assert(l.length() == 4);
 	assert(l.pop_front() == "Two");
-	assert(l.length() == 1);
+	assert(l.length() == 3);
 	assert(l.pop_front() == "Three");
+	assert(l.length() == 2);
+	assert(l.pop_front() == "Four");
+	assert(l.length() == 1);
+	assert(l.pop_front() == "Five");
 	assert(l.length() == 0);
 
 	try {
@@ -369,6 +414,19 @@ void test_list_contains() {
 	l.add_back("Two");
 	assert(l.contains("One") == true);
 	assert(l.contains("Two") == true);
+
+	assert(l.contains("Three") == false);
+	l.add_back("Three");
+	assert(l.contains("One") == true);
+	assert(l.contains("Two") == true);
+	assert(l.contains("Three") == true);
+
+	assert(l.contains("Four") == false);
+	l.add_back("Four");
+	assert(l.contains("One") == true);
+	assert(l.contains("Two") == true);
+	assert(l.contains("Three") == true);
+	assert(l.contains("Four") == true);
 }
 
 // prec: contains
@@ -377,22 +435,41 @@ void test_list_remove() {
 	l.add_back("One");
 	l.add_back("Two");
 	l.add_back("Three");
+	l.add_back("Four");
+	l.add_back("Five");
 
 	// -- //
 
+	try {
+		l.remove("Not there");
+		assert(false);
+	} catch (tf::exception &) {}
+
+	l.remove("Three");
+	assert(l.contains("Three") == false);
+	assert(l.length() == 4);
+	assert(l.front() == "One");
+	assert(l.back() == "Five");
+
 	l.remove("Two");
 	assert(l.contains("Two") == false);
+	assert(l.length() == 3);
+	assert(l.front() == "One");
+	assert(l.back() == "Five");
+
+	l.remove("Five");
+	assert(l.contains("Five") == false);
 	assert(l.length() == 2);
 	assert(l.front() == "One");
-	assert(l.back() == "Three");
+	assert(l.back() == "Four");
 
 	l.remove("One");
 	assert(l.contains("One") == false);
 	assert(l.length() == 1);
-	assert(l.front() == "Three");
-	assert(l.back() == "Three");
+	assert(l.front() == "Four");
+	assert(l.back() == "Four");
 
-	l.remove("Three");
+	l.remove("Four");
 	assert(l.length() == 0);
 
 	try {
@@ -407,6 +484,8 @@ void test_list_iteration() {
 	l.add_back("Zero");
 	l.add_back("One");
 	l.add_back("Two");
+	l.add_back("Three");
+	l.add_back("Four");
 
 	const tf::linked_list<std::string> l2(l);
 
@@ -418,14 +497,18 @@ void test_list_iteration() {
 		case 0: assert(*it == "Zero"); break;
 		case 1: assert(*it == "One"); break;
 		case 2: assert(*it == "Two"); break;
+		case 3: assert(*it == "Three"); break;
+		case 4: assert(*it == "Four"); break;
 		}
 		++i;
 	}
-	assert(i == 3);
+	assert(i == 5);
 
 	for (auto it = l.end(); it.condition(); --it) {
 		--i;
 		switch (i) {
+		case 4: assert(it.value() == "Four"); break;
+		case 3: assert(it.value() == "Three"); break;
 		case 2: assert(it.value() == "Two"); break;
 		case 1: assert(it.value() == "One"); break;
 		case 0:
@@ -440,7 +523,7 @@ void test_list_iteration() {
 		assert(*it == "New Zero");
 	}
 	for (auto it = l.end(); it.condition(); ++it) {
-		assert(*it == "Two");
+		assert(*it == "Four");
 	}
 
 
@@ -449,18 +532,22 @@ void test_list_iteration() {
 		case 0: assert(*it == "Zero"); break;
 		case 1: assert(*it == "One"); break;
 		case 2: assert(*it == "Two"); break;
+		case 3: assert(*it == "Three"); break;
+		case 4: assert(*it == "Four"); break;
 		}
 		++i;
 	}
-	assert(i == 3);
+	assert(i == 5);
 
 	for (auto it = l2.end(); it.condition(); --it) {
 		--i;
 		switch (i) {
-		case 2: assert(*it == "Two"); break;
-		case 1: assert(*it == "One"); break;
+		case 4: assert(it.value() == "Four"); break;
+		case 3: assert(it.value() == "Three"); break;
+		case 2: assert(it.value() == "Two"); break;
+		case 1: assert(it.value() == "One"); break;
 		case 0:
-			assert(*it == "Zero");
+			assert(it.value() == "Zero");
 			// it.value() = "New Zero";
 			break;
 		}
@@ -471,7 +558,7 @@ void test_list_iteration() {
 		assert(*it == "Zero");
 	}
 	for (auto it = l2.end(); it.condition(); ++it) {
-		assert(*it == "Two");
+		assert(*it == "Four");
 	}
 }
 

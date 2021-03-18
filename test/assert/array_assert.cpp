@@ -190,7 +190,7 @@ void test_array_brackets_operator() {
 	try {
 		tf::array<std::string> a2(10, false);
 
-		a2[10] = "Ten";
+		a2[10];
 		assert(false);
 	} catch (tf::exception &) {}
 }
@@ -200,7 +200,6 @@ void test_array_set_all() {
 	tf::array<std::string> a;
 	a.insert(1, "One");
 	a.insert(9, "Nine");
-	assert(a.capacity() == 10);
 
 	// -- //
 
