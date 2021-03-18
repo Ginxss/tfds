@@ -27,7 +27,7 @@ void std_unordered_map_insert_get(int num_elements) {
 	}
 
 	for (int i = 0; i < num_elements; ++i) {
-		int value = map.at(std::to_string(i));
+		map.at(std::to_string(i));
 	}
 }
 
@@ -38,7 +38,7 @@ void tf_table_insert_get(int num_elements) {
 	}
 
 	for (int i = 0; i < num_elements; ++i) {
-		int value = table.get(std::to_string(i));
+		table.get(std::to_string(i));
 	}
 }
 

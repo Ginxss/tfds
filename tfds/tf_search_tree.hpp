@@ -490,100 +490,6 @@ public:
     }
 
     // O(log(n))
-    V remove(const K &key) {
-        node *it = root;
-        while (it) {
-            if (less_than<K>(key, it->key)) {
-                it = it->left;
-            }
-            else if (greater_than<K>(key, it->key)) {
-                it = it->right;
-            }
-            else {
-                value_bucket *to_delete = it->bucket;
-                V result = to_delete->value;
-
-                if (to_delete->next) {
-                    it->bucket = to_delete->next;
-                    destroy_value_bucket(to_delete);
-                }
-                else {
-                    remove_node(it);
-                }
-
-                return result;
-            }
-        }
-
-        throw exception("search tree: remove: key not found");
-    }
-
-    // O(log(n))
-    V remove_all(const K &key) {
-        node *it = root;
-        while (it) {
-            if (less_than<K>(key, it->key)) {
-                it = it->left;
-            }
-            else if (greater_than<K>(key, it->key)) {
-                it = it->right;
-            }
-            else {
-                V result = it->bucket->value;
-                remove_node(it);
-                return result;
-            }
-        }
-
-        throw exception("search tree: remove: key not found");
-    }
-
-    // O(log(n) + #values with that key)
-    V remove_value(const K &key, const V &value) {
-        node *it = root;
-        while (it) {
-            if (less_than<K>(key, it->key)) {
-                it = it->left;
-            }
-            else if (greater_than<K>(key, it->key)) {
-                it = it->right;
-            }
-            else {
-                value_bucket *bucket_it = it->bucket;
-                value_bucket *prev = nullptr;
-                while (bucket_it) {
-                    if (equals<V>(value, bucket_it->value)) {
-                        V result = bucket_it->value;
-
-                        if (prev) {
-                            prev->next = bucket_it->next;
-                            destroy_value_bucket(bucket_it);
-                        }
-                        else {
-                            if (bucket_it->next) {
-                                it->bucket = bucket_it->next;
-                                destroy_value_bucket(bucket_it);
-                            }
-                            else {
-                                remove_node(it);
-                            }
-                        }
-
-                        return result;
-                    }
-
-                    prev = bucket_it;
-                    bucket_it = bucket_it->next;
-                }
-
-                throw exception("search tree: remove_value: value not found");
-            }
-        }
-
-        throw exception("search tree: remove_value: key not found");
-    }
-
-    // O(log(n))
     const V &get(const K &key) const {
         node *it = root;
         while (it) {
@@ -707,6 +613,100 @@ public:
         }
         
         return result;
+    }
+
+    // O(log(n))
+    V remove(const K &key) {
+        node *it = root;
+        while (it) {
+            if (less_than<K>(key, it->key)) {
+                it = it->left;
+            }
+            else if (greater_than<K>(key, it->key)) {
+                it = it->right;
+            }
+            else {
+                value_bucket *to_delete = it->bucket;
+                V result = to_delete->value;
+
+                if (to_delete->next) {
+                    it->bucket = to_delete->next;
+                    destroy_value_bucket(to_delete);
+                }
+                else {
+                    remove_node(it);
+                }
+
+                return result;
+            }
+        }
+
+        throw exception("search tree: remove: key not found");
+    }
+
+    // O(log(n))
+    V remove_all(const K &key) {
+        node *it = root;
+        while (it) {
+            if (less_than<K>(key, it->key)) {
+                it = it->left;
+            }
+            else if (greater_than<K>(key, it->key)) {
+                it = it->right;
+            }
+            else {
+                V result = it->bucket->value;
+                remove_node(it);
+                return result;
+            }
+        }
+
+        throw exception("search tree: remove: key not found");
+    }
+
+    // O(log(n) + #values with that key)
+    V remove_value(const K &key, const V &value) {
+        node *it = root;
+        while (it) {
+            if (less_than<K>(key, it->key)) {
+                it = it->left;
+            }
+            else if (greater_than<K>(key, it->key)) {
+                it = it->right;
+            }
+            else {
+                value_bucket *bucket_it = it->bucket;
+                value_bucket *prev = nullptr;
+                while (bucket_it) {
+                    if (equals<V>(value, bucket_it->value)) {
+                        V result = bucket_it->value;
+
+                        if (prev) {
+                            prev->next = bucket_it->next;
+                            destroy_value_bucket(bucket_it);
+                        }
+                        else {
+                            if (bucket_it->next) {
+                                it->bucket = bucket_it->next;
+                                destroy_value_bucket(bucket_it);
+                            }
+                            else {
+                                remove_node(it);
+                            }
+                        }
+
+                        return result;
+                    }
+
+                    prev = bucket_it;
+                    bucket_it = bucket_it->next;
+                }
+
+                throw exception("search tree: remove_value: value not found");
+            }
+        }
+
+        throw exception("search tree: remove_value: key not found");
     }
 
     // O(log(n))

@@ -1,9 +1,9 @@
 #include "vector_performance.cpp"
-#include "list_performance.cpp"
-#include "table_performance.cpp"
-#include "tree_performance.cpp"
+#include "linked_list_performance.cpp"
+#include "hash_table_performance.cpp"
+#include "search_tree_performance.cpp"
 
-//Naive tfds performance measure (mostly inserting and accessing of std::strings)
+// Naive tfds performance measure (mostly inserting and accessing of std::strings)
 int main(int argc, char *argv[]) {
 	int num_elements = 1000000;
 	int runs = 20;

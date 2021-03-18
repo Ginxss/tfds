@@ -189,32 +189,6 @@ public:
         }
     }
 
-    // O(n)
-    void remove(const T &value) {
-        node *it = start_node;
-        while (it) {
-            if (equals<T>(value, it->value)) {
-                if (it == start_node) {
-                    pop_front();
-                }
-                else if (it == end_node) {
-                    pop_back();
-                }
-                else {
-                    it->prev->next = it->next;
-                    it->next->prev = it->prev;
-                    destroy_node(it);
-                }
-                
-                return;
-            }
-
-            it = it->next;
-        }
-
-        throw exception("linked list: remove: value not found");
-    }
-
     // O(1)
     T &back() {
         if (end_node)
@@ -288,16 +262,29 @@ public:
     }
 
     // O(n)
-    void clear() {
+    void remove(const T &value) {
         node *it = start_node;
         while (it) {
-            node *to_delete = it;
+            if (equals<T>(value, it->value)) {
+                if (it == start_node) {
+                    pop_front();
+                }
+                else if (it == end_node) {
+                    pop_back();
+                }
+                else {
+                    it->prev->next = it->next;
+                    it->next->prev = it->prev;
+                    destroy_node(it);
+                }
+                
+                return;
+            }
+
             it = it->next;
-            destroy_node(to_delete);
         }
 
-        start_node = nullptr;
-        end_node = nullptr;
+        throw exception("linked list: remove: value not found");
     }
 
     // O(n)
@@ -312,6 +299,19 @@ public:
         }
 
         return false;
+    }
+
+    // O(n)
+    void clear() {
+        node *it = start_node;
+        while (it) {
+            node *to_delete = it;
+            it = it->next;
+            destroy_node(to_delete);
+        }
+
+        start_node = nullptr;
+        end_node = nullptr;
     }
 
     // O(1)

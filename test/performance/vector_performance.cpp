@@ -39,7 +39,7 @@ void std_vector_insert_get(int num_elements) {
 		vector.emplace_back(std::to_string(i));
 	}
 
-	for (int i = 0; i < vector.size(); ++i) {
+	for (size_t i = 0; i < vector.size(); ++i) {
 		std::string value = vector.at(i);
 	}
 }
@@ -50,7 +50,7 @@ void tf_vector_insert_get(int num_elements) {
 		vector.add(std::to_string(i));
 	}
 
-	for (int i = 0; i < vector.size(); ++i) {
+	for (size_t i = 0; i < vector.size(); ++i) {
 		std::string value = vector.get(i);
 	}
 }

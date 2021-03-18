@@ -27,19 +27,13 @@ public:
         swap(first.tree, second.tree);
     }
 
-    // copy assignment operator
-    prio_queue &operator=(prio_queue other) {
-        swap(*this, other);
-        return *this;
-    }
-
     // move constructor
     prio_queue(prio_queue &&other) noexcept : prio_queue() {
         swap(*this, other);
     }
 
-    // move assignment operator
-    prio_queue &operator=(prio_queue &&other) {
+    // copy assignment operator
+    prio_queue &operator=(prio_queue other) {
         swap(*this, other);
         return *this;
     }

@@ -26,19 +26,13 @@ public:
         swap(first.list, second.list);
     }
 
-    // copy assignment operator
-    fifo_queue &operator=(fifo_queue other) {
-        swap(*this, other);
-        return *this;
-    }
-
     // move constructor
     fifo_queue(fifo_queue &&other) noexcept : fifo_queue() {
         swap(*this, other);
     }
 
-    // move assignment operator
-    fifo_queue &operator=(fifo_queue &&other) {
+    // copy assignment operator
+    fifo_queue &operator=(fifo_queue other) {
         swap(*this, other);
         return *this;
     }

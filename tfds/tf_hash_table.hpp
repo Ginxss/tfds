@@ -259,42 +259,6 @@ public:
     }
 
     // average: O(1) / worst: O(n)
-    V remove(const K &key) {
-        unsigned long index = hash<K>(key) % table_size_;
-
-        if (buckets[index]) {
-            bucket *to_delete = nullptr;
-
-            if (equals<K>(key, buckets[index]->key)) {
-                to_delete = buckets[index];
-                buckets[index] = to_delete->next;
-            }
-            else {
-                bucket *it = buckets[index]->next;
-                bucket *prev = buckets[index];
-                while (it) {
-                    if (equals<K>(key, it->key)) {
-                        to_delete = it;
-                        prev->next = it->next;
-                        break;
-                    }
-
-                    prev = it;
-                    it = it->next;
-                }
-            }
-
-            if (to_delete) {
-                V result = to_delete->value;
-                destroy_bucket(to_delete);
-                return result;
-            }
-        }
-
-        throw exception("hash table: remove: key not found");
-    }
-
-    // average: O(1) / worst: O(n)
     const V &get(const K &key) const {
         unsigned long index = hash<K>(key) % table_size_;
 
@@ -340,6 +304,42 @@ public:
         }
 
         throw exception("hash table: []: key not found");
+    }
+
+    // average: O(1) / worst: O(n)
+    V remove(const K &key) {
+        unsigned long index = hash<K>(key) % table_size_;
+
+        if (buckets[index]) {
+            bucket *to_delete = nullptr;
+
+            if (equals<K>(key, buckets[index]->key)) {
+                to_delete = buckets[index];
+                buckets[index] = to_delete->next;
+            }
+            else {
+                bucket *it = buckets[index]->next;
+                bucket *prev = buckets[index];
+                while (it) {
+                    if (equals<K>(key, it->key)) {
+                        to_delete = it;
+                        prev->next = it->next;
+                        break;
+                    }
+
+                    prev = it;
+                    it = it->next;
+                }
+            }
+
+            if (to_delete) {
+                V result = to_delete->value;
+                destroy_bucket(to_delete);
+                return result;
+            }
+        }
+
+        throw exception("hash table: remove: key not found");
     }
 
     // average: O(1) / worst: O(n)

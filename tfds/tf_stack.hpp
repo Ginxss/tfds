@@ -27,19 +27,13 @@ public:
         swap(first.vec, second.vec);
     }
 
-    // copy assignment operator
-    stack &operator=(stack other) {
-        swap(*this, other);
-        return *this;
-    }
-
     // move constructor
     stack(stack &&other) noexcept : stack(1) {
         swap(*this, other);
     }
 
-    // move assignment operator
-    stack &operator=(stack &&other) {
+    // copy assignment operator
+    stack &operator=(stack other) {
         swap(*this, other);
         return *this;
     }
