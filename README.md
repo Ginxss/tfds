@@ -279,7 +279,7 @@ Constructor with type `std::string`:
 ```
 tf::linked_list<std::string> list;
 ```
-Copy constructor, copy assignment operator, move constructor and move assignment operator also exist.
+Copy constructor, move constructor and copy assignment operator (copy and swap) also exist.
 
 ---
 
@@ -357,18 +357,6 @@ list.add_back_all(list2);
 
 ---
 
-### remove(value)
-*Runtime:* **O(n)**
-
-*Exceptions:* Throws a tf::exception if the value does not exist.
-
-Removes the value "hello" from the list:
-```
-list.remove("hello");
-```
-
----
-
 ### back()
 *Runtime:* **O(1)**
 
@@ -419,12 +407,34 @@ std::string first_value = list.pop_front();
 
 ---
 
+### remove(value)
+*Runtime:* **O(n)**
+
+*Exceptions:* Throws a tf::exception if the value does not exist.
+
+Removes the value "hello" from the list:
+```
+list.remove("hello");
+```
+
+---
+
 ### contains(value)
 *Runtime:* **O(n)**
 
 Returns `true` if the value "hello" is found in the list:
 ```
 bool contains_value = list.contains("hello");
+```
+
+---
+
+### clear()
+*Runtime:* **O(n)**
+
+Deallocates all stored values:
+```
+list.clear();
 ```
 
 ---
@@ -445,16 +455,6 @@ size_t num_elements = list.length();
 Returns `true` if the list has no elements:
 ```
 bool list_empty = list.empty();
-```
-
----
-
-### clear()
-*Runtime:* **O(n)**
-
-Deallocates all stored values:
-```
-list.clear();
 ```
 
 ---
@@ -481,7 +481,7 @@ tf::hash_table<std::string, int> table(10, false);
 ```
 In this case, the hash table will not check the existing entries for duplicate keys when inserting to improve performance. Note that this flag is mainly supposed to speed up insertion time if you KNOW that there can never be identical keys. If there are duplicate keys inside the table, functions like get(...) and remove(...) will only find one of the inserted pairs.
 
-Copy constructor, copy assignment operator, move constructor and move assignment operator also exist.
+Copy constructor, move constructor and copy assignment operator (copy and swap) also exist.
 
 ---
 
@@ -512,18 +512,6 @@ table.insert("hello", 1);
 
 ---
 
-### remove(key)
-*Runtime:* average case: **O(1)** / worst case: O(n)
-
-*Exceptions:* Throws a tf::exception if the key does not exist.
-
-Removes the entry with key "hello" and returns the value:
-```
-std::string value = table.remove("hello");
-```
-
----
-
 ### get(key)
 *Runtime:* average case: **O(1)** / worst case: O(n)
 
@@ -549,12 +537,34 @@ table["hello"] = 2;
 
 ---
 
+### remove(key)
+*Runtime:* average case: **O(1)** / worst case: O(n)
+
+*Exceptions:* Throws a tf::exception if the key does not exist.
+
+Removes the entry with key "hello" and returns the value:
+```
+std::string value = table.remove("hello");
+```
+
+---
+
 ### contains(key)
 *Runtime:* average case: **O(1)** / worst case: O(n)
 
 Returns `true` if an entry with key "hello" is found in the hash table:
 ```
 bool contains_value = table.contains("hello");
+```
+
+---
+
+### clear()
+*Runtime:* **O(n)**
+
+Deallocates all stored values:
+```
+table.clear();
 ```
 
 ---
@@ -569,12 +579,12 @@ size_t num_entries = table.size();
 
 ---
 
-### checks_duplicate_keys()
+### table_size()
 *Runtime:* **O(1)**
 
-Returns `true` if the hash table looks for duplicate keys when inserting:
+Returns the number of buckets in the hash table:
 ```
-bool table_checking_duplicate_keys = table.checks_duplicate_keys();
+size_t num_buckets = table.table_size();
 ```
 
 ---
@@ -589,22 +599,12 @@ bool table_empty = table.empty();
 
 ---
 
-### table_size()
+### checks_duplicate_keys()
 *Runtime:* **O(1)**
 
-Returns the number of buckets in the hash table:
+Returns `true` if the hash table looks for duplicate keys when inserting:
 ```
-size_t num_buckets = table.table_size();
-```
-
----
-
-### clear()
-*Runtime:* **O(n)**
-
-Deallocates all stored values:
-```
-table.clear();
+bool table_checking_duplicate_keys = table.checks_duplicate_keys();
 ```
 
 ---
@@ -628,7 +628,7 @@ Additionally, you can allow duplicate keys with:
 ```
 tf::search_tree<int, std::string> tree(true);
 ```
-Copy constructor, copy assignment operator, move constructor and move assignment operator also exist.
+Copy constructor, move constructor and copy assignment operator (copy and swap) also exist.
 
 ---
 
@@ -657,42 +657,6 @@ The value of the iterator can be accessed with either `*it` or the method `it.va
 Inserts the value "hello" with key 1 into the search tree:
 ```
 tree.insert(1, "hello");
-```
-
----
-
-### remove(key)
-*Runtime:* **O(log(n))**
-
-*Exceptions:* Throws a tf::exception if the key does not exist.
-
-Removes and returns one entry with key 1:
-```
-std::string value = tree.remove(1);
-```
-
----
-
-### remove_all(key)
-*Runtime:* **O(log(n))**
-
-*Exceptions:* Throws a tf::exception if the key does not exist.
-
-Removes all entries with key 1 and returns one of them:
-```
-std::string value = tree.remove_all(1);
-```
-
----
-
-### remove_value(key, value)
-*Runtime:* **O(log(n))**
-
-*Exceptions:* Throws a tf::exception if the key-value pair does not exist.
-
-Removes the entry with key 1 and value "hello" and returns "hello" again:
-```
-std::string same_value = tree.remove_value(1, "hello");
 ```
 
 ---
@@ -771,6 +735,42 @@ std::string max_value = tree.pop_max();
 
 ---
 
+### remove(key)
+*Runtime:* **O(log(n))**
+
+*Exceptions:* Throws a tf::exception if the key does not exist.
+
+Removes and returns one entry with key 1:
+```
+std::string value = tree.remove(1);
+```
+
+---
+
+### remove_all(key)
+*Runtime:* **O(log(n))**
+
+*Exceptions:* Throws a tf::exception if the key does not exist.
+
+Removes all entries with key 1 and returns one of them:
+```
+std::string value = tree.remove_all(1);
+```
+
+---
+
+### remove_value(key, value)
+*Runtime:* **O(log(n))**
+
+*Exceptions:* Throws a tf::exception if the key-value pair does not exist.
+
+Removes the entry with key 1 and value "hello" and returns "hello" again:
+```
+std::string same_value = tree.remove_value(1, "hello");
+```
+
+---
+
 ### contains(key)
 *Runtime:* **O(log(n))**
 
@@ -791,12 +791,12 @@ bool key_value_present = tree.contains(1, "one");
 
 ---
 
-### height()
-*Runtime:* **O(1)**
+### clear()
+*Runtime:* **O(n)**
 
-Returns the height of the search tree.
+Deallocates all entries:
 ```
-size_t tree_height = tree.height();
+tree.clear();
 ```
 
 ---
@@ -811,6 +811,16 @@ size_t num_entries = tree.size();
 
 ---
 
+### height()
+*Runtime:* **O(1)**
+
+Returns the height of the search tree.
+```
+size_t tree_height = tree.height();
+```
+
+---
+
 ### empty()
 *Runtime:* **O(log(n))**
 
@@ -821,12 +831,12 @@ bool tree_empty = tree.empty();
 
 ---
 
-### clear()
-*Runtime:* **O(n)**
+### allows_duplicate_keys()
+*Runtime:* **O(1)**
 
-Deallocates all entries:
+Returns `true` if the search tree allows multiple entries with the same key:
 ```
-tree.clear();
+bool is_multi_search_tree = tree.allows_duplicate_keys();
 ```
 
 ---
@@ -848,7 +858,7 @@ A custom initial capacity, in this case 100, can be set in the constructor:
 ```
 tf::stack<std::string> stack(100);
 ```
-Copy constructor, copy assignment operator, move constructor and move assignment operator also exist.
+Copy constructor, move constructor and copy assignment operator (copy and swap) also exist.
 
 ---
 
@@ -889,6 +899,17 @@ std::string top_value = stack.pop();
 
 ---
 
+### clear()
+*Runtime:* **O(1)**
+
+Removes all elements from the stack:
+```
+stack.clear();
+```
+In reality, clear() just resets the internal top index, which means that no actual memory is deallocated and the stack is not reverted to its original capacity.
+
+---
+
 ### size()
 *Runtime:* **O(1)**
 
@@ -908,17 +929,6 @@ bool stack_empty = stack.empty();
 ```
 
 ---
-
-### clear()
-*Runtime:* **O(1)**
-
-Removes all elements from the stack:
-```
-stack.clear();
-```
-In reality, clear() just resets the internal top index, which means that no actual memory is deallocated and the stack is not reverted to its original capacity.
-
----
 ---
 
 ## FIFO Queue
@@ -931,7 +941,7 @@ Constructor with type `std::string`:
 ```
 tf::fifo_queue<std::string> queue;
 ```
-Copy constructor, copy assignment operator, move constructor and move assignment operator also exist.
+Copy constructor, move constructor and copy assignment operator (copy and swap) also exist.
 
 ---
 
@@ -967,6 +977,16 @@ bool contains_value = queue.contains("hello");
 
 ---
 
+### clear()
+*Runtime:* **O(n)**
+
+Deallocates all elements:
+```
+queue.clear();
+```
+
+---
+
 ### length()
 *Runtime:* **O(1)**
 
@@ -986,16 +1006,6 @@ bool queue_empty = queue.empty();
 ```
 
 ---
-
-### clear()
-*Runtime:* **O(n)**
-
-Deallocates all elements:
-```
-queue.clear();
-```
-
----
 ---
 
 ## Priority Queue
@@ -1012,7 +1022,7 @@ Additionally, you can allow duplicate keys in the constructor:
 ```
 tf::prio_queue<int, std::string> queue(true);
 ```
-Copy constructor, copy assignment operator, move constructor and move assignment operator also exist.
+Copy constructor, move constructor and copy assignment operator (copy and swap) also exist.
 
 ---
 
@@ -1062,6 +1072,16 @@ bool contains_value = queue.contains(3);
 
 ---
 
+### clear()
+*Runtime:* **O(n)**
+
+Deallocates all entries:
+```
+queue.clear();
+```
+
+---
+
 ### length()
 *Runtime:* **O(1)**
 
@@ -1078,14 +1098,4 @@ size_t num_entries = queue.length();
 Returns `true` if the priority queue has no entries.
 ```
 bool queue_empty = queue.empty();
-```
-
----
-
-### clear()
-*Runtime:* **O(n)**
-
-Deallocates all entries:
-```
-queue.clear();
 ```

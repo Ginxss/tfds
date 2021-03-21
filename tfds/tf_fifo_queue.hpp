@@ -55,6 +55,11 @@ public:
         return list.contains(value);
     }
 
+    // O(n)
+    void clear() {
+        list.clear();
+    }
+
     // O(1)
     size_t length() const {
         return list.length();
@@ -63,11 +68,6 @@ public:
     // O(1)
     bool empty() const {
         return list.empty();
-    }
-
-    // O(n)
-    void clear() {
-        list.clear();
     }
 };
 

@@ -69,6 +69,11 @@ public:
         return tree.contains(key);
     }
 
+    // O(n)
+    void clear() {
+        tree.clear();
+    }
+
     // O(1)
     size_t length() const {
         return tree.size();
@@ -77,11 +82,6 @@ public:
     // O(1)
     bool empty() const {
         return tree.empty();
-    }
-
-    // O(n)
-    void clear() {
-        tree.clear();
     }
 };
 

@@ -367,13 +367,13 @@ public:
     }
 
     // O(1)
-    size_t table_size() const {
-        return table_size_;
+    size_t size() const  {
+        return size_;
     }
 
     // O(1)
-    size_t size() const  {
-        return size_;
+    size_t table_size() const {
+        return table_size_;
     }
 
     // O(1)

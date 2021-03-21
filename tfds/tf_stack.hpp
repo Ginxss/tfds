@@ -68,6 +68,11 @@ public:
     }
 
     // O(1)
+    void clear() {
+        vec.clear();
+    }
+
+    // O(1)
     size_t size() const {
         return vec.size();
     }
@@ -75,11 +80,6 @@ public:
     // O(1)
     bool empty() const {
         return vec.empty();
-    }
-
-    // O(1)
-    void clear() {
-        vec.clear();
     }
 };
 
