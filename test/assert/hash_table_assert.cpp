@@ -296,7 +296,7 @@ void test_table_iteration() {
 	// -- //
 
 	int i = 0;
-	for (auto it = h.begin(); it.condition(); ++it) {
+	for (auto it = h.begin(); it.has_value(); ++it) {
 		assert(*it == 1 || *it == 2 || *it == 3 || *it == 4);
 		++i;
 	}

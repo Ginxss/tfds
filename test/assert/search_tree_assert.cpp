@@ -539,7 +539,7 @@ void test_tree_iteration() {
 	// -- //
 
 	int i = 0;
-	for (auto it = t.begin(); it.condition(); ++it) {
+	for (auto it = t.begin(); it.has_value(); ++it) {
 		switch (i) {
 		case 0: assert(*it == "nHundred"); break;
 		case 1: assert(*it == "nOne"); break;
@@ -553,7 +553,7 @@ void test_tree_iteration() {
 	}
 	assert(i == 7);
 
-	for (auto it = t.end(); it.condition(); --it) {
+	for (auto it = t.end(); it.has_value(); --it) {
 		--i;
 		switch (i) {
 		case 6: assert(*it == "Sixty"); break;
@@ -570,15 +570,15 @@ void test_tree_iteration() {
 	}
 	assert(i == 0);
 
-	for (auto it = t.begin(); it.condition(); --it) {
+	for (auto it = t.begin(); it.has_value(); --it) {
 		assert(*it == "New nHundred");
 	}
 
-	for (auto it = t.end(); it.condition(); ++it) {
+	for (auto it = t.end(); it.has_value(); ++it) {
 		assert(*it == "Sixty");
 	}
 
-	for (auto it = t2.begin(); it.condition(); ++it) {
+	for (auto it = t2.begin(); it.has_value(); ++it) {
 		switch (i) {
 		case 0: assert(*it == "nHundred"); break;
 		case 1: assert(*it == "nOne"); break;
@@ -592,7 +592,7 @@ void test_tree_iteration() {
 	}
 	assert(i == 7);
 
-	for (auto it = t2.end(); it.condition(); --it) {
+	for (auto it = t2.end(); it.has_value(); --it) {
 		--i;
 		switch (i) {
 		case 6: assert(*it == "Sixty"); break;
@@ -609,11 +609,11 @@ void test_tree_iteration() {
 	}
 	assert(i == 0);
 
-	for (auto it = t2.begin(); it.condition(); --it) {
+	for (auto it = t2.begin(); it.has_value(); --it) {
 		assert(*it == "nHundred");
 	}
 
-	for (auto it = t2.end(); it.condition(); ++it) {
+	for (auto it = t2.end(); it.has_value(); ++it) {
 		assert(*it == "Sixty");
 	}
 }

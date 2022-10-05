@@ -492,7 +492,7 @@ void test_list_iteration() {
 	// -- //
 
 	int i = 0;
-	for (auto it = l.begin(); it.condition(); ++it) {
+	for (auto it = l.begin(); it.has_value(); ++it) {
 		switch (i) {
 		case 0: assert(*it == "Zero"); break;
 		case 1: assert(*it == "One"); break;
@@ -504,7 +504,7 @@ void test_list_iteration() {
 	}
 	assert(i == 5);
 
-	for (auto it = l.end(); it.condition(); --it) {
+	for (auto it = l.end(); it.has_value(); --it) {
 		--i;
 		switch (i) {
 		case 4: assert(it.value() == "Four"); break;
@@ -519,15 +519,15 @@ void test_list_iteration() {
 	}
 	assert(i == 0);
 
-	for (auto it = l.begin(); it.condition(); --it) {
+	for (auto it = l.begin(); it.has_value(); --it) {
 		assert(*it == "New Zero");
 	}
-	for (auto it = l.end(); it.condition(); ++it) {
+	for (auto it = l.end(); it.has_value(); ++it) {
 		assert(*it == "Four");
 	}
 
 
-	for (auto it = l2.begin(); it.condition(); ++it) {
+	for (auto it = l2.begin(); it.has_value(); ++it) {
 		switch (i) {
 		case 0: assert(*it == "Zero"); break;
 		case 1: assert(*it == "One"); break;
@@ -539,7 +539,7 @@ void test_list_iteration() {
 	}
 	assert(i == 5);
 
-	for (auto it = l2.end(); it.condition(); --it) {
+	for (auto it = l2.end(); it.has_value(); --it) {
 		--i;
 		switch (i) {
 		case 4: assert(it.value() == "Four"); break;
@@ -554,10 +554,10 @@ void test_list_iteration() {
 	}
 	assert(i == 0);
 
-	for (auto it = l2.begin(); it.condition(); --it) {
+	for (auto it = l2.begin(); it.has_value(); --it) {
 		assert(*it == "Zero");
 	}
-	for (auto it = l2.end(); it.condition(); ++it) {
+	for (auto it = l2.end(); it.has_value(); ++it) {
 		assert(*it == "Four");
 	}
 }

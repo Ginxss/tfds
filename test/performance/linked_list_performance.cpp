@@ -1,95 +1,110 @@
 #include <iostream>
 #include <string>
 #include <list>
+#include <chrono>
 #include "../../tfds/tf_linked_list.hpp"
-#include "measure.hpp"
-
-void std_list_insert(int num_elements) {
-	std::list<std::string> list;
-	for (int i = 0; i < num_elements; ++i) {
-		list.emplace_back(std::to_string(i));
-	}
-}
-
-void tf_list_insert(int num_elements) {
-	tf::linked_list<std::string> list;
-	for (int i = 0; i < num_elements; ++i) {
-		list.add_back(std::to_string(i));
-	}
-}
-
-void std_list_insert_iterate(int num_elements) {
-	std::list<std::string> list;
-	for (int i = 0; i < num_elements; ++i) {
-		list.emplace_back(std::to_string(i));
-	}
-
-	for (auto it = list.begin(); it != list.end(); ++it) {
-		std::string value = *it;
-	}
-}
-
-void tf_list_insert_iterate(int num_elements) {
-	tf::linked_list<std::string> list;
-	for (int i = 0; i < num_elements; ++i) {
-		list.add_back(std::to_string(i));
-	}
-
-	for (auto it = list.begin(); it.condition(); ++it) {
-		std::string value = *it;
-	}
-}
-
-void std_list_insert_pop(int num_elements) {
-	std::list<std::string> list;
-	for (int i = 0; i < num_elements; ++i) {
-		list.emplace_back(std::to_string(i));
-	}
-
-	while (!list.empty()) {
-		std::string value = list.back();
-		list.pop_back();
-	}
-}
-
-void tf_list_insert_pop(int num_elements) {
-	tf::linked_list<std::string> list;
-	for (int i = 0; i < num_elements; ++i) {
-		list.add_back(std::to_string(i));
-	}
-
-	while (!list.empty()) {
-		std::string value = list.pop_back();
-	}
-}
 
 void print_list_performance(int num_elements, int runs) {
+	long long std_insert_ms = 0;
+	long long tf_insert_ms = 0;
+
+	long long std_iterate_ms = 0;
+	long long tf_iterate_ms = 0;
+
+	long long std_remove_ms = 0;
+	long long tf_remove_ms = 0;
+
+	for (int run = 0; run < runs; ++run) {
+		std::list<std::string> std_list;
+		tf::linked_list<std::string> tf_list;
+
+		// INSERT
+
+		// std
+		auto start = std::chrono::high_resolution_clock::now();
+
+		for (int i = 0; i < num_elements; ++i) {
+			std_list.emplace_back(std::to_string(i));
+		}
+
+		auto elapsed = std::chrono::high_resolution_clock::now() - start;
+		std_insert_ms += std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
+
+		// tf
+		start = std::chrono::high_resolution_clock::now();
+
+		for (int i = 0; i < num_elements; ++i) {
+			tf_list.add_back(std::to_string(i));
+		}
+
+		elapsed = std::chrono::high_resolution_clock::now() - start;
+		tf_insert_ms += std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
+
+		// ITERATE
+
+		// std
+		start = std::chrono::high_resolution_clock::now();
+
+		for (auto it = std_list.begin(); it != std_list.end(); ++it) {
+			*it;
+		}
+
+		elapsed = std::chrono::high_resolution_clock::now() - start;
+		std_iterate_ms += std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
+
+		// tf
+		start = std::chrono::high_resolution_clock::now();
+
+		for (auto it = tf_list.begin(); it.has_value(); ++it) {
+			*it;
+		}
+
+		elapsed = std::chrono::high_resolution_clock::now() - start;
+		tf_iterate_ms += std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
+
+		// REMOVE
+
+		// std
+		start = std::chrono::high_resolution_clock::now();
+
+		for (int i = 0; i < num_elements; ++i) {
+			std_list.remove(std::to_string(i));
+		}
+
+		elapsed = std::chrono::high_resolution_clock::now() - start;
+		std_remove_ms += std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
+
+		// tf
+		start = std::chrono::high_resolution_clock::now();
+
+		for (int i = 0; i < num_elements; ++i) {
+			tf_list.remove(std::to_string(i));
+		}
+
+		elapsed = std::chrono::high_resolution_clock::now() - start;
+		tf_remove_ms += std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
+	}
+
+	std_insert_ms /= runs;
+	tf_insert_ms /= runs;
+
+	std_iterate_ms /= runs;
+	tf_iterate_ms /= runs;
+
+	std_remove_ms /= runs;
+	tf_remove_ms /= runs;
+
 	std::cout << "| LINKED LIST |" << std::endl << std::endl;
 	
-	std::cout << "std::list inserted " << num_elements << " std::strings : " <<
-		measure(std_list_insert, num_elements, runs) << " milliseconds" << std::endl;
-	std::cout << "tf::linked_list inserted " << num_elements << " std::strings : " <<
-		measure(tf_list_insert, num_elements, runs) << " milliseconds" << std::endl;
-	std::cout << std::endl;
+	std::cout << "Inserting " << num_elements << " std::strings:" << std::endl;
+	std::cout << "std::list: " << std_insert_ms << " ms" << std::endl;
+	std::cout << "tf::linked_list: " << tf_insert_ms << " ms" << std::endl << std::endl;
 
-	std::cout << "std::list inserted and iterated over " << num_elements << " std::strings : " <<
-		measure(std_list_insert_iterate, num_elements, runs) << " milliseconds" << std::endl;
-	std::cout << "tf::linked_list inserted and iterated over " << num_elements << " std::strings : " <<
-		measure(tf_list_insert_iterate, num_elements, runs) << " milliseconds" << std::endl;
-	std::cout << std::endl;
+	std::cout << "Iterating over " << num_elements << " std::strings:" << std::endl;
+	std::cout << "std::list: " << std_iterate_ms << " ms" << std::endl;
+	std::cout << "tf::linked_list: " << tf_iterate_ms << " ms" << std::endl << std::endl;
 
-	std::cout << "std::list inserted and popped " << num_elements << " std::strings : " <<
-		measure(std_list_insert_pop, num_elements, runs) << " milliseconds" << std::endl;
-	std::cout << "tf::linked_list inserted and popped " << num_elements << " std::strings : " <<
-		measure(tf_list_insert_pop, num_elements, runs) << " milliseconds" << std::endl;
-	std::cout << std::endl;
+	std::cout << "Removing " << num_elements << " std::strings from front:" << std::endl;
+	std::cout << "std::list: " << std_remove_ms << " ms" << std::endl;
+	std::cout << "tf::linked_list: " << tf_remove_ms << " ms" << std::endl << std::endl;
 }
-
-/* int main(int argc, char *argv[]) {
-	int num_elements = 100000;
-	int runs = 10;
-
-	print_list_performance(num_elements, runs);
-
-	return 0;
-} */

@@ -1,6 +1,11 @@
 #ifndef TF_SEARCH_TREE_H
 #define TF_SEARCH_TREE_H
 
+#ifdef _MSC_VER
+#include <basetsd.h>
+typedef SSIZE_T ssize_t;
+#endif
+
 #include <algorithm> // std::swap
 #include "utils/tf_exception.hpp"
 #include "utils/tf_compare_functions.hpp"
@@ -349,7 +354,7 @@ public:
         V &value() { return current_bucket->value; }
         void operator++() { next_bucket(); }
         void operator--() { prev_bucket(); }
-        bool condition() const { return current_bucket != nullptr; }
+        bool has_value() const { return current_bucket != nullptr; }
     };
 
     class const_iterator {
@@ -404,7 +409,7 @@ public:
         const V &value() const { return current_bucket->value; }
         void operator++() { next_bucket(); }
         void operator--() { prev_bucket(); }
-        bool condition() const { return current_bucket != nullptr; }
+        bool has_value() const { return current_bucket != nullptr; }
     };
 
     // CLASS
@@ -421,7 +426,7 @@ public:
         allow_duplicate_keys(other.allow_duplicate_keys),
         root(nullptr)
     {
-        for (auto it = other.begin(); it.condition(); ++it) {
+        for (auto it = other.begin(); it.has_value(); ++it) {
             insert(it.key(), it.value());
         }
     }

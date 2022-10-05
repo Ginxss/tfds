@@ -137,7 +137,7 @@ public:
         V &operator*() { return current_bucket->value; }
         V &value() { return current_bucket->value; }
         void operator++() { next_bucket(); }
-        bool condition() const { return current_bucket != nullptr; }
+        bool has_value() const { return current_bucket != nullptr; }
     };
 
     class const_iterator {
@@ -175,7 +175,7 @@ public:
         const V &operator*() const { return current_bucket->value; }
         const V &value() const { return current_bucket->value; }
         void operator++() { next_bucket(); }
-        bool condition() const { return current_bucket != nullptr; }
+        bool has_value() const { return current_bucket != nullptr; }
     };
 
     // CLASS

@@ -58,7 +58,7 @@ public:
         T *prev_value() { return (nd->prev) ? &nd->prev->value : nullptr; }
         void operator++() { nd = nd->next; }
         void operator--() { nd = nd->prev; }
-        bool condition() const { return nd != nullptr; }
+        bool has_value() const { return nd != nullptr; }
     };
 
     class const_iterator {
@@ -75,7 +75,7 @@ public:
         const T *prev_value() const { return (nd->prev) ? &nd->prev->value : nullptr; }
         void operator++() { nd = nd->next; }
         void operator--() { nd = nd->prev; }
-        bool condition() const { return nd != nullptr; }
+        bool has_value() const { return nd != nullptr; }
     };
 
     // CLASS
@@ -184,7 +184,7 @@ public:
 
     // O(other.n)
     void add_back_all(const linked_list &other) {
-        for (auto it = other.begin(); it.condition(); ++it) {
+        for (auto it = other.begin(); it.has_value(); ++it) {
             add_back(*it);
         }
     }

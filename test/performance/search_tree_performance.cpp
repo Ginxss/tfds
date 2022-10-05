@@ -1,66 +1,78 @@
 #include <iostream>
 #include <string>
 #include <map>
+#include <chrono>
 #include "../../tfds/tf_search_tree.hpp"
-#include "measure.hpp"
-
-void std_map_insert(int num_elements) {
-	std::map<int, std::string> map;
-	for (int i = 0; i < num_elements; ++i) {
-		map[i] = std::to_string(i);
-	}
-}
-
-void tf_tree_insert(int num_elements) {
-	tf::search_tree<int, std::string> tree;
-	for (int i = 0; i < num_elements; ++i) {
-		tree.insert(i, std::to_string(i));
-	}
-}
-
-void std_map_insert_get(int num_elements) {
-	std::map<int, std::string> map;
-	for (int i = 0; i < num_elements; ++i) {
-		map[i] = std::to_string(i);
-	}
-
-	for (int i = 0; i < num_elements; ++i) {
-		std::string value = map.at(i);
-	}
-}
-
-void tf_tree_insert_get(int num_elements) {
-	tf::search_tree<int, std::string> tree;
-	for (int i = 0; i < num_elements; ++i) {
-		tree.insert(i, std::to_string(i));
-	}
-
-	for (int i = 0; i < num_elements; ++i) {
-		std::string value = tree.get(i);
-	}
-}
 
 void print_tree_performance(int num_elements, int runs) {
-	std::cout << "| SEARCH TREE |" << std::endl << std::endl;
+	long long std_insert_ms = 0;
+	long long tf_insert_ms = 0;
+
+	long long std_get_ms = 0;
+	long long tf_get_ms = 0;
+
+	for (int run = 0; run < runs; ++run) {
+		std::map<int, std::string> std_map;
+		tf::search_tree<int, std::string> tf_tree;
+
+		// INSERT
+
+		// std
+		auto start = std::chrono::high_resolution_clock::now();
+
+		for (int i = 0; i < num_elements; ++i) {
+			std_map[i] = std::to_string(i);
+		}
+
+		auto elapsed = std::chrono::high_resolution_clock::now() - start;
+		std_insert_ms += std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
+
+		// tf
+		start = std::chrono::high_resolution_clock::now();
+
+		for (int i = 0; i < num_elements; ++i) {
+			tf_tree.insert(i, std::to_string(i));
+		}
+
+		elapsed = std::chrono::high_resolution_clock::now() - start;
+		tf_insert_ms += std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
+
+		// GET
+
+		// std
+		start = std::chrono::high_resolution_clock::now();
+
+		for (int i = 0; i < num_elements; ++i) {
+			std_map.at(i);
+		}
+
+		elapsed = std::chrono::high_resolution_clock::now() - start;
+		std_get_ms += std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
+
+		// tf
+		start = std::chrono::high_resolution_clock::now();
+
+		for (int i = 0; i < num_elements; ++i) {
+			tf_tree.get(i);
+		}
+
+		elapsed = std::chrono::high_resolution_clock::now() - start;
+		tf_get_ms += std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
+	}
+
+	std_insert_ms /= runs;
+	tf_insert_ms /= runs;
+
+	std_get_ms /= runs;
+	tf_get_ms /= runs;
 	
-	std::cout << "std::map inserted " << num_elements << " (int, std::string) pairs : " <<
-		measure(std_map_insert, num_elements, runs) << " milliseconds" << std::endl;
-	std::cout << "tf::search_tree inserted " << num_elements << " (int, std::string) pairs : " <<
-		measure(tf_tree_insert, num_elements, runs) << " milliseconds" << std::endl;
-	std::cout << std::endl;
+	std::cout << "| SEARCH TREE |" << std::endl << std::endl;
 
-	std::cout << "std::map inserted and accessed " << num_elements << " (int, std::string) pairs : " <<
-		measure(std_map_insert_get, num_elements, runs) << " milliseconds" << std::endl;
-	std::cout << "tf::search_tree inserted and accessed " << num_elements << " (int, std::string) pairs : " <<
-		measure(tf_tree_insert_get, num_elements, runs) << " milliseconds" << std::endl;
-	std::cout << std::endl;
+	std::cout << "Inserting " << num_elements << " (int, std::string) pairs:" << std::endl;
+	std::cout << "std::map: " << std_insert_ms << " milliseconds" << std::endl;
+	std::cout << "tf::search_tree: " << tf_insert_ms << " milliseconds" << std::endl << std::endl;
+
+	std::cout << "Accessing " << num_elements << " (int, std::string) pairs:" << std::endl;
+	std::cout << "std::map: " << std_get_ms << " milliseconds" << std::endl;
+	std::cout << "tf::search_tree: " << tf_get_ms << " milliseconds" << std::endl << std::endl;	
 }
-
-/* int main(int argc, char *argv[]) {
-	int num_elements = 100000;
-	int runs = 10;
-
-	print_tree_performance(num_elements, runs);
-
-	return 0;
-} */
